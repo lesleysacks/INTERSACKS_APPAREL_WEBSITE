@@ -1,0 +1,217 @@
+/* ============================================================
+   INTERSACKS APPAREL — responsive.css
+   Mobile First → Tablet → Desktop
+============================================================ */
+
+/* ── Tablet: max 1024px ────────────────────────────────────── */
+@media (max-width: 1024px) {
+
+  /* Product grid: 2 columns */
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Features: 2 columns */
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Contact: 2 columns */
+  .contact-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Featured Drop: stack */
+  .drop-inner {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .drop-img-ph {
+    max-height: 450px;
+    aspect-ratio: unset;
+  }
+
+  /* About: stack */
+  .about-inner {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .about-img-ph {
+    max-height: 400px;
+    aspect-ratio: unset;
+  }
+
+  .about-text .section-title {
+    text-align: center;
+  }
+
+  .about-text {
+    text-align: center;
+  }
+
+  /* Instagram: 2 columns */
+  .insta-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+/* ── Mobile: max 768px ─────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Navbar */
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 75%;
+    max-width: 300px;
+    height: 100vh;
+    background-color: #111;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    border-left: 1px solid #222;
+    transition: right 0.35s ease;
+    z-index: 999;
+  }
+  .nav-links.open {
+    right: 0;
+  }
+  .nav-link {
+    font-size: 1rem;
+    letter-spacing: 3px;
+  }
+  .hamburger {
+    display: flex;
+    z-index: 1000;
+  }
+
+  /* Overlay when menu open */
+  body.menu-open::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 998;
+  }
+
+  /* Hero */
+  .hero-title {
+    font-size: clamp(3.5rem, 18vw, 6rem);
+  }
+
+  /* Product grid: 1 column */
+  .product-grid {
+    grid-template-columns: 1fr;
+    max-width: 360px;
+    margin-inline: auto;
+  }
+
+  /* Features: 1 column */
+  .features-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin-inline: auto;
+  }
+
+  /* Contact: 1 column */
+  .contact-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin-inline: auto;
+  }
+
+  /* Drop */
+  .drop-title {
+    font-size: 3rem;
+  }
+
+  /* Footer */
+  .footer-top {
+    flex-direction: column;
+    text-align: center;
+    gap: 32px;
+  }
+  .footer-nav {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  /* General section padding */
+  section {
+    padding: 70px 0;
+  }
+
+  /* Back to top */
+  .back-to-top {
+    bottom: 20px;
+    right: 20px;
+  }
+
+}
+
+/* ── Small mobile: max 480px ───────────────────────────────── */
+@media (max-width: 480px) {
+
+  .hero-title {
+    font-size: clamp(3rem, 20vw, 5rem);
+    letter-spacing: 3px;
+  }
+
+  .hero-tagline {
+    letter-spacing: 5px;
+  }
+
+  .btn {
+    padding: 12px 28px;
+    font-size: 0.8rem;
+  }
+
+  .section-title {
+    font-size: 2.2rem;
+  }
+
+  .banner-title {
+    font-size: 2.2rem;
+  }
+
+  .drop-title {
+    font-size: 2.5rem;
+  }
+
+  /* Instagram: 2 tight columns */
+  .insta-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+  }
+
+}
+
+/* ── Reduced Motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .scroll-line,
+  .scarcity-dot {
+    animation: none;
+  }
+  [data-animate],
+  .product-card,
+  .feature-card,
+  .contact-card {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
