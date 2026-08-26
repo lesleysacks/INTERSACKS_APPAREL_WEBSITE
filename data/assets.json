@@ -1,0 +1,1266 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/build-asset-manifest.py",
+  "assets": [
+    {
+      "id": "design-source-001",
+      "type": "design-source",
+      "source": "assets/Designs/0ceea4478c03705b4283b673023e1450.jpg",
+      "sha256": "b2d8e773da12a8ffe2ce342f9a306345adbfcd4cc797f182afcadb3d6519720c",
+      "width": 768,
+      "height": 1344,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "000f2100011f3e7c",
+      "dhash": "f93e43d1cbb2e4e0"
+    },
+    {
+      "id": "design-source-002",
+      "type": "design-source",
+      "source": "assets/Designs/104e5a912c34fd6898133b672a492a89.jpg",
+      "sha256": "6564cf9dafbfe726dacd6beaf3f7ae79e0a030019799f766970b710c0a502b1d",
+      "width": 736,
+      "height": 736,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "8181cbc38393d3ff",
+      "dhash": "4d33333f2737274f"
+    },
+    {
+      "id": "design-source-003",
+      "type": "design-source",
+      "source": "assets/Designs/185ac590435857a9da23b5b7e50d5b99.jpg",
+      "sha256": "e40000d06c5ca8dc605dd6397982b145b8c28fa3b59a8e2b5a2dc0686bf6383c",
+      "width": 603,
+      "height": 1109,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "fefcf0e080003cf9",
+      "dhash": "10104201164a7081"
+    },
+    {
+      "id": "design-source-004",
+      "type": "design-source",
+      "source": "assets/Designs/1a1bb04ef96cca4968e4442c9401c49e.jpg",
+      "sha256": "6618b36f96ce8cbf03e471733d650327f4aca00b11f63e8d3e219d8eea8a0097",
+      "width": 736,
+      "height": 1308,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ff6a0078ff020000",
+      "dhash": "968aa8aa8aaaaaaa"
+    },
+    {
+      "id": "design-source-005",
+      "type": "design-source",
+      "source": "assets/Designs/2.jpg",
+      "sha256": "d0492951de9a6dcb0a9a1ef2b6555a0429dc5a1f38765f48c92f2454b4392a94",
+      "width": 832,
+      "height": 1040,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "f0e70c001b31363e",
+      "dhash": "45ce983ab26364f2"
+    },
+    {
+      "id": "design-source-006",
+      "type": "design-source",
+      "source": "assets/Designs/210865ccdb490c7bffd0b20d0aabf8c0.jpg",
+      "sha256": "9fc9b11e1d7bae9f2304bb29314095711c1a96c0eceb60d1722f18ccbabedfa9",
+      "width": 1200,
+      "height": 1200,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "fffbe3000000ffff",
+      "dhash": "0006025d595be408"
+    },
+    {
+      "id": "design-source-007",
+      "type": "design-source",
+      "source": "assets/Designs/2f70647aa2391d1f174627eb0437412d.jpg",
+      "sha256": "d15c157761a9365c7423f8739dc952fd946d61df5b50b967d7b1b7d972857740",
+      "width": 512,
+      "height": 913,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "e8bcf8fcdc8080c0",
+      "dhash": "0858403938542300"
+    },
+    {
+      "id": "design-source-008",
+      "type": "design-source",
+      "source": "assets/Designs/3.jpg",
+      "sha256": "d2487ef8ae8e0e4e587032f4c77ea3068b2463a7e1a087c0416c124ba23fa0e9",
+      "width": 736,
+      "height": 1313,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "063792c70f0ef776",
+      "dhash": "ace6349eb63c47e4"
+    },
+    {
+      "id": "design-source-009",
+      "type": "design-source",
+      "source": "assets/Designs/38df9a87233dca6f693907a55ed23c46.jpg",
+      "sha256": "9e958491ba122057d1cfce47cb8a18c9cf9680119c28e944b8c1ef906a30fbae",
+      "width": 736,
+      "height": 1308,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ffe7c38180e1e3ff",
+      "dhash": "6c4c073737074b0d"
+    },
+    {
+      "id": "design-source-010",
+      "type": "design-source",
+      "source": "assets/Designs/4.jpg",
+      "sha256": "9f8cb8ce0c960b2116f6a6ad8ab8a49c0f0b17e7b19a977266baea80045fe786",
+      "width": 1200,
+      "height": 1714,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "38003cbd99ff3e3c",
+      "dhash": "e0e869293336e4f0"
+    },
+    {
+      "id": "design-source-011",
+      "type": "design-source",
+      "source": "assets/Designs/410b3288fe3732e8f27da47a8fbe478d.jpg",
+      "sha256": "e0e5ddef00078c99f34efdd15ccf57cb65e13f616e69623c06f60676f2509148",
+      "width": 626,
+      "height": 626,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "002666261c3c3c18",
+      "dhash": "38ecc4c4717979b2"
+    },
+    {
+      "id": "design-source-012",
+      "type": "design-source",
+      "source": "assets/Designs/41b2ec497924d2e529e5203ab923aa1f.jpg",
+      "sha256": "f7da16448171d4e0c77c0029a54f32934da2832306bc0910efe11fa2d8a2351f",
+      "width": 736,
+      "height": 1132,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "7d6083dedf801e1c",
+      "dhash": "b9c61e3c391b7478"
+    },
+    {
+      "id": "design-source-013",
+      "type": "design-source",
+      "source": "assets/Designs/43847d66a48aa157b606ceaa49f8b386.jpg",
+      "sha256": "74db0a65dd78fa81eddda7a930e488e5ac74b8fe61b78f3bdd9ee88b8dcc89f4",
+      "width": 547,
+      "height": 541,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ffe7c381c991c3e7",
+      "dhash": "2e0f0f171333370e"
+    },
+    {
+      "id": "design-source-014",
+      "type": "design-source",
+      "source": "assets/Designs/4774e8359a7a443c2a00923c0bb19764.jpg",
+      "sha256": "742fe86ae1110b7545560691d26dfdb6fe38cf7b53799c70a0944a9229ee105b",
+      "width": 1198,
+      "height": 1226,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "c38181a1913c3cff",
+      "dhash": "0f27436b69697172"
+    },
+    {
+      "id": "design-source-015",
+      "type": "design-source",
+      "source": "assets/Designs/4cba37fb0760fa6073f9b05260a00a42.jpg",
+      "sha256": "324111941ffc0c85c05a01a70d829c235fdb46c1d67402776605fc46ba32024f",
+      "width": 832,
+      "height": 960,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "207e4648767ddf1e",
+      "dhash": "c4a68c9a8cedb6b6"
+    },
+    {
+      "id": "design-source-016",
+      "type": "design-source",
+      "source": "assets/Designs/4cfed7e87630e3a9e7f03c089546cb34.jpg",
+      "sha256": "33d5f14d6d192c7f822187c757a6f1f2ab574044b58ceda3303a3ee914197eeb",
+      "width": 511,
+      "height": 666,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "001bf3031ffefc00",
+      "dhash": "f8b263332ad48861"
+    },
+    {
+      "id": "design-source-017",
+      "type": "design-source",
+      "source": "assets/Designs/5.jpg",
+      "sha256": "98e98171ceecef4e2307dca0c2ba00d8351467051e8015a06bd7a71a38135b79",
+      "width": 736,
+      "height": 736,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "8181c3c18383c3ff",
+      "dhash": "2b57231d37661696"
+    },
+    {
+      "id": "design-source-018",
+      "type": "design-source",
+      "source": "assets/Designs/5aec2daaddea1c879fa2fa0465ffb314.jpg",
+      "sha256": "c5d144466a9a92056176f6ac19e5cb7b89cec84fca7daeea18084147332ede9d",
+      "width": 736,
+      "height": 1104,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "f18383cdcf9b31bd",
+      "dhash": "43177b191b336949"
+    },
+    {
+      "id": "design-source-019",
+      "type": "design-source",
+      "source": "assets/Designs/61d2bdc94edd88fb2b640eeead1780ab.jpg",
+      "sha256": "2e28764ac06b410f995ec092574a7aad31a49031552371527bed98f26254a8d6",
+      "width": 768,
+      "height": 768,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ffbfe381018183ff",
+      "dhash": "79758f1b33134f78"
+    },
+    {
+      "id": "design-source-020",
+      "type": "design-source",
+      "source": "assets/Designs/6217097dc119e9777c723f95583f0f14.jpg",
+      "sha256": "d80b70b1238f50f96dccd9fe8b84736c09057542e0404dfd0b93b5c607e419bc",
+      "width": 678,
+      "height": 960,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ff00c3c30020ffff",
+      "dhash": "0b45920761cc0c61"
+    },
+    {
+      "id": "design-source-021",
+      "type": "design-source",
+      "source": "assets/Designs/701886b7d23d0efaa953e76e24c514b0.jpg",
+      "sha256": "6a29f57a74aa572ab0535038682b735487d81384f0b1f0396892ee0f1ca868db",
+      "width": 736,
+      "height": 1308,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ff00000000e0f8ff",
+      "dhash": "194513a14d546137"
+    },
+    {
+      "id": "design-source-022",
+      "type": "design-source",
+      "source": "assets/Designs/79d35d4d6b52cef61c053188ebdcf407.jpg",
+      "sha256": "149ed8bbcf4116b3bd8b20ce0e86ade442d3b00d3feaae3d02749f14922cef6f",
+      "width": 360,
+      "height": 360,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "05ff74100e3ef81a",
+      "dhash": "5de2a8a17cf2e0b2"
+    },
+    {
+      "id": "design-source-023",
+      "type": "design-source",
+      "source": "assets/Designs/7d228a53f900d9f652a03571b3a1c75c.jpg",
+      "sha256": "e3632afeb5b12170478441ec750747fafd9d286d7fca0f0c4a0868356c1f65c6",
+      "width": 736,
+      "height": 736,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "001c7e7e7e7e3c00",
+      "dhash": "12f4d4d2a6f8f9b2"
+    },
+    {
+      "id": "design-source-024",
+      "type": "design-source",
+      "source": "assets/Designs/8434d7c9eb841e5d27a66d63870c3f74.jpg",
+      "sha256": "bee304c3f169a400bace2ba2c9260b9ad74aecb69bb9c215837c33811d9015f1",
+      "width": 735,
+      "height": 1003,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ff83c30185c131ff",
+      "dhash": "57270b1f1d8b4967"
+    },
+    {
+      "id": "design-source-025",
+      "type": "design-source",
+      "source": "assets/Designs/8b3e07d634a47bcb523a2576a99ef4c2.jpg",
+      "sha256": "6b1adc0b77b0d3f5ee7dcbf4a5acc334556aea2dda27eea4cc1df8ae87ce85c8",
+      "width": 736,
+      "height": 1308,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ffff2d8b81004fff",
+      "dhash": "102b591b1f39990c"
+    },
+    {
+      "id": "design-source-026",
+      "type": "design-source",
+      "source": "assets/Designs/8e17fe895871602ebffcc9945dc40be2.jpg",
+      "sha256": "2530e7975b185beeca86f80242f2e109d802b8ccce7e03f44dd772f57f3b4e47",
+      "width": 707,
+      "height": 1048,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ff018381818181ff",
+      "dhash": "65575b65432b593b"
+    },
+    {
+      "id": "design-source-027",
+      "type": "design-source",
+      "source": "assets/Designs/8f6fcefed0f858c4e00491ed9b53e500.jpg",
+      "sha256": "ccbbcad4239f2c225f2cb4a165aecd8d2ab7ebdf9721ca981fede675f1cb7581",
+      "width": 650,
+      "height": 1201,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ff8783818181c1f3",
+      "dhash": "b92e2a2b071b0707"
+    },
+    {
+      "id": "design-source-028",
+      "type": "design-source",
+      "source": "assets/Designs/900628fe35995de3003b1f39e8a15afc.jpg",
+      "sha256": "bca0082758436b754e57130594e739f808f5e2a68516a9c8393062e476ee2d3d",
+      "width": 480,
+      "height": 461,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ffc181c7c381a5ef",
+      "dhash": "0c0f1f96376f4d08"
+    },
+    {
+      "id": "design-source-029",
+      "type": "design-source",
+      "source": "assets/Designs/92fbef5fa7dd87df06454563690cc17c.jpg",
+      "sha256": "ed1957e53e3a124286a349bf47754c3c094ab4b3dfcfe25ec4e7e9705cfbbde0",
+      "width": 673,
+      "height": 1200,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "81858d81079ff373",
+      "dhash": "070d3b37363de7e3"
+    },
+    {
+      "id": "design-source-030",
+      "type": "design-source",
+      "source": "assets/Designs/9317c0dba87e936c9793258679d79b6e.jpg",
+      "sha256": "4d099fed8eacbc0f38f3aa0719db5f890f249ea072b9b929eb62d5b7f7af74f5",
+      "width": 753,
+      "height": 686,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "fffff0c48183e7e7",
+      "dhash": "0101011c330f0c4f"
+    },
+    {
+      "id": "design-source-031",
+      "type": "design-source",
+      "source": "assets/Designs/a9dd8910173127cee9518b9385780180.jpg",
+      "sha256": "bcdf22b8ee1233042cf22c83b10ef6fbc2e299f74b41befdddf130ec61cdfffa",
+      "width": 736,
+      "height": 1226,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "022727262626777e",
+      "dhash": "cecececcccceceec"
+    },
+    {
+      "id": "design-source-032",
+      "type": "design-source",
+      "source": "assets/Designs/abeaaeb96e604c9e013397e78e93e288.jpg",
+      "sha256": "2869e2b5e53a74e713e7d56ce2843a29149c2c85941dba4f76e1a05134aa58b1",
+      "width": 736,
+      "height": 736,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "3e7e7c3c3c7e3e10",
+      "dhash": "e4e8cc7079dcf031"
+    },
+    {
+      "id": "design-source-033",
+      "type": "design-source",
+      "source": "assets/Designs/ART_PACKS/ChatGPT Image Jul 20, 2026, 01_21_03 AM.png",
+      "sha256": "fb9fa20f9fece559b8dfab08415e9e62917701daf5e4e2308f036dfe5a419acb",
+      "width": 1024,
+      "height": 1024,
+      "format": "PNG",
+      "transparent": true,
+      "ahash": "387efec9817e7c38",
+      "dhash": "f0c6961327f0e0f0"
+    },
+    {
+      "id": "design-source-034",
+      "type": "design-source",
+      "source": "assets/Designs/b9c1055add2f70b517e2e4b9c2cb710e.jpg",
+      "sha256": "4bf338deff915218ec3082fe1ce6e146fd69bc48a2621cabdbd6c4bb11d2baf4",
+      "width": 1150,
+      "height": 932,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ffe7e7e1c181c3c7",
+      "dhash": "0d4c0f4b11131616"
+    },
+    {
+      "id": "design-source-035",
+      "type": "design-source",
+      "source": "assets/Designs/ba848dfb063deb99fa0d27f576dd7be6.jpg",
+      "sha256": "c73ad2a976f1776c1b2a8277be9c861f4719ab7f88a8c7fc31fbffbb47b07384",
+      "width": 756,
+      "height": 1344,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ffc3c3818181c3ff",
+      "dhash": "171f37332b275bc7"
+    },
+    {
+      "id": "design-source-036",
+      "type": "design-source",
+      "source": "assets/Designs/c0a17b20fbd83b6a0b96f8f2b154495b.jpg",
+      "sha256": "c4b35a55022bf558fa73e3fbdbbc76e41ec49d5bf9ea8e1e312609733a6d6269",
+      "width": 1200,
+      "height": 2133,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "00420846cf18ff7e",
+      "dhash": "b696b894bb71b3cc"
+    },
+    {
+      "id": "design-source-037",
+      "type": "design-source",
+      "source": "assets/Designs/c2d72669feb4303a398b54a9bff14357.jpg",
+      "sha256": "16180e7439901e16bf2850b42582d1f4f6a429c70a23f52ee956d2d420ca43e7",
+      "width": 960,
+      "height": 960,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "fffff9e1800000ff",
+      "dhash": "031043073d315a7a"
+    },
+    {
+      "id": "design-source-038",
+      "type": "design-source",
+      "source": "assets/Designs/c39314c8bf0e0e06a61058a4b50163da.jpg",
+      "sha256": "e6bb914fbc13896cb0e19cf0635630eb730a7fbb1a510a25a2d2e76ef0f507dc",
+      "width": 736,
+      "height": 1104,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ffb9f181818189c3",
+      "dhash": "6b4b61232b232b17"
+    },
+    {
+      "id": "design-source-039",
+      "type": "design-source",
+      "source": "assets/Designs/c7ba146fa0f0f376177e2b7f32f6495e.jpg",
+      "sha256": "038cccffe11b8cc062de84569712c09a10bd6c0c2f078a678c82ccbc48a992b6",
+      "width": 1200,
+      "height": 2133,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "00007eff3c7fff00",
+      "dhash": "a800aeaac8e8aa00"
+    },
+    {
+      "id": "design-source-040",
+      "type": "design-source",
+      "source": "assets/Designs/c8792f0286f156be8719539bbb3b3e46.jpg",
+      "sha256": "3a55dad015b77645c96bfa9c9556f5ee7a509fd041781c65c77dab4f6814061e",
+      "width": 736,
+      "height": 1308,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "8ec6e2850c80abff",
+      "dhash": "7a3e160d69155336"
+    },
+    {
+      "id": "design-source-041",
+      "type": "design-source",
+      "source": "assets/Designs/CAPS/ChatGPT Image Jul 20, 2026, 02_50_30 AM.png",
+      "sha256": "0b077c83bb120b5b5fb251c69c725586e3975c7d6ce7aea6067dc3e2469ba7d5",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "007e76e262663c10",
+      "dhash": "86cece8e8ecce871"
+    },
+    {
+      "id": "design-source-042",
+      "type": "design-source",
+      "source": "assets/Designs/dcc13fb91b7a8b4d114cba7e588c98d8.jpg",
+      "sha256": "b47045467761024562d99b515141702fdc87d7b806550b69648f2be963e5633f",
+      "width": 1200,
+      "height": 1200,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "fffbe3818183ffff",
+      "dhash": "1006061927650025"
+    },
+    {
+      "id": "design-source-043",
+      "type": "design-source",
+      "source": "assets/Designs/ddc04068f181bfd8b41b7517022b71a4.jpg",
+      "sha256": "9d47f5f11fd72362ae2a0fc06eed5bee991358fade5adfe5a843d560bd1fedb5",
+      "width": 736,
+      "height": 1307,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "00002cfefe7c0000",
+      "dhash": "8001d4bcb4f801a0"
+    },
+    {
+      "id": "design-source-044",
+      "type": "design-source",
+      "source": "assets/Designs/download (1).png",
+      "sha256": "b3fb5656db1a4025aa3a39992863de1f8422a843e224516f2c5ed241e36a8a40",
+      "width": 1152,
+      "height": 2048,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "0000063eff7d607e",
+      "dhash": "5cbc8c78e4c9cdce"
+    },
+    {
+      "id": "design-source-045",
+      "type": "design-source",
+      "source": "assets/Designs/download (2).png",
+      "sha256": "8617e027d9070bad2f37098c59e09dd1818d6af11bcef176ac1ec1cd5e3fc0a2",
+      "width": 300,
+      "height": 150,
+      "format": "PNG",
+      "transparent": true,
+      "ahash": "ffffffffffffffff",
+      "dhash": "0000000000000000"
+    },
+    {
+      "id": "design-source-046",
+      "type": "design-source",
+      "source": "assets/Designs/download (3).png",
+      "sha256": "abca39eff96161ee8a62018e52d76552e2b4e1ac0916d1a436163e4f3e14a765",
+      "width": 1152,
+      "height": 2048,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ffcf8f8f8703cfff",
+      "dhash": "1b9b1b1f1f1f1b93"
+    },
+    {
+      "id": "design-source-047",
+      "type": "design-source",
+      "source": "assets/Designs/download (4).png",
+      "sha256": "0458222d508b561c98c1b74dce8ab35dde53a5791f25f8e0a9ebb653e0f2e0f9",
+      "width": 1152,
+      "height": 2048,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ff8381918181c3ff",
+      "dhash": "0f33372b2b0b0b15"
+    },
+    {
+      "id": "design-source-048",
+      "type": "design-source",
+      "source": "assets/Designs/download.png",
+      "sha256": "4e868ea16bfd89b6cbe61d7240578174f1b6f61fad4a001b7126543c677df144",
+      "width": 1152,
+      "height": 2048,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "0000fffffffd0000",
+      "dhash": "55aa29529a71758a"
+    },
+    {
+      "id": "design-source-049",
+      "type": "design-source",
+      "source": "assets/Designs/e72a20fd85f19d804f6bef00e7518179.jpg",
+      "sha256": "fb9d783bf6afbc9c172be99a48908948eae3b488e611491b150daf391e69a174",
+      "width": 474,
+      "height": 711,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "fffff0c08080bfff",
+      "dhash": "004501092d176310"
+    },
+    {
+      "id": "design-source-050",
+      "type": "design-source",
+      "source": "assets/Designs/f98a975d6804ffc745270de2efc0cb51.jpg",
+      "sha256": "d12dd57a774c5321cea7eb09e846a2988437a4af235c508b779e4902138ab37b",
+      "width": 729,
+      "height": 1168,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "e7c38181009081ef",
+      "dhash": "0e0f331f5575331e"
+    },
+    {
+      "id": "design-source-051",
+      "type": "design-source",
+      "source": "assets/Designs/FULL_OUTFITS/ChatGPT Image Jul 20, 2026, 01_42_43 AM.png",
+      "sha256": "eea1fe3e4c8137316a67cfcc2f01783aa59e4d7710964c9e832d5e6991580412",
+      "width": 1122,
+      "height": 1402,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "8f9a9e9e8c9c989f",
+      "dhash": "16343434343d3133"
+    },
+    {
+      "id": "design-source-052",
+      "type": "design-source",
+      "source": "assets/Designs/FULL_OUTFITS/ChatGPT Image Jul 20, 2026, 01_49_34 AM.png",
+      "sha256": "5bead90c7a80d99a4706209bfb23893d18526c98bb28bee69be6ac0262cbe51a",
+      "width": 1122,
+      "height": 1402,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "0f0dc141c143137f",
+      "dhash": "dc999b9b9bab67f6"
+    },
+    {
+      "id": "design-source-053",
+      "type": "design-source",
+      "source": "assets/Designs/FULL_OUTFITS/ChatGPT Image Jul 20, 2026, 01_53_03 AM.png",
+      "sha256": "7989553d45d557da57dd9ace6e8e43ce5b7e54bd3c8eece6e89da07789c0df4d",
+      "width": 1122,
+      "height": 1402,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "004cc3c3cb41033f",
+      "dhash": "5c999b1b9bbb67f7"
+    },
+    {
+      "id": "design-source-054",
+      "type": "design-source",
+      "source": "assets/Designs/hiphop animation.jpg",
+      "sha256": "46da69a77a32ea28ad02a10fc0ebaa058c4baa24961d3206f2f01a02f85bb944",
+      "width": 736,
+      "height": 1308,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "ff81010185c7e7ff",
+      "dhash": "493367551d4d4d21"
+    },
+    {
+      "id": "design-source-055",
+      "type": "design-source",
+      "source": "assets/Designs/LOGOS/494270673_708313071721779_281460282416568802_n.jpg",
+      "sha256": "67891d388a89a5ff5b8236d91fbb7ca77c2fd1b898400dbd6de28cbd0ebb3cf1",
+      "width": 200,
+      "height": 200,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "000000ffffcb0000",
+      "dhash": "a000b8fa6d1a0012"
+    },
+    {
+      "id": "design-source-056",
+      "type": "design-source",
+      "source": "assets/Designs/LOGOS/images.jpg",
+      "sha256": "55f7c879555e2f90b0a12108c156a43485203cc5b324d95f595c6c1798a422eb",
+      "width": 447,
+      "height": 447,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "007effeb627e7e24",
+      "dhash": "70ecba9696c6cccc"
+    },
+    {
+      "id": "design-source-057",
+      "type": "design-source",
+      "source": "assets/Designs/Pants_designs/ChatGPT Image Jul 20, 2026, 12_58_34 AM.png",
+      "sha256": "2fce48a73b2f2a3de4a6b3966d2003a278f2ce006cd176eafb5308e7265c4514",
+      "width": 1122,
+      "height": 1402,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "dbc9c9c1c1c1c3c3",
+      "dhash": "9313131303238796"
+    },
+    {
+      "id": "design-source-058",
+      "type": "design-source",
+      "source": "assets/Designs/plain black tshirt.png",
+      "sha256": "32976132cbdbb06b217ce56a1e37f2aec6fc08cc91f18e4d1c181d2ad9cfb551",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "c3c3c3c3c30181e7",
+      "dhash": "1717171717692b16"
+    },
+    {
+      "id": "design-source-059",
+      "type": "design-source",
+      "source": "assets/Designs/plain white tshirt.png",
+      "sha256": "ebba1f7ac417e282e262fb498029b181f1c5e6a29e11efc4a2f4d98737389ea7",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "c3c3c3c3c181c1ef",
+      "dhash": "0313032223610316"
+    },
+    {
+      "id": "design-source-060",
+      "type": "design-source",
+      "source": "assets/Designs/Screenshot 2026-08-26 210744.png",
+      "sha256": "369129a33b248de8249037fa8bd2688690927a56a5c2be203d14b0801f4176d0",
+      "width": 930,
+      "height": 270,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "e3818381818181ff",
+      "dhash": "0b2b2b333b2b2b0f"
+    },
+    {
+      "id": "design-source-061",
+      "type": "design-source",
+      "source": "assets/Designs/Skirt_designs/7423ff05d4d4e60b141cc6dc9a3ff9fc.jpg",
+      "sha256": "01e8036ccab6314f04db3556a07d2c80cefcc7d9284a0d6c546115b77c5f80e3",
+      "width": 1080,
+      "height": 1349,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "e763137868f2e1c1",
+      "dhash": "8fc7a7dbdae68793"
+    },
+    {
+      "id": "design-source-062",
+      "type": "design-source",
+      "source": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 01_28_32 AM.png",
+      "sha256": "067b40ac81eb4d19b6c77b8ed740d70ebe32094c3d17cbead0590e8b5ed6346c",
+      "width": 1122,
+      "height": 1402,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ffc3c3c3c3c3c3e7",
+      "dhash": "26969e973f3b9696"
+    },
+    {
+      "id": "design-source-063",
+      "type": "design-source",
+      "source": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 01_35_02 AM.png",
+      "sha256": "489a4b762645f1c54983079cae97b48720b757321411e5aa0c06aefab9b32db7",
+      "width": 1122,
+      "height": 1402,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ffc3c3c3c3c1c3e7",
+      "dhash": "069696972b2b9f96"
+    },
+    {
+      "id": "design-source-064",
+      "type": "design-source",
+      "source": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 12_41_45 AM.png",
+      "sha256": "f8913d3cf53279f519022546b5aa5580a497cce1187330e0463637d7bb51b51f",
+      "width": 1024,
+      "height": 1536,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "00c1c3e3c3f7efe7",
+      "dhash": "6487938686948cc8"
+    },
+    {
+      "id": "design-source-065",
+      "type": "design-source",
+      "source": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 12_42_27 AM.png",
+      "sha256": "8098cc86fe6308644060fa68a063a74f24f0a8709c6845898dd3b34455b90614",
+      "width": 1024,
+      "height": 1536,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ff83c3c3c3c3c7ff",
+      "dhash": "17270716068e9696"
+    },
+    {
+      "id": "design-source-066",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/0ba4bced50054d38ccd3b83f237e3e60.jpg",
+      "sha256": "b271fc3715ef8ca651a18ccaf79a6c58874055d99d7501cac8a5c962ac0c932d",
+      "width": 1200,
+      "height": 1598,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "0fccf8d8ccdc783e",
+      "dhash": "9cb8a1b9b9bde162"
+    },
+    {
+      "id": "design-source-067",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/96235ecb662d6b17652af38a19ee3d5e.jpg",
+      "sha256": "7a9d85115d6c73a69db7c8880ca9fbbe43c51645d631e72874b5bb1b2c79f115",
+      "width": 1000,
+      "height": 1000,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "7270383f1f8f8fe7",
+      "dhash": "e66445657a3a2ccc"
+    },
+    {
+      "id": "design-source-068",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/black shirt.png",
+      "sha256": "5275074a1800e8a62e3af97b205c6669a2d542684fb69f281e00b4a5a6643595",
+      "width": 1322,
+      "height": 1190,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "c3c3c3c3810081c3",
+      "dhash": "232b3b3335492b17"
+    },
+    {
+      "id": "design-source-069",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/ChatGPT Image Jul 20, 2026, 02_00_16 AM.png",
+      "sha256": "59fd62c6c27cc4abc9642318bb7df3ed7674a10cafa6e65a64c95a16f507ed42",
+      "width": 1182,
+      "height": 1331,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "8181c3c3d38181c3",
+      "dhash": "3b3333172b691733"
+    },
+    {
+      "id": "design-source-070",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/ChatGPT Image Jul 20, 2026, 02_03_42 AM.png",
+      "sha256": "9f8c14a76b1a423a871a122b35b88a2b1febbd4fae18ab07de80b793fcbc7d08",
+      "width": 1215,
+      "height": 1295,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "c38181c3813081c7",
+      "dhash": "2b332b3337692b17"
+    },
+    {
+      "id": "design-source-071",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/ChatGPT Image Jul 20, 2026, 02_47_40 AM.png",
+      "sha256": "9d0d7ed6c11175e9d5756e2fefa72fcd9b827fec8f677b41bcdde5ad1256d4a9",
+      "width": 1086,
+      "height": 1448,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "000b0b6a6f6f0800",
+      "dhash": "d3daded2cadad2f4"
+    },
+    {
+      "id": "design-source-072",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/ChatGPT Image Jul 20, 2026, 02_54_42 AM.png",
+      "sha256": "14da1d7d95baed6bf442b7f1c0d634885c3ffcac131ae3ed3f4a9ddd7338f888",
+      "width": 1199,
+      "height": 1312,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "000e0a686e7efc00",
+      "dhash": "defcd2d8c8d88888"
+    },
+    {
+      "id": "design-source-073",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/ChatGPT Image Jul 20, 2026, 12_46_31 AM.png",
+      "sha256": "2e721874b5867d608dd24b2a96aa64d0affd9d43e2ab1a187fd055365186c074",
+      "width": 1301,
+      "height": 1209,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ff00008d918181ff",
+      "dhash": "2b17597971332b17"
+    },
+    {
+      "id": "design-source-074",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/ChatGPT Image Jul 20, 2026, 12_46_54 AM.png",
+      "sha256": "4012ecff5fcaca155bb7aceb7f347c3784df00df388974d03378b1d74ea3ed4d",
+      "width": 1301,
+      "height": 1209,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ffffb383c3a7dfff",
+      "dhash": "231967060f4d3316"
+    },
+    {
+      "id": "design-source-075",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/Untitled design.png",
+      "sha256": "c83481300557c120fd16e23cb38eb83a1c097f4def4d639b5fdc0d3a2638c7d8",
+      "width": 1414,
+      "height": 2000,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ffffffc381c1ffff",
+      "dhash": "0121590f1b074619"
+    },
+    {
+      "id": "design-source-076",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/white long sleeve.png",
+      "sha256": "fc17990aa8b441c0e158c14b601cbb1c0eb1e98755804cf5d7fea79435455dc0",
+      "width": 1185,
+      "height": 1327,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ffc38383c3c3d7ff",
+      "dhash": "4f0e2b37171f2f33"
+    },
+    {
+      "id": "design-source-077",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/white shirt.png",
+      "sha256": "8de009c065ee636509c279997ea389d9196b2f075969565396d46039d67e1e71",
+      "width": 1122,
+      "height": 1402,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ffc3c3c3c3c7ffff",
+      "dhash": "3b17071e0f0e530f"
+    },
+    {
+      "id": "design-source-078",
+      "type": "design-source",
+      "source": "assets/Designs/tshirt_designs/white tshirt.png",
+      "sha256": "c9545e1d1a0503a9b657e7c9ad6bf11804063258706c3ffc96e8f70d3776f90c",
+      "width": 1341,
+      "height": 1173,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "c3c3c3c3c3c3f7ff",
+      "dhash": "0f960e8e1f8e8613"
+    },
+    {
+      "id": "design-source-079",
+      "type": "design-source",
+      "source": "assets/Designs/WhatsApp Image 2026-07-20 at 16.09.56.jpeg",
+      "sha256": "0a77c29d81c44f02d78a0286089bb9757743c570271c43964c1b364f8de00a08",
+      "width": 738,
+      "height": 1600,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "02ffff00008080ff",
+      "dhash": "5647b19131352412"
+    },
+    {
+      "id": "product-source-001",
+      "type": "product-source",
+      "source": "assets/products/pantherPJ_longsleeve(blue&black) (2).png",
+      "sha256": "14da1d7d95baed6bf442b7f1c0d634885c3ffcac131ae3ed3f4a9ddd7338f888",
+      "width": 1199,
+      "height": 1312,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "000e0a686e7efc00",
+      "dhash": "defcd2d8c8d88888"
+    },
+    {
+      "id": "product-source-002",
+      "type": "product-source",
+      "source": "assets/products/pantherPJ_Vest(blue&black) (1).png",
+      "sha256": "9d0d7ed6c11175e9d5756e2fefa72fcd9b827fec8f677b41bcdde5ad1256d4a9",
+      "width": 1086,
+      "height": 1448,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "000b0b6a6f6f0800",
+      "dhash": "d3daded2cadad2f4"
+    },
+    {
+      "id": "product-source-003",
+      "type": "product-source",
+      "source": "assets/products/product-1.png",
+      "sha256": "eea1fe3e4c8137316a67cfcc2f01783aa59e4d7710964c9e832d5e6991580412",
+      "width": 1122,
+      "height": 1402,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "8f9a9e9e8c9c989f",
+      "dhash": "16343434343d3133"
+    },
+    {
+      "id": "product-source-004",
+      "type": "product-source",
+      "source": "assets/products/product-2.png",
+      "sha256": "fc17990aa8b441c0e158c14b601cbb1c0eb1e98755804cf5d7fea79435455dc0",
+      "width": 1185,
+      "height": 1327,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ffc38383c3c3d7ff",
+      "dhash": "4f0e2b37171f2f33"
+    },
+    {
+      "id": "product-source-005",
+      "type": "product-source",
+      "source": "assets/products/product-3.png",
+      "sha256": "2e721874b5867d608dd24b2a96aa64d0affd9d43e2ab1a187fd055365186c074",
+      "width": 1301,
+      "height": 1209,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ff00008d918181ff",
+      "dhash": "2b17597971332b17"
+    },
+    {
+      "id": "product-source-006",
+      "type": "product-source",
+      "source": "assets/products/product-4.jpg",
+      "sha256": "7a9d85115d6c73a69db7c8880ca9fbbe43c51645d631e72874b5bb1b2c79f115",
+      "width": 1000,
+      "height": 1000,
+      "format": "JPEG",
+      "transparent": false,
+      "ahash": "7270383f1f8f8fe7",
+      "dhash": "e66445657a3a2ccc"
+    },
+    {
+      "id": "product-source-007",
+      "type": "product-source",
+      "source": "assets/products/product-5.png",
+      "sha256": "8de009c065ee636509c279997ea389d9196b2f075969565396d46039d67e1e71",
+      "width": 1122,
+      "height": 1402,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ffc3c3c3c3c7ffff",
+      "dhash": "3b17071e0f0e530f"
+    },
+    {
+      "id": "product-source-008",
+      "type": "product-source",
+      "source": "assets/products/product-6.png",
+      "sha256": "8098cc86fe6308644060fa68a063a74f24f0a8709c6845898dd3b34455b90614",
+      "width": 1024,
+      "height": 1536,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "ff83c3c3c3c3c7ff",
+      "dhash": "17270716068e9696"
+    },
+    {
+      "id": "product-source-009",
+      "type": "product-source",
+      "source": "assets/products/product-7.png",
+      "sha256": "9f8c14a76b1a423a871a122b35b88a2b1febbd4fae18ab07de80b793fcbc7d08",
+      "width": 1215,
+      "height": 1295,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "c38181c3813081c7",
+      "dhash": "2b332b3337692b17"
+    },
+    {
+      "id": "product-source-010",
+      "type": "product-source",
+      "source": "assets/products/product-8.png",
+      "sha256": "7989553d45d557da57dd9ace6e8e43ce5b7e54bd3c8eece6e89da07789c0df4d",
+      "width": 1122,
+      "height": 1402,
+      "format": "PNG",
+      "transparent": false,
+      "ahash": "004cc3c3cb41033f",
+      "dhash": "5c999b1b9bbb67f7"
+    }
+  ],
+  "exactDuplicateGroups": [
+    [
+      "assets/Designs/FULL_OUTFITS/ChatGPT Image Jul 20, 2026, 01_42_43 AM.png",
+      "assets/products/product-1.png"
+    ],
+    [
+      "assets/Designs/FULL_OUTFITS/ChatGPT Image Jul 20, 2026, 01_53_03 AM.png",
+      "assets/products/product-8.png"
+    ],
+    [
+      "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 12_42_27 AM.png",
+      "assets/products/product-6.png"
+    ],
+    [
+      "assets/Designs/tshirt_designs/96235ecb662d6b17652af38a19ee3d5e.jpg",
+      "assets/products/product-4.jpg"
+    ],
+    [
+      "assets/Designs/tshirt_designs/ChatGPT Image Jul 20, 2026, 02_03_42 AM.png",
+      "assets/products/product-7.png"
+    ],
+    [
+      "assets/Designs/tshirt_designs/ChatGPT Image Jul 20, 2026, 02_47_40 AM.png",
+      "assets/products/pantherPJ_Vest(blue&black) (1).png"
+    ],
+    [
+      "assets/Designs/tshirt_designs/ChatGPT Image Jul 20, 2026, 02_54_42 AM.png",
+      "assets/products/pantherPJ_longsleeve(blue&black) (2).png"
+    ],
+    [
+      "assets/Designs/tshirt_designs/ChatGPT Image Jul 20, 2026, 12_46_31 AM.png",
+      "assets/products/product-3.png"
+    ],
+    [
+      "assets/Designs/tshirt_designs/white long sleeve.png",
+      "assets/products/product-2.png"
+    ],
+    [
+      "assets/Designs/tshirt_designs/white shirt.png",
+      "assets/products/product-5.png"
+    ]
+  ],
+  "possibleVisualDuplicates": [
+    {
+      "left": "assets/Designs/104e5a912c34fd6898133b672a492a89.jpg",
+      "right": "assets/Designs/5.jpg",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/8e17fe895871602ebffcc9945dc40be2.jpg",
+      "right": "assets/Designs/Screenshot 2026-08-26 210744.png",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/ba848dfb063deb99fa0d27f576dd7be6.jpg",
+      "right": "assets/Designs/download (4).png",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/FULL_OUTFITS/ChatGPT Image Jul 20, 2026, 01_49_34 AM.png",
+      "right": "assets/Designs/FULL_OUTFITS/ChatGPT Image Jul 20, 2026, 01_53_03 AM.png",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/FULL_OUTFITS/ChatGPT Image Jul 20, 2026, 01_49_34 AM.png",
+      "right": "assets/products/product-8.png",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/plain black tshirt.png",
+      "right": "assets/Designs/plain white tshirt.png",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/plain black tshirt.png",
+      "right": "assets/Designs/tshirt_designs/black shirt.png",
+      "distance": 5,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 01_28_32 AM.png",
+      "right": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 01_35_02 AM.png",
+      "distance": 1,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 01_28_32 AM.png",
+      "right": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 12_42_27 AM.png",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 01_28_32 AM.png",
+      "right": "assets/products/product-6.png",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 01_35_02 AM.png",
+      "right": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 12_42_27 AM.png",
+      "distance": 5,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 01_35_02 AM.png",
+      "right": "assets/products/product-6.png",
+      "distance": 5,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 12_42_27 AM.png",
+      "right": "assets/Designs/tshirt_designs/white long sleeve.png",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 12_42_27 AM.png",
+      "right": "assets/Designs/tshirt_designs/white shirt.png",
+      "distance": 5,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 12_42_27 AM.png",
+      "right": "assets/products/product-2.png",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/Skirt_designs/ChatGPT Image Jul 20, 2026, 12_42_27 AM.png",
+      "right": "assets/products/product-5.png",
+      "distance": 5,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/tshirt_designs/white long sleeve.png",
+      "right": "assets/Designs/tshirt_designs/white shirt.png",
+      "distance": 5,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/tshirt_designs/white long sleeve.png",
+      "right": "assets/products/product-5.png",
+      "distance": 5,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/tshirt_designs/white long sleeve.png",
+      "right": "assets/products/product-6.png",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/tshirt_designs/white shirt.png",
+      "right": "assets/products/product-2.png",
+      "distance": 5,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/Designs/tshirt_designs/white shirt.png",
+      "right": "assets/products/product-6.png",
+      "distance": 5,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/products/product-2.png",
+      "right": "assets/products/product-5.png",
+      "distance": 5,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/products/product-2.png",
+      "right": "assets/products/product-6.png",
+      "distance": 4,
+      "status": "review-required"
+    },
+    {
+      "left": "assets/products/product-5.png",
+      "right": "assets/products/product-6.png",
+      "distance": 5,
+      "status": "review-required"
+    }
+  ],
+  "brokenFiles": [],
+  "unsupportedFiles": [
+    "assets/Designs/FULL_OUTFITS/PROMPT.txt"
+  ]
+}

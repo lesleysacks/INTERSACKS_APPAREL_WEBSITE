@@ -11,8 +11,23 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  /* Garment grid: 2 columns */
+  .garment-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Design grid: 3 columns */
+  .design-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
   /* Features: 2 columns */
   .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Steps: 2 columns */
+  .steps-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -111,6 +126,23 @@
     margin-inline: auto;
   }
 
+  /* Garment grid: 1 column */
+  .garment-grid {
+    grid-template-columns: 1fr;
+    max-width: 360px;
+    margin-inline: auto;
+  }
+
+  /* Design grid: 2 columns */
+  .design-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Steps: 2 columns */
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+
   /* Features: 1 column */
   .features-grid {
     grid-template-columns: 1fr;
@@ -125,9 +157,35 @@
     margin-inline: auto;
   }
 
+  /* Filter buttons wrap */
+  .design-filters {
+    gap: 8px;
+  }
+
+  .filter-btn {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+  }
+
   /* Drop */
   .drop-title {
     font-size: 3rem;
+  }
+
+  /* Announcement bar */
+  .announcement-bar {
+    font-size: 0.7rem;
+    padding: 10px 12px;
+  }
+
+  /* Hero buttons */
+  .hero-buttons {
+    gap: 12px;
+  }
+
+  .hero-buttons .btn {
+    padding: 12px 24px;
+    font-size: 0.8rem;
   }
 
   /* Footer */
@@ -189,10 +247,51 @@
     font-size: 2.5rem;
   }
 
+  /* Design grid: 1 column */
+  .design-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Garment grid: 1 column */
+  .garment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Steps: 1 column */
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Announcement bar */
+  .announcement-bar {
+    font-size: 0.65rem;
+    padding: 8px 10px;
+    letter-spacing: 1px;
+  }
+
+  /* Hero buttons stack */
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
+  }
+
   /* Instagram: 2 tight columns */
   .insta-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 2px;
+  }
+
+  /* Design card: smaller text */
+  .design-card-name {
+    font-size: 0.85rem;
+  }
+
+  .filter-btn {
+    padding: 6px 12px;
+    font-size: 0.7rem;
   }
 
 }

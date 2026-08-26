@@ -10,36 +10,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const hamburger  = document.getElementById('hamburger');
   const navLinks   = document.getElementById('navLinks');
 
-  hamburger.addEventListener('click', () => {
-    const isOpen = hamburger.classList.toggle('open');
-    navLinks.classList.toggle('open', isOpen);
-    document.body.classList.toggle('menu-open', isOpen);
-    hamburger.setAttribute('aria-expanded', isOpen);
-  });
-
-  // Close menu when a nav link is clicked
-  navLinks.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-      hamburger.classList.remove('open');
-      navLinks.classList.remove('open');
-      document.body.classList.remove('menu-open');
-      hamburger.setAttribute('aria-expanded', false);
+  if (hamburger && navLinks) {
+    hamburger.addEventListener('click', () => {
+      const isOpen = hamburger.classList.toggle('open');
+      navLinks.classList.toggle('open', isOpen);
+      document.body.classList.toggle('menu-open', isOpen);
+      hamburger.setAttribute('aria-expanded', isOpen);
     });
-  });
 
-  // Close menu on outside click
-  document.addEventListener('click', e => {
-    if (
-      navLinks.classList.contains('open') &&
-      !navLinks.contains(e.target) &&
-      !hamburger.contains(e.target)
-    ) {
-      hamburger.classList.remove('open');
-      navLinks.classList.remove('open');
-      document.body.classList.remove('menu-open');
-      hamburger.setAttribute('aria-expanded', false);
-    }
-  });
+    // Close menu when a nav link is clicked
+    navLinks.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        navLinks.classList.remove('open');
+        document.body.classList.remove('menu-open');
+        hamburger.setAttribute('aria-expanded', false);
+      });
+    });
+
+    // Close menu on outside click
+    document.addEventListener('click', e => {
+      if (
+        navLinks.classList.contains('open') &&
+        !navLinks.contains(e.target) &&
+        !hamburger.contains(e.target)
+      ) {
+        hamburger.classList.remove('open');
+        navLinks.classList.remove('open');
+        document.body.classList.remove('menu-open');
+        hamburger.setAttribute('aria-expanded', false);
+      }
+    });
+  }
 
 
   /* ── 2. STICKY NAVBAR ────────────────────────────────────── */
@@ -117,12 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ── 6. BACK TO TOP ──────────────────────────────────────── */
   const backToTop = document.getElementById('backToTop');
 
-  window.addEventListener('scroll', () => {
-    backToTop.classList.toggle('visible', window.scrollY > 400);
-  }, { passive: true });
+  if (backToTop) {
+    window.addEventListener('scroll', () => {
+      backToTop.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
 
-  backToTop.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 
 });
