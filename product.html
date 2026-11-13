@@ -3,192 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Customize your InterSacks Apparel — Choose garment, colour, design and placement." />
-  <title>Customize | InterSacks Apparel</title>
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Customize Your InterSacks | Built Different" />
-  <meta property="og:description" content="Design your custom InterSacks Apparel item." />
+  <meta name="description" content="Customise an InterSacks piece. Choose the garment, colour, size, and Classic Tee artwork, then add it to your bag." />
+  <meta name="color-scheme" content="light dark" />
+  <title>Customise | InterSacks Apparel</title>
+  <link rel="canonical" href="https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/product.html" />
   <meta property="og:type" content="website" />
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/responsive.css" />
-  <link rel="stylesheet" href="css/product.css" />
+  <meta property="og:site_name" content="InterSacks Apparel" />
+  <meta property="og:url" content="https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/product.html" />
+  <meta property="og:title" content="Customise | InterSacks Apparel" />
+  <meta property="og:description" content="Choose a garment, colour, size, and artwork. Pricing updates before you add the piece to your bag." />
+  <meta property="og:image" content="https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/assets/Designs/plain%20black%20tshirt.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Customise | InterSacks Apparel" />
+  <meta name="twitter:description" content="Choose a garment, colour, size, and artwork before you order on WhatsApp." />
+  <meta name="twitter:image" content="https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/assets/Designs/plain%20black%20tshirt.png" />
+  <!-- lcp-preload -->
+  <link rel="preload" href="fonts/bebas-neue-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/plus-jakarta-sans-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/syne-700-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="fonts/faces.css" />
 </head>
-<body>
-
-  <!-- ============================================================
-       NAVBAR
-  ============================================================ -->
-  <nav class="navbar" id="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="nav-logo">
-        <span class="logo-text">INTERSACKS</span>
-      </a>
-
-      <ul class="nav-links" id="navLinks">
-        <li><a href="index.html" class="nav-link">Home</a></li>
-        <li><a href="index.html#garments" class="nav-link">Collections</a></li>
-        <li><a href="index.html#about" class="nav-link">About</a></li>
-        <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-        <li><a href="cart.html" class="nav-link">
-          Cart <span class="cart-badge">0</span>
-        </a></li>
-      </ul>
-
-      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- ============================================================
-       CUSTOMIZER PAGE
-  ============================================================ -->
-  <section class="customizer-page">
-    <div class="container">
-      <div class="customizer-grid">
-        
-        <!-- LEFT SIDE: Preview -->
-        <div class="customizer-preview-section">
-          <div class="preview-header">
-            <h2 class="preview-title">DESIGN YOUR ITEM</h2>
-            <div class="view-toggle">
-              <button class="view-toggle-btn active" data-view="front">FRONT</button>
-              <button class="view-toggle-btn" data-view="back">BACK</button>
-            </div>
-          </div>
-
-          <div class="product-preview-wrapper">
-            <div class="product-preview">
-              <img class="garment-layer" src="assets/products/product-1.png" alt="Garment mockup" onerror="handleImageError(this)">
-              <img class="design-layer" src="assets/Designs/tshirt_designs/black shirt.png" alt="Design overlay" style="display: none; position: absolute; pointer-events: none; object-fit: contain;" onerror="handleImageError(this)">
-            </div>
-          </div>
-
-          <div class="preview-info">
-            <p class="preview-hint">Select garment and design to preview</p>
-          </div>
-        </div>
-
-        <!-- RIGHT SIDE: Customizer Controls -->
-        <div class="customizer-controls-section">
-          
-          <!-- Step 1: Garment Selection -->
-          <div class="customizer-step">
-            <div class="step-header">
-              <h3 class="step-title">Step 1: Choose Your Garment</h3>
-              <span class="step-number">01</span>
-            </div>
-            <div class="garment-selector" id="garmentSelector">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-
-          <!-- Step 2: Colour Selection -->
-          <div class="customizer-step">
-            <div class="step-header">
-              <h3 class="step-title">Step 2: Select Colour</h3>
-              <span class="step-number">02</span>
-            </div>
-            <div class="colour-selector" id="colourSelector">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-
-          <!-- Step 3: Size Selection -->
-          <div class="customizer-step">
-            <div class="step-header">
-              <h3 class="step-title">Step 3: Choose Size</h3>
-              <span class="step-number">03</span>
-            </div>
-            <div class="size-selector" id="sizeSelector">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-
-          <!-- Step 4: Design Selection -->
-          <div class="customizer-step">
-            <div class="step-header">
-              <h3 class="step-title">Step 4: Pick A Design</h3>
-              <span class="step-number">04</span>
-            </div>
-            <div class="design-selector" id="designSelector">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-
-          <!-- Step 5: Placement Selection -->
-          <div class="customizer-step" id="placementStep" style="display: none;">
-            <div class="step-header">
-              <h3 class="step-title">Step 5: Placement</h3>
-              <span class="step-number">05</span>
-            </div>
-            <div class="placement-selector" id="placementSelector">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-
-        </div>
-
-        <!-- SUMMARY (Mobile: Below Preview, Desktop: Right Side) -->
-        <div class="customizer-summary-section">
-          <div class="customizer-summary" id="customizerSummary">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       FOOTER
-  ============================================================ -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h4 class="footer-title">InterSacks Apparel</h4>
-          <p class="footer-text">South African streetwear. Built Different.</p>
-        </div>
-        <div class="footer-section">
-          <h4 class="footer-title">Quick Links</h4>
-          <ul class="footer-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="index.html#garments">Shop</a></li>
-            <li><a href="index.html#about">About</a></li>
-            <li><a href="index.html#contact">Contact</a></li>
-          </ul>
-        </div>
-        <div class="footer-section">
-          <h4 class="footer-title">Legal</h4>
-          <ul class="footer-links">
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2024 InterSacks Apparel. All rights reserved. Built Different.</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Scripts -->
-  <script src="js/data.js"></script>
-  <script src="js/catalogue.js"></script>
-  <script src="js/customizer.js"></script>
-  <script src="js/product.js"></script>
-  <script src="js/app.js"></script>
-
+<body data-page="product">
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

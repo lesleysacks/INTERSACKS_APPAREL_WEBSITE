@@ -5,7 +5,7 @@ Run from the repository root:
     python scripts/build-asset-manifest.py
 
 The script writes data/assets.json and docs/asset-audit.generated.md. Curated
-storefront metadata remains in js/data.js because image recognition cannot
+storefront metadata remains in src/data/catalogue.js because image recognition cannot
 reliably decide whether a file is printable artwork or a product photograph.
 """
 

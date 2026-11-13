@@ -1,0 +1,225 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import {
+  STORE_CONFIG,
+  calculatePrice,
+  filterGarments,
+  formatPrice,
+  getDesigns,
+  getGarments,
+  getPlannedGarments,
+  getPurchasableGarments,
+  sortGarments
+} from '../src/data/catalogue.js'
+import { Cart, createMemoryStorage } from '../src/services/cart.js'
+import { Customizer } from '../src/services/customizer.js'
+import { generateWhatsAppMessage } from '../src/services/orders.js'
+
+test('Baseline: Store configuration matches expected InterSacks brand settings', () => {
+  assert.equal(STORE_CONFIG.brandName, 'InterSacks Apparel')
+  assert.equal(STORE_CONFIG.tagline, 'Built Different.')
+  assert.equal(STORE_CONFIG.currency, 'R')
+  assert.equal(STORE_CONFIG.whatsappNumber, '27843252262')
+})
+
+test('Baseline: Garment catalogue integrity (11 active real products, 18 planned)', () => {
+  const allGarments = getGarments()
+  const realGarments = allGarments.filter((garment) => garment.available !== false)
+  const plannedGarments = allGarments.filter((garment) => garment.available === false)
+
+  assert.equal(allGarments.length, 29, 'Total garments should be 29 (11 real + 18 planned)')
+  assert.equal(realGarments.length, 11, 'Real active garments should be 11')
+  assert.equal(plannedGarments.length, 18, 'Planned garments should be 18')
+
+  realGarments.forEach((garment) => {
+    assert.ok(garment.basePrice > 0, `${garment.id} should have basePrice > 0`)
+    assert.ok(garment.colours.length > 0, `${garment.id} should have at least 1 colour`)
+    assert.ok(garment.sizes.length > 0, `${garment.id} should have at least 1 size`)
+    assert.ok(garment.image, `${garment.id} should have an image`)
+  })
+
+  plannedGarments.forEach((garment) => {
+    assert.equal(garment.available, false, `${garment.id} should be available: false`)
+    assert.equal(garment.basePrice, 0, `${garment.id} basePrice should be 0`)
+  })
+})
+
+test('Baseline: Design catalogue integrity (50 designs in manifest)', () => {
+  const designs = getDesigns()
+  assert.equal(designs.length, 50, 'There should be 50 designs')
+  designs.forEach((design) => {
+    assert.ok(design.id, 'Design must have id')
+    assert.ok(design.name, 'Design must have name')
+    assert.ok(design.image, 'Design must have image')
+    assert.ok(design.category, 'Design must have category')
+  })
+})
+
+test('Baseline: Price calculations for base garments and customized designs', () => {
+  assert.equal(calculatePrice('classic-tee'), 349)
+  assert.equal(formatPrice(349), 'R349')
+  assert.equal(calculatePrice('classic-tee', 'design-001'), 399)
+  assert.equal(calculatePrice('panther-long-sleeve'), 499)
+  assert.equal(calculatePrice('skull-tracksuit'), 899)
+})
+
+test('Baseline: Cart operations (add, remove, quantity update, clear, subtotal)', () => {
+  const cart = new Cart(createMemoryStorage())
+
+  assert.equal(cart.getItemCount(), 0)
+  assert.equal(cart.getSubtotal(), 0)
+  assert.ok(cart.isEmpty())
+
+  cart.addItem({
+    garmentId: 'classic-tee',
+    garmentName: 'Classic Tee',
+    colour: 'Black',
+    size: 'L',
+    designId: 'design-001',
+    designName: 'Midnight Snake',
+    placement: 'front-center',
+    unitPrice: 399,
+    quantity: 1
+  })
+
+  assert.equal(cart.getItemCount(), 1)
+  assert.equal(cart.getSubtotal(), 399)
+  assert.equal(cart.isEmpty(), false)
+
+  cart.addItem({
+    garmentId: 'classic-tee',
+    garmentName: 'Classic Tee',
+    colour: 'Black',
+    size: 'L',
+    designId: 'design-001',
+    designName: 'Midnight Snake',
+    placement: 'front-center',
+    unitPrice: 399,
+    quantity: 2
+  })
+
+  assert.equal(cart.getItemCount(), 3)
+  assert.equal(cart.getSubtotal(), 1197)
+
+  cart.updateQuantity(0, 2)
+  assert.equal(cart.getItemCount(), 2)
+  assert.equal(cart.getSubtotal(), 798)
+
+  cart.removeItem(0)
+  assert.equal(cart.getItemCount(), 0)
+  assert.ok(cart.isEmpty())
+})
+
+test('Baseline: LocalStorage cart persistence', () => {
+  const storage = createMemoryStorage()
+  const cart1 = new Cart(storage)
+  cart1.addItem({
+    garmentId: 'panther-vest',
+    garmentName: 'Panther Vest',
+    colour: 'Blue / Black',
+    size: 'XL',
+    designId: null,
+    designName: 'None',
+    placement: 'N/A',
+    unitPrice: 399,
+    quantity: 1
+  })
+
+  const rawStorage = storage.getItem('intersacks-cart')
+  assert.ok(rawStorage)
+  const parsed = JSON.parse(rawStorage)
+  assert.equal(parsed.length, 1)
+  assert.equal(parsed[0].garmentId, 'panther-vest')
+
+  const cart2 = new Cart(storage)
+  assert.equal(cart2.getItemCount(), 1)
+  assert.equal(cart2.getSubtotal(), 399)
+})
+
+test('Baseline: WhatsApp order message format generation', () => {
+  const cart = new Cart(createMemoryStorage())
+  cart.addItem({
+    garmentId: 'classic-tee',
+    garmentName: 'Classic Tee',
+    colour: 'Black',
+    size: 'M',
+    designId: 'design-001',
+    designName: 'Midnight Snake',
+    placement: 'front-center',
+    unitPrice: 399,
+    quantity: 2
+  })
+
+  const message = generateWhatsAppMessage(cart)
+  assert.ok(message.includes('Hi InterSacks Apparel 👋'))
+  assert.ok(message.includes('2 × Classic Tee'))
+  assert.ok(message.includes('Colour: Black'))
+  assert.ok(message.includes('Size: M'))
+  assert.ok(message.includes('Design: Midnight Snake'))
+  assert.ok(message.includes('Placement: front-center'))
+  assert.ok(message.includes('TOTAL: R798'))
+  assert.ok(message.includes('Name:'))
+  assert.ok(message.includes('Delivery Area:'))
+  assert.ok(message.includes('Built Different.'))
+})
+
+test('Baseline: Customizer state management and price updates', () => {
+  const customizer = new Customizer()
+
+  customizer.setGarment('classic-tee')
+  assert.equal(customizer.selectedGarmentId, 'classic-tee')
+  assert.equal(customizer.selectedColourName, 'Black')
+  assert.equal(customizer.selectedSize, 'S')
+  assert.equal(customizer.getPrice(), 349)
+
+  customizer.setSize('XL')
+  assert.equal(customizer.selectedSize, 'XL')
+
+  customizer.setColour('#f5f5f5', 'White')
+  assert.equal(customizer.selectedColourName, 'White')
+
+  customizer.setDesign('design-001')
+  assert.equal(customizer.selectedDesignId, 'design-001')
+  assert.equal(customizer.selectedPlacement, 'front-small')
+  assert.equal(customizer.getPrice(), 399)
+
+  const cartItem = customizer.createCartItem()
+  assert.equal(cartItem.garmentName, 'Classic Tee')
+  assert.equal(cartItem.colour, 'White')
+  assert.equal(cartItem.size, 'XL')
+  assert.equal(cartItem.designName, 'Midnight Snake')
+  assert.equal(cartItem.unitPrice, 399)
+  assert.equal(cartItem.quantity, 1)
+})
+
+test('Planned garments cannot be selected or purchased', () => {
+  const customizer = new Customizer()
+  customizer.setGarment('oversized-tee')
+  assert.equal(customizer.selectedGarmentId, null)
+  assert.equal(getPlannedGarments().length, 18)
+  assert.throws(() => customizer.createCartItem(), /not available to order/)
+})
+
+test('Shop sort and filter use catalogue fields without mutating the source list', () => {
+  const source = getPurchasableGarments()
+  const before = source.map((garment) => garment.id).join('|')
+  const priced = sortGarments(filterGarments(source, { category: 'T-Shirts', query: 'tee' }), 'price-asc')
+  assert.ok(priced.length >= 2)
+  assert.ok(priced.every((garment) => garment.category === 'T-Shirts'))
+  assert.ok(priced[0].basePrice <= priced[1].basePrice)
+  assert.equal(source.map((garment) => garment.id).join('|'), before)
+})
+
+test('Custom quantity is priced per unit and rejected outside 1 to 10', () => {
+  const customizer = new Customizer()
+  customizer.setGarment('classic-tee')
+  customizer.setQuantity(3)
+  const item = customizer.createCartItem()
+  assert.equal(item.quantity, 3)
+  assert.equal(item.unitPrice, 349)
+
+  const cart = new Cart(createMemoryStorage())
+  cart.addItem(item)
+  assert.equal(cart.getSubtotal(), 1047)
+  assert.throws(() => cart.updateQuantity(0, 11), /1 to 10/)
+})

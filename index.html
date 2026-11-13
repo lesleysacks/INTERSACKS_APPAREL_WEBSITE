@@ -3,385 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="InterSacks Apparel — South African streetwear. Choose your garment, choose your design and create a look built different." />
-  <meta name="keywords" content="streetwear, South Africa, custom apparel, hoodies, oversized t-shirts, InterSacks" />
+  <meta name="description" content="InterSacks Apparel is an independent South African streetwear label. Shop catalogue pieces or customise a Classic Tee, then order on WhatsApp." />
+  <meta name="color-scheme" content="light dark" />
   <title>InterSacks Apparel | Built Different</title>
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="InterSacks Apparel | Built Different" />
-  <meta property="og:description" content="InterSacks Apparel — South African streetwear. Choose your garment, choose your design and create a look built different." />
+  <link rel="canonical" href="https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/" />
   <meta property="og:type" content="website" />
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/responsive.css" />
-  <link rel="stylesheet" href="css/product.css" />
-</head>
-<body>
-
-  <!-- ============================================================
-       ANNOUNCEMENT BAR
-  ============================================================ -->
-  <div class="announcement-bar">
-    <p>NEW DROPS COMING SOON — BUILT DIFFERENT.</p>
-  </div>
-
-  <!-- ============================================================
-       NAVBAR
-  ============================================================ -->
-  <nav class="navbar" id="navbar">
-    <div class="nav-container">
-      <a href="#home" class="nav-logo">
-        <span class="logo-text">INTERSACKS</span>
-      </a>
-
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#home" class="nav-link active">Home</a></li>
-        <li><a href="#garments" class="nav-link">Shop</a></li>
-        <li><a href="#designs" class="nav-link">Designs</a></li>
-        <li><a href="#about" class="nav-link">About</a></li>
-        <li><a href="#contact" class="nav-link">Contact</a></li>
-        <li><a href="cart.html" class="nav-link">
-          Cart <span class="cart-badge">0</span>
-        </a></li>
-      </ul>
-
-      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- ============================================================
-       HERO
-  ============================================================ -->
-  <section class="hero" id="home">
-    <div class="hero-bg"></div>
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <h1 class="hero-title">INTERSACKS<br><span class="hero-title-accent">APPAREL</span></h1>
-      <p class="hero-tagline">Built Different.</p>
-      <p class="hero-sub">Choose your garment. Choose your design. Make it yours.</p>
-      <div class="hero-buttons">
-        <a href="product.html" class="btn btn-primary">START DESIGNING</a>
-        <a href="#designs" class="btn btn-secondary">VIEW DESIGNS</a>
-      </div>
-    </div>
-    <div class="hero-scroll-hint">
-      <span>Scroll</span>
-      <div class="scroll-line"></div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       CURRENT DROP (Featured Drop)
-  ============================================================ -->
-  <section class="featured-drop" id="drop">
-    <div class="container">
-      <div class="section-header">
-        <p class="section-eyebrow">Current Drop</p>
-        <h2 class="section-title">Panther Collection</h2>
-        <p class="section-sub">Only the bold wear it. Original artwork, premium heavyweight cotton, small batch run.</p>
-      </div>
-      <div class="drop-inner">
-        <div class="drop-image">
-          <img id="featuredDropImage" src="" alt="Panther Collection" onerror="handleImageError(this)">
-          <div class="drop-badge">Limited Release</div>
-        </div>
-        <div class="drop-info">
-          <p class="drop-desc">Once it's gone — it's gone. This exclusive run features the iconic Panther design on premium heavyweight cotton in multiple colours and styles.</p>
-          <div class="drop-scarcity">
-            <div class="scarcity-dot"></div>
-            <span>Only Available While Stock Lasts</span>
-          </div>
-          <a href="product.html?garment=panther-long-sleeve" class="btn btn-primary">SHOP THIS DROP</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       SHOP BY GARMENT
-  ============================================================ -->
-  <section class="shop-garments" id="garments">
-    <div class="container">
-      <div class="section-header">
-        <p class="section-eyebrow">The Range</p>
-        <h2 class="section-title">Shop By Product</h2>
-        <p class="section-sub">Shop the current range and preview upcoming InterSacks apparel, accessories and homeware.</p>
-      </div>
-
-      <div class="garment-grid" id="garmentGrid">
-        <!-- Dynamically populated by catalogue.js -->
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       SHOP BY DESIGN
-  ============================================================ -->
-  <section class="featured-designs" id="featured-designs">
-    <div class="container">
-      <div class="section-header">
-        <p class="section-eyebrow">Featured Artwork</p>
-        <h2 class="section-title">Featured Designs</h2>
-        <p class="section-sub">Selected from the same verified design catalogue used by the customizer.</p>
-      </div>
-      <div class="design-grid" id="featuredDesignGrid"></div>
-    </div>
-  </section>
-
-  <section class="shop-designs" id="designs">
-    <div class="container">
-      <div class="section-header">
-        <p class="section-eyebrow">Artwork Collection</p>
-        <h2 class="section-title">Choose Your Design</h2>
-        <p class="section-sub">Curated designs for the bold. Filter, search, or explore all.</p>
-      </div>
-
-      <div class="design-library-controls" id="designFilterContainer">
-        <!-- Dynamically populated filter buttons -->
-      </div>
-
-      <div class="design-grid" id="designGrid">
-        <!-- Dynamically populated by catalogue.js -->
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       HOW IT WORKS
-  ============================================================ -->
-  <section class="how-it-works" id="how">
-    <div class="container">
-      <div class="section-header">
-        <p class="section-eyebrow">Simple Process</p>
-        <h2 class="section-title">How It Works</h2>
-      </div>
-
-      <div class="steps-grid">
-        <div class="step-card" data-animate>
-          <div class="step-number">01</div>
-          <h3 class="step-title">Choose Your Garment</h3>
-          <p class="step-desc">Pick your favourite fit from our range of premium garments.</p>
-        </div>
-        <div class="step-card" data-animate>
-          <div class="step-number">02</div>
-          <h3 class="step-title">Choose Your Design</h3>
-          <p class="step-desc">Select artwork from the InterSacks design library.</p>
-        </div>
-        <div class="step-card" data-animate>
-          <div class="step-number">03</div>
-          <h3 class="step-title">Make It Yours</h3>
-          <p class="step-desc">Choose colour, size and placement for your design.</p>
-        </div>
-        <div class="step-card" data-animate>
-          <div class="step-number">04</div>
-          <h3 class="step-title">Place Your Order</h3>
-          <p class="step-desc">Review your custom item and order via WhatsApp.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       WHY INTERSACKS
-  ============================================================ -->
-  <section class="why-us" id="why">
-    <div class="container">
-      <div class="section-header">
-        <p class="section-eyebrow">The Standard</p>
-        <h2 class="section-title">Why InterSacks</h2>
-      </div>
-
-      <div class="features-grid">
-        <div class="feature-card" data-animate>
-          <div class="feature-icon">◈</div>
-          <h3 class="feature-title">Premium Quality</h3>
-          <p class="feature-desc">Heavy-weight cotton. Structured fits. Garments that hold their shape and feel long after other brands fade.</p>
-        </div>
-        <div class="feature-card" data-animate>
-          <div class="feature-icon">✦</div>
-          <h3 class="feature-title">Unique Designs</h3>
-          <p class="feature-desc">Every piece is built around original artwork. You won't find these graphics anywhere else.</p>
-        </div>
-        <div class="feature-card" data-animate>
-          <div class="feature-icon">◉</div>
-          <h3 class="feature-title">Small Batch Drops</h3>
-          <p class="feature-desc">Limited production runs only. When a piece sells out, it stays sold out. No restocks, no reprints.</p>
-        </div>
-        <div class="feature-card" data-animate>
-          <div class="feature-icon">❋</div>
-          <h3 class="feature-title">Made with Passion</h3>
-          <p class="feature-desc">Built from the ground up in South Africa. Every decision, every design, every drop means something.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       ABOUT
-  ============================================================ -->
-  <section class="about" id="about">
-    <div class="container">
-      <div class="about-inner">
-        <div class="about-img">
-          <img src="assets/hero/hero-bg.jpg" alt="InterSacks Apparel">
-          <div class="img-placeholder about-img-ph">
-            <img src="assets/hero/hero-bg_2.jpg" alt="InterSacks Apparel">
-            <p class="ph-hint"><li><a href="#contact" class="nav-link">TO THE FUTURE...</a></li></p>
-          </div>
-        </div>
-        <div class="about-text">
-          <p class="section-eyebrow">Our Story</p>
-          <h2 class="section-title">Not Fast Fashion.<br>Never Was.</h2>
-          <p>InterSacks Apparel isn't built for the mainstream. It's a growing South African streetwear brand focused on original artwork, quality garments and limited releases.</p>
-          <p>Each drop is designed from scratch — no recycled templates, no generic prints. Just raw creative direction and garments that say something about the person wearing them.</p>
-          <p>If you never blend in, this is your brand.</p>
-          <a href="#garments" class="btn btn-primary">View Collection</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       INSTAGRAM FEED (Placeholder)
-  ============================================================ -->
-  <section class="instagram" id="instagram">
-    <div class="container">
-      <div class="section-header">
-        <p class="section-eyebrow">Follow Along</p>
-        <h2 class="section-title">@InterSacks</h2>
-        <p class="section-sub">Tag us in your fit — we repost the ones that hit.</p>
-      </div>
-      <div class="insta-grid">
-        <!--<a href="https://instagram.com/intersacks"><img src="assets/reviews/review-1.png" alt="Instagram post"></a> -->
-        <div class="insta-item img-placeholder">
-          <span class="ph-label">Post 1</span>
-          <p class="ph-hint"><img src="assets/reviews/review-1.png" alt="Instagram post"></p>
-        </div>
-        <div class="insta-item img-placeholder">
-          <span class="ph-label">Post 2</span>
-          <p class="ph-hint"><img src="assets/reviews/review-2.png" alt="Instagram post"></p>
-        </div>
-        <div class="insta-item img-placeholder">
-          <span class="ph-label">Post 3</span>
-          <p class="ph-hint"><img src="assets/reviews/review-3.png" alt="Instagram post"></p>
-        </div>
-        <div class="insta-item img-placeholder">
-          <span class="ph-label">Post 4</span>
-          <p class="ph-hint"><img src="assets/reviews/review-4.png" alt="Instagram post"></p>
-        </div>
-      </div>
-      <div class="insta-cta">
-        <a href="https://instagram.com/sackslesley/" target="_blank" rel="noopener" class="btn btn-outline">Follow on Instagram</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       CONTACT
-  ============================================================ -->
-  <section class="contact" id="contact">
-    <div class="container">
-      <div class="section-header">
-        <p class="section-eyebrow">Get In Touch</p>
-        <h2 class="section-title">Contact Us</h2>
-        <p class="section-sub">Questions, custom orders, wholesale — reach out on any channel.</p>
-      </div>
-
-      <div class="contact-grid">
-        <a href="mailto:lesleysacks1@gmail.com" class="contact-card" data-animate>
-          <div class="contact-icon"><img src="assets/icons/gmail.png" alt="Email"></div>
-          <h3>Email</h3>
-          <!-- Replace with your actual email -->
-          <p>hello@intersacks.co.za</p>
-        </a>
-        <a href="https://wa.me/27843252262" target="_blank" rel="noopener" class="contact-card" data-animate>
-          <div class="contact-icon"><img src="assets/icons/whatsapp.png" alt="WhatsApp"></div>
-          <h3>WhatsApp</h3>
-          <!-- Replace with your actual WhatsApp number -->
-          <p>+27 000 000 000</p>
-        </a>
-        <a href="https://instagram.com/sackslesley/" target="_blank" rel="noopener" class="contact-card" data-animate>
-          <div class="contact-icon"><img src="assets/icons/instagram.png" alt="Instagram"></div>
-          <h3>Instagram</h3>
-          <!-- Replace with your actual Instagram handle -->
-          <p>@intersacks</p>
-        </a>
-        <a href="https://facebook.com/share/1As4dCE4xn" target="_blank" rel="noopener" class="contact-card" data-animate>
-          <div class="contact-icon"><img src="assets/icons/facebook.png" alt="Facebook"></div>
-          <h3>Facebook</h3>
-          <!-- Replace with your actual Facebook page -->
-          <p>InterSacks Apparel</p>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       FOOTER
-  ============================================================ -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h4 class="footer-title">InterSacks Apparel</h4>
-          <p class="footer-text">South African streetwear. Built Different.</p>
-        </div>
-        <div class="footer-section">
-          <h4 class="footer-title">Quick Links</h4>
-          <ul class="footer-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#garments">Shop</a></li>
-            <li><a href="#designs">Designs</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-          </ul>
-        </div>
-        <div class="footer-section">
-          <h4 class="footer-title">Legal</h4>
-          <ul class="footer-links">
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2024 InterSacks Apparel. All rights reserved. Built Different.</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Back to Top -->
-  <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
-
-  <!-- Scripts -->
-  <script src="js/data.js"></script>
-  <script src="js/catalogue.js"></script>
-  <script src="js/customizer.js"></script>
-  <script src="js/app.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Render dynamic content
-      renderAllGarments('garmentGrid');
-      renderFeaturedDesigns('featuredDesignGrid');
-      initDesignFilter('designFilterContainer', 'designGrid');
-      updateCartBadge();
-      const featuredDrop = getGarmentById('panther-long-sleeve');
-      if (featuredDrop) document.getElementById('featuredDropImage').src = featuredDrop.image;
-
-      // Initialize search
-      initSearch('#designSearchInput', 'designGrid', 'designs');
-    });
+  <meta property="og:site_name" content="InterSacks Apparel" />
+  <meta property="og:url" content="https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/" />
+  <meta property="og:title" content="InterSacks Apparel | Built Different" />
+  <meta property="og:description" content="Independent South African streetwear. Shop the catalogue or customise a Classic Tee. Orders are confirmed on WhatsApp." />
+  <meta property="og:image" content="https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/assets/products/pantherPJ_longsleeve(blue%26black)%20(2).png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="InterSacks Apparel | Built Different" />
+  <meta name="twitter:description" content="Independent South African streetwear. Shop the catalogue or customise a Classic Tee." />
+  <meta name="twitter:image" content="https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/assets/products/pantherPJ_longsleeve(blue%26black)%20(2).png" />
+  <!-- lcp-preload -->
+  <link rel="preload" href="fonts/bebas-neue-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/plus-jakarta-sans-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/syne-700-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="fonts/faces.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ClothingStore",
+    "name": "InterSacks Apparel",
+    "image": "https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/assets/logo/logo.png",
+    "url": "https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/",
+    "telephone": "+27843252262",
+    "priceRange": "R349 - R899",
+    "description": "Independent South African streetwear label. Orders are confirmed on WhatsApp.",
+    "slogan": "Built Different.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "ZA"
+    }
+  }
   </script>
-
+</head>
+<body data-page="home">
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

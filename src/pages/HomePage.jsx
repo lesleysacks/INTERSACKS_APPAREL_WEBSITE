@@ -1,0 +1,276 @@
+import { useMemo, useState } from 'react'
+import { ProductCard } from '../components/ProductCard.jsx'
+import { Photo } from '../components/Photo.jsx'
+import { ExternalLink, Layout, visibleWhatsAppNumber, WHATSAPP_DESK_URL } from '../components/Chrome.jsx'
+import {
+  filterDesigns,
+  filterGarments,
+  formatPrice,
+  getDesignCategories,
+  getDesigns,
+  getFeaturedDesigns,
+  getPlannedGarments,
+  getPriceBreakdown,
+  getPurchasableCategories,
+  getPurchasableGarments,
+  sortGarments
+} from '../data/catalogue.js'
+
+function initialCategory() {
+  const requested = new URLSearchParams(window.location.search).get('category')
+  return getPurchasableCategories().includes(requested) ? requested : 'All'
+}
+
+export function HomePage() {
+  const purchasable = getPurchasableGarments()
+  const categories = getPurchasableCategories()
+  const featured = purchasable.filter((garment) => garment.featured)
+  const hero = purchasable.find((garment) => garment.id === 'panther-long-sleeve') || featured[0]
+  const collections = categories.map((category) => {
+    const items = purchasable.filter((garment) => garment.category === category)
+    return { category, count: items.length, lead: items.find((item) => item.featured) || items[0] }
+  })
+  const [category, setCategory] = useState(initialCategory)
+  const [sort, setSort] = useState('featured')
+  const [query, setQuery] = useState('')
+  const shopItems = sortGarments(filterGarments(purchasable, { category, query }), sort)
+  const [designCategory, setDesignCategory] = useState('All')
+  const [designQuery, setDesignQuery] = useState('')
+  const designs = useMemo(
+    () => filterDesigns(getDesigns(), { category: designCategory, query: designQuery }),
+    [designCategory, designQuery]
+  )
+  const classic = purchasable.find((garment) => garment.id === 'classic-tee')
+  const artworkPrice = getPriceBreakdown('classic-tee', 'design-001').artwork
+
+  return (
+    <Layout current="home">
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="hero-copy">
+          <p className="kicker">South African streetwear</p>
+          <h1 id="hero-title">Built different.</h1>
+          <p className="lede">Heavyweight garments and original artwork from an independent label. Shop the pieces in the catalogue, or start with a plain tee and place a design on it.</p>
+          <div className="hero-actions">
+            <a className="btn" href="#shop">Shop now</a>
+            <a className="btn btn-ghost" href="#collections">Explore collection</a>
+          </div>
+        </div>
+        {hero ? (
+          <figure className="hero-figure">
+            <Photo
+              priority
+              layout="hero"
+              className="hero-photo"
+              src={hero.image}
+              alt={`${hero.name}, ${hero.colours.map((colour) => colour.name).join(', ')}`}
+            />
+            <figcaption>{hero.name} · {formatPrice(hero.basePrice)}</figcaption>
+          </figure>
+        ) : null}
+      </section>
+
+      <section id="collections" className="band" aria-labelledby="collections-title">
+        <div className="wrap">
+          <div className="section-head">
+            <p className="kicker">01 — Collections</p>
+            <h2 id="collections-title">Shop by silhouette</h2>
+          </div>
+          <div className="collection-grid">
+            {collections.map((collection) => (
+              <a key={collection.category} className="collection-tile" href={`index.html?category=${encodeURIComponent(collection.category)}#shop`}>
+                <Photo src={collection.lead.image} alt="" />
+                <span>
+                  <strong>{collection.category}</strong>
+                  <span>{collection.count} {collection.count === 1 ? 'piece' : 'pieces'}</span>
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="band" aria-labelledby="featured-title">
+        <div className="wrap">
+          <div className="section-head">
+            <p className="kicker">02 — Featured</p>
+            <h2 id="featured-title">Pieces from the current catalogue</h2>
+            <p>Marked featured in the catalogue. InterSacks does not publish a sales ranking.</p>
+          </div>
+          <div className="product-grid">
+            {featured.map((garment) => <ProductCard key={garment.id} garment={garment} />)}
+          </div>
+        </div>
+      </section>
+
+      <section id="shop" className="band" aria-labelledby="shop-title">
+        <div className="wrap">
+          <div className="section-head">
+            <p className="kicker">03 — Shop</p>
+            <h2 id="shop-title">Available to order</h2>
+          </div>
+          <search aria-labelledby="shop-title">
+            <form className="filters" onSubmit={(event) => event.preventDefault()}>
+              <div className="field">
+                <label htmlFor="shop-search">Search products</label>
+                <input id="shop-search" name="q" type="search" value={query} onChange={(event) => setQuery(event.target.value)} />
+              </div>
+              <div className="field">
+                <label htmlFor="shop-category">Category</label>
+                <select id="shop-category" name="category" value={category} onChange={(event) => setCategory(event.target.value)}>
+                  <option value="All">All</option>
+                  {categories.map((entry) => <option key={entry} value={entry}>{entry}</option>)}
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="shop-sort">Sort</label>
+                <select id="shop-sort" name="sort" value={sort} onChange={(event) => setSort(event.target.value)}>
+                  <option value="featured">Featured</option>
+                  <option value="price-asc">Price, low to high</option>
+                  <option value="price-desc">Price, high to low</option>
+                  <option value="name">Name</option>
+                </select>
+              </div>
+              <button className="btn" type="submit">Search</button>
+            </form>
+          </search>
+          <p aria-live="polite">{shopItems.length} {shopItems.length === 1 ? 'piece' : 'pieces'}</p>
+          {shopItems.length ? (
+            <div className="product-grid">
+              {shopItems.map((garment) => <ProductCard key={garment.id} garment={garment} />)}
+            </div>
+          ) : <p>No pieces match that search.</p>}
+        </div>
+      </section>
+
+      <section className="band band-quiet" aria-labelledby="planned-title">
+        <div className="wrap">
+          <div className="section-head">
+            <p className="kicker">In development</p>
+            <h2 id="planned-title">Not available to order</h2>
+            <p>These silhouettes are planned. They have no price, no sizes, and cannot be added to the bag.</p>
+          </div>
+          <ul className="planned-list">
+            {getPlannedGarments().map((garment) => (
+              <li key={garment.id}>
+                <strong>{garment.name}</strong>
+                <span>{garment.category}</span>
+                <span>{garment.description}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section id="about" className="story" aria-labelledby="about-title">
+        <div className="wrap story-grid">
+          <div>
+            <p className="kicker">The label</p>
+            <h2 id="about-title">Not fast fashion. Never was.</h2>
+            <p>InterSacks Apparel is an independent South African streetwear brand focused on original artwork, quality garments, and limited releases.</p>
+            <p>Each piece in the shop is listed from the real catalogue. When a garment is still a concept, it stays out of the bag until it can actually be made.</p>
+            <a className="btn" href="#shop">View the shop</a>
+          </div>
+          <div className="story-photos">
+            <Photo src="assets/products/product-1.png" alt="Skull Tracksuit, black hoodie and joggers with purple and green skull artwork" />
+            <Photo src="assets/products/product-8.png" alt="Rose Sleeve Tracksuit, black set with rose artwork on the sleeve" />
+          </div>
+        </div>
+      </section>
+
+      <section id="how" className="band" aria-labelledby="how-title">
+        <div className="wrap">
+          <div className="section-head">
+            <p className="kicker">Atelier</p>
+            <h2 id="how-title">How a custom tee is made</h2>
+          </div>
+          <ol className="steps">
+            <li><h3>Choose the garment</h3><p>Custom artwork is available on the Classic Tee. Every other piece is sold as photographed.</p></li>
+            <li><h3>Choose the artwork</h3><p>Pick from the InterSacks archive, or leave the tee plain. Artwork adds {formatPrice(artworkPrice)}.</p></li>
+            <li><h3>Set colour, size, and placement</h3><p>Front Small and Front Centre are the placements that can be produced today.</p></li>
+            <li><h3>Send the order</h3><p>Review the bag and send it on WhatsApp. The team confirms delivery before the order is made.</p></li>
+          </ol>
+        </div>
+      </section>
+
+      {classic ? (
+        <section className="customise-promo" aria-labelledby="customise-promo-title">
+          <div className="wrap customise-grid">
+            <Photo src={classic.image} alt="" />
+            <div>
+              <p className="kicker">Customise</p>
+              <h2 id="customise-promo-title">Put archive artwork on a Classic Tee.</h2>
+              <p>{classic.description} From {formatPrice(classic.basePrice)}, plus {formatPrice(artworkPrice)} when you add a design.</p>
+              <a className="btn" href="product.html?garment=classic-tee">Start customising</a>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <section id="designs" className="band" aria-labelledby="designs-title">
+        <div className="wrap">
+          <div className="section-head">
+            <p className="kicker">Artwork</p>
+            <h2 id="designs-title">Design archive</h2>
+          </div>
+          <div className="product-grid featured-designs">
+            {getFeaturedDesigns().slice(0, 6).map((design) => (
+              <article key={design.id} className="product-card">
+                <a className="product-link" href={`product.html?design=${encodeURIComponent(design.id)}`}>
+                  <Photo layout="design" src={design.image} alt="" />
+                  <p className="kicker">{design.category}</p>
+                  <h3>{design.name}</h3>
+                </a>
+                <p className="price">+{formatPrice(design.additionalPrice)}</p>
+              </article>
+            ))}
+          </div>
+          <search aria-labelledby="designs-title">
+            <form className="filters" onSubmit={(event) => event.preventDefault()}>
+              <div className="field">
+                <label htmlFor="design-search">Search artwork</label>
+                <input id="design-search" name="artwork" type="search" value={designQuery} onChange={(event) => setDesignQuery(event.target.value)} />
+              </div>
+              <div className="field">
+                <label htmlFor="design-category">Artwork category</label>
+                <select id="design-category" name="artwork-category" value={designCategory} onChange={(event) => setDesignCategory(event.target.value)}>
+                  <option value="All">All</option>
+                  {getDesignCategories().map((entry) => <option key={entry} value={entry}>{entry}</option>)}
+                </select>
+              </div>
+              <button className="btn" type="submit">Search</button>
+            </form>
+          </search>
+          <p aria-live="polite">{designs.length} designs</p>
+          <div className="product-grid">
+            {designs.map((design) => (
+              <article key={design.id} className="product-card">
+                <a className="product-link" href={`product.html?design=${encodeURIComponent(design.id)}`}>
+                  <Photo layout="design" src={design.image} alt="" />
+                  <p className="kicker">{design.category}</p>
+                  <h3>{design.name}</h3>
+                </a>
+                <p className="price">+{formatPrice(design.additionalPrice)}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" className="band" aria-labelledby="contact-title">
+        <div className="wrap">
+          <div className="section-head">
+            <p className="kicker">Contact</p>
+            <h2 id="contact-title">Talk to InterSacks</h2>
+            <p>Sizing, wholesale, and order questions go through the same channels the label already uses.</p>
+          </div>
+          <div className="contact-grid">
+            <a href="mailto:hello@intersacks.co.za"><h3>Email</h3><p>hello@intersacks.co.za</p></a>
+            <ExternalLink href={WHATSAPP_DESK_URL}><h3>WhatsApp</h3><p>{visibleWhatsAppNumber()}</p></ExternalLink>
+            <ExternalLink href="https://instagram.com/sackslesley/"><h3>Instagram</h3><p>@intersacks</p></ExternalLink>
+            <ExternalLink href="https://facebook.com/share/1As4dCE4xn"><h3>Facebook</h3><p>InterSacks Apparel</p></ExternalLink>
+          </div>
+        </div>
+      </section>
+    </Layout>
+  )
+}

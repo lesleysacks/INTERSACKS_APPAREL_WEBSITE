@@ -1,0 +1,21 @@
+{
+  "name": "intersacks-apparel",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/run.mjs dev",
+    "build": "node scripts/run.mjs build",
+    "preview": "vite preview",
+    "test": "node --test tests/storefront.test.js"
+  },
+  "dependencies": {
+    "@oddbird/popover-polyfill": "^0.7.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.3.0",
+    "sharp": "^0.35.5",
+    "vite": "^8.3.8"
+  }
+}

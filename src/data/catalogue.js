@@ -1,9 +1,9 @@
 /* InterSacks Apparel — curated storefront manifest.
    Edit catalogue metadata here; machine audit data lives in data/assets.json. */
 
-const STORE_CONFIG = { whatsappNumber: "27843252262", brandName: "InterSacks Apparel", tagline: "Built Different.", currency: "R" };
+export const STORE_CONFIG = { whatsappNumber: "27843252262", brandName: "InterSacks Apparel", tagline: "Built Different.", currency: "R" };
 
-const garments = [
+export const garments = [
   { id:"classic-tee", name:"Classic Tee", category:"T-Shirts", description:"A clean short-sleeve base for custom InterSacks artwork.", basePrice:349, colours:[
     {name:"Black",value:"#111111",frontImage:"assets/Designs/plain black tshirt.png",backImage:null},
     {name:"White",value:"#f5f5f5",frontImage:"assets/Designs/plain white tshirt.png",backImage:null}
@@ -100,9 +100,9 @@ const designManifest = [
   ["design-050","PJH Crest","assets/Designs/LOGOS/images.jpg","Logo",false]
 ];
 
-const designs = designManifest.map(([id,name,image,category,featured,transparent]) => ({ ...designDefaults, id,name,image,category,featured, transparentImage:transparent ? image : null, hasUsableTransparency:Boolean(transparent) }));
+export const designs = designManifest.map(([id,name,image,category,featured,transparent]) => ({ ...designDefaults, id,name,image,category,featured, transparentImage:transparent ? image : null, hasUsableTransparency:Boolean(transparent) }));
 
-const unclassifiedAssets = [
+export const unclassifiedAssets = [
   "assets/Designs/download (2).png",
   "assets/Designs/Screenshot 2026-08-26 210744.png",
   "assets/Designs/WhatsApp Image 2026-07-20 at 16.09.56.jpeg"
@@ -113,18 +113,83 @@ const placementConfigs = {
   "front-center":{name:"Front Centre",styles:{width:"34%",top:"31%",left:"50%",transform:"translateX(-50%)"}}
 };
 
-function getGarments(){return garments.filter(g=>g.active)}
-function getGarmentById(id){return garments.find(g=>g.id===id)}
-function getGarmentsByCategory(category){return getGarments().filter(g=>g.category===category)}
-function getFeaturedGarments(){return getGarments().filter(g=>g.featured)}
-function getDesigns(){return designs.filter(d=>d.active)}
-function getDesignById(id){return designs.find(d=>d.id===id)}
-function getDesignsByCategory(category){return getDesigns().filter(d=>d.category===category)}
-function getFeaturedDesigns(){return getDesigns().filter(d=>d.featured)}
-function getCompatibleDesigns(garmentId){return getDesigns().filter(d=>d.compatibleGarments.includes(garmentId))}
-function getPlacementConfig(id){return placementConfigs[id]}
-function getPlacementsForDesign(id){const d=getDesignById(id);return d?d.placements.map(p=>({id:p,...placementConfigs[p]})):[]}
-function getDesignCategories(){return [...new Set(getDesigns().map(d=>d.category))].sort()}
-function getGarmentCategories(){return [...new Set(getGarments().map(g=>g.category))].sort()}
-function calculatePrice(garmentId,designId=null){const g=getGarmentById(garmentId);const d=designId?getDesignById(designId):null;return g?g.basePrice+(d?.active?d.additionalPrice:0):0}
-function formatPrice(amount){return `${STORE_CONFIG.currency}${amount}`}
+export function getGarments(){return garments.filter(g=>g.active)}
+export function getGarmentById(id){return garments.find(g=>g.id===id)}
+export function getGarmentsByCategory(category){return getGarments().filter(g=>g.category===category)}
+export function getFeaturedGarments(){return getGarments().filter(g=>g.featured)}
+export function getDesigns(){return designs.filter(d=>d.active)}
+export function getDesignById(id){return designs.find(d=>d.id===id)}
+export function getDesignsByCategory(category){return getDesigns().filter(d=>d.category===category)}
+export function getFeaturedDesigns(){return getDesigns().filter(d=>d.featured)}
+export function getCompatibleDesigns(garmentId){return getDesigns().filter(d=>d.compatibleGarments.includes(garmentId))}
+export function getPlacementConfig(id){return placementConfigs[id]}
+export function getPlacementsForDesign(id){const d=getDesignById(id);return d?d.placements.map(p=>({id:p,...placementConfigs[p]})):[]}
+export function getDesignCategories(){return [...new Set(getDesigns().map(d=>d.category))].sort()}
+export function getGarmentCategories(){return [...new Set(getGarments().map(g=>g.category))].sort()}
+export function calculatePrice(garmentId,designId=null){const g=getGarmentById(garmentId);const d=designId?getDesignById(designId):null;return g?g.basePrice+(d?.active?d.additionalPrice:0):0}
+export function formatPrice(amount){return `${STORE_CONFIG.currency}${amount}`}
+
+export function isPurchasable(garment) {
+  return Boolean(garment && garment.active && garment.available !== false)
+}
+
+export function getPurchasableGarments() {
+  return getGarments().filter((garment) => garment.available !== false)
+}
+
+export function getPlannedGarments() {
+  return getGarments().filter((garment) => garment.available === false)
+}
+
+export function getPurchasableCategories() {
+  return [...new Set(getPurchasableGarments().map((garment) => garment.category))].sort()
+}
+
+export function getPriceBreakdown(garmentId, designId = null) {
+  const base = calculatePrice(garmentId, null)
+  const total = calculatePrice(garmentId, designId)
+  return { base, artwork: total - base, total }
+}
+
+export function placementLabel(placementId) {
+  if (!placementId || placementId === 'N/A') return 'N/A'
+  return getPlacementConfig(placementId)?.name || placementId
+}
+
+export function getCartItemImage(item) {
+  const garment = getGarmentById(item?.garmentId)
+  if (!garment) return null
+  const colour = garment.colours?.find((entry) => entry.name === item.colour)
+  return colour?.frontImage || garment.image || null
+}
+
+export function sortGarments(list, mode = 'featured') {
+  const sorted = [...list]
+  if (mode === 'price-asc') sorted.sort((a, b) => a.basePrice - b.basePrice || a.name.localeCompare(b.name))
+  else if (mode === 'price-desc') sorted.sort((a, b) => b.basePrice - a.basePrice || a.name.localeCompare(b.name))
+  else if (mode === 'name') sorted.sort((a, b) => a.name.localeCompare(b.name))
+  else sorted.sort((a, b) => Number(b.featured) - Number(a.featured) || a.name.localeCompare(b.name))
+  return sorted
+}
+
+export function filterGarments(list, { category = 'All', query = '' } = {}) {
+  const needle = query.trim().toLowerCase()
+  return list.filter((garment) => {
+    const categoryMatch = category === 'All' || garment.category === category
+    if (!categoryMatch) return false
+    if (!needle) return true
+    return [garment.name, garment.category, garment.description]
+      .filter(Boolean)
+      .some((value) => value.toLowerCase().includes(needle))
+  })
+}
+
+export function filterDesigns(list, { category = 'All', query = '' } = {}) {
+  const needle = query.trim().toLowerCase()
+  return list.filter((design) => {
+    const categoryMatch = category === 'All' || design.category === category
+    if (!categoryMatch) return false
+    if (!needle) return true
+    return [design.name, design.category].filter(Boolean).some((value) => value.toLowerCase().includes(needle))
+  })
+}
