@@ -76,7 +76,7 @@ export class Customizer {
   }
 
   getPrice() {
-    return calculatePrice(this.selectedGarmentId, this.selectedDesignId)
+    return calculatePrice(this.selectedGarmentId, this.selectedDesignId, this.selectedPlacement)
   }
 
   getSummary() {

@@ -9,11 +9,17 @@ import {
   getDesignCategories,
   getDesigns,
   getPlannedGarments,
-  getPriceBreakdown,
+  getMinArtworkPrice,
+  getDesignCollections,
   getPurchasableCategories,
   getPurchasableGarments,
   sortGarments
 } from '../data/catalogue.js'
+
+function initialCollection() {
+  const requested = new URLSearchParams(window.location.search).get('collection')
+  return getDesignCollections().includes(requested) ? requested : 'All'
+}
 
 function initialCategory() {
   const requested = new URLSearchParams(window.location.search).get('category')
@@ -36,14 +42,15 @@ export function HomePage() {
   const [query, setQuery] = useState('')
   const shopItems = sortGarments(filterGarments(purchasable, { category, query }), sort)
   const [designCategory, setDesignCategory] = useState('All')
+  const [designCollection, setDesignCollection] = useState(initialCollection)
   const [designQuery, setDesignQuery] = useState('')
   const [showAllDesigns, setShowAllDesigns] = useState(false)
   const designs = useMemo(
-    () => filterDesigns(getDesigns(), { category: designCategory, query: designQuery }),
-    [designCategory, designQuery]
+    () => filterDesigns(getDesigns(), { category: designCategory, collection: designCollection, query: designQuery }),
+    [designCategory, designCollection, designQuery]
   )
   const classic = purchasable.find((garment) => garment.id === 'classic-tee')
-  const artworkPrice = getPriceBreakdown('classic-tee', 'design-001').artwork
+  const artworkPrice = getMinArtworkPrice()
 
   return (
     <Layout current="home">
@@ -54,7 +61,7 @@ export function HomePage() {
           <p className="lede">Heavyweight garments and original artwork from an independent label. Shop the pieces in the catalogue, or start with a plain tee and place a design on it.</p>
           <div className="hero-actions">
             <a className="btn" href="#shop">Shop now</a>
-            <a className="btn btn-ghost" href="#collections">Explore collection</a>
+            <a className="btn btn-ghost" href="custom.html">Custom orders</a>
           </div>
         </div>
         {hero ? (
@@ -155,7 +162,7 @@ export function HomePage() {
               <li key={garment.id}>{garment.name}</li>
             ))}
           </ul>
-          <p><ExternalLink className="btn btn-ghost" href={`${WHATSAPP_DESK_URL}?text=${encodeURIComponent('Hi InterSacks, I would like to ask about a custom or bulk order.')}`}>Ask about a custom order on WhatsApp</ExternalLink></p>
+          <p><a className="btn btn-ghost" href="custom.html">Plan a custom or bulk order</a></p>
         </div>
       </section>
 
@@ -183,8 +190,8 @@ export function HomePage() {
           </div>
           <ol className="steps">
             <li><h3>Choose the garment</h3><p>Custom artwork is available on the Classic Tee. Every other piece is sold as photographed.</p></li>
-            <li><h3>Choose the artwork</h3><p>Pick from the InterSacks archive, or leave the tee plain. Artwork adds {formatPrice(artworkPrice)}.</p></li>
-            <li><h3>Set colour, size, and placement</h3><p>Front Small and Front Centre are the placements that can be produced today.</p></li>
+            <li><h3>Choose the artwork</h3><p>Pick from the InterSacks archive, or leave the tee plain. Artwork adds from {formatPrice(artworkPrice)}.</p></li>
+            <li><h3>Pick the print position</h3><p>Front small or centre (+R50), a big back print (+R80), or a sleeve hit (+R40).</p></li>
             <li><h3>Send the order</h3><p>Review the bag and send it on WhatsApp. The team confirms delivery before the order is made.</p></li>
           </ol>
         </div>
@@ -197,7 +204,7 @@ export function HomePage() {
             <div>
               <p className="kicker">Customise</p>
               <h2 id="customise-promo-title">Put archive artwork on a Classic Tee.</h2>
-              <p>{classic.description} From {formatPrice(classic.basePrice)}, plus {formatPrice(artworkPrice)} when you add a design.</p>
+              <p>{classic.description} From {formatPrice(classic.basePrice)}, plus from {formatPrice(artworkPrice)} when you add a design on the front, back or sleeve.</p>
               <a className="btn" href="product.html?garment=classic-tee">Start customising</a>
             </div>
           </div>
@@ -209,7 +216,20 @@ export function HomePage() {
           <div className="section-head">
             <p className="kicker">Artwork</p>
             <h2 id="designs-title">Design archive</h2>
-            <p>Every design can go on a Classic Tee for {formatPrice(artworkPrice)} extra. Tap one to try it on.</p>
+            <p>Every design can go on a Classic Tee from {formatPrice(artworkPrice)} extra. Browse by collection and tap one to try it on.</p>
+          </div>
+          <div className="collection-chips" role="group" aria-label="Design collections">
+            {['All', ...getDesignCollections()].map((entry) => (
+              <button
+                key={entry}
+                type="button"
+                className="chip"
+                aria-pressed={designCollection === entry}
+                onClick={() => setDesignCollection(entry)}
+              >
+                {entry === 'All' ? 'All designs' : entry}
+              </button>
+            ))}
           </div>
           <search aria-labelledby="designs-title">
             <form className="filters" onSubmit={(event) => event.preventDefault()}>
@@ -229,18 +249,18 @@ export function HomePage() {
           </search>
           <p aria-live="polite">{designs.length} {designs.length === 1 ? 'design' : 'designs'}</p>
           <div className="product-grid">
-            {(showAllDesigns || designQuery || designCategory !== 'All' ? designs : designs.slice(0, DESIGN_PREVIEW)).map((design) => (
+            {(showAllDesigns || designQuery || designCategory !== 'All' || designCollection !== 'All' ? designs : designs.slice(0, DESIGN_PREVIEW)).map((design) => (
               <article key={design.id} className="product-card">
                 <a className="product-link" href={`product.html?design=${encodeURIComponent(design.id)}`}>
                   <Photo layout="design" src={design.image} alt="" />
-                  <p className="kicker">{design.category}</p>
+                  <p className="kicker">{design.collection}</p>
                   <h3>{design.name}</h3>
                 </a>
-                <p className="price">+{formatPrice(design.additionalPrice)}</p>
+                <p className="price">from +{formatPrice(artworkPrice)}</p>
               </article>
             ))}
           </div>
-          {!showAllDesigns && !designQuery && designCategory === 'All' && designs.length > DESIGN_PREVIEW ? (
+          {!showAllDesigns && !designQuery && designCategory === 'All' && designCollection === 'All' && designs.length > DESIGN_PREVIEW ? (
             <p className="more-row">
               <button type="button" className="btn btn-ghost" onClick={() => setShowAllDesigns(true)}>Show all {designs.length} designs</button>
             </p>

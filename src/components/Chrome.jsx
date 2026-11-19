@@ -18,6 +18,7 @@ const LINKS = [
   { href: 'index.html#shop', label: 'Shop' },
   { href: 'index.html#collections', label: 'Collections' },
   { href: 'product.html', label: 'Customise', page: 'product' },
+  { href: 'custom.html', label: 'Custom orders', page: 'custom' },
   { href: 'index.html#about', label: 'About' },
   { href: 'index.html#contact', label: 'Contact' },
   { href: 'cart.html', label: 'Cart', page: 'cart' }
@@ -135,6 +136,7 @@ export function SiteFooter() {
             <li><a href="index.html#shop">Shop</a></li>
             <li><a href="index.html#collections">Collections</a></li>
             <li><a href="product.html">Customise</a></li>
+            <li><a href="custom.html">Custom orders</a></li>
             <li><a href="index.html#about">About</a></li>
             <li><a href="index.html#contact">Contact</a></li>
             <li><a href="cart.html">Cart</a></li>

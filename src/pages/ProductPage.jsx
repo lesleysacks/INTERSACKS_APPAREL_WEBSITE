@@ -5,6 +5,8 @@ import { useCart } from '../context/CartContext.jsx'
 import {
   formatPrice,
   getCompatibleDesigns,
+  getDesignCollections,
+  getMinArtworkPrice,
   getDesignById,
   getGarmentById,
   getPlacementConfig,
@@ -36,10 +38,15 @@ export function ProductPage() {
   const design = customizer.selectedDesignId ? getDesignById(customizer.selectedDesignId) : null
   const placement = customizer.selectedPlacement ? getPlacementConfig(customizer.selectedPlacement) : null
   const previewSrc = customizer.viewMode === 'back' ? colour?.backImage : colour?.frontImage
-  const breakdown = getPriceBreakdown(customizer.selectedGarmentId, customizer.selectedDesignId)
+  const breakdown = getPriceBreakdown(customizer.selectedGarmentId, customizer.selectedDesignId, customizer.selectedPlacement)
   const designs = getCompatibleDesigns(customizer.selectedGarmentId)
   const [designQuery, setDesignQuery] = useState('')
-  const visibleDesigns = designs.filter((entry) => entry.name.toLowerCase().includes(designQuery.trim().toLowerCase()))
+  const [designCollection, setDesignCollection] = useState('All')
+  const visibleDesigns = designs.filter((entry) =>
+    (designCollection === 'All' || entry.collection === designCollection) &&
+    [entry.name, entry.collection].some((value) => value.toLowerCase().includes(designQuery.trim().toLowerCase()))
+  )
+  const isBackPrint = placement?.view === 'back'
 
   function selectGarment(garmentId) {
     customizer.setGarment(garmentId)
@@ -102,7 +109,7 @@ export function ProductPage() {
                   src={previewSrc || garment?.image}
                   alt={garment ? `${garment.name}, ${customizer.selectedColourName || 'selected colour'}, ${customizer.viewMode}` : 'Selected garment'}
                 />
-                {design && customizer.viewMode === 'front' && placement ? (
+                {design && placement ? (
                   <ArtworkLayer
                     src={design.transparentImage || design.image}
                     style={{
@@ -113,7 +120,7 @@ export function ProductPage() {
                     }}
                   />
                 ) : null}
-                <figcaption>{customizer.viewMode === 'back' ? 'Back' : 'Front'} · {formatPrice(breakdown.total)} each</figcaption>
+                <figcaption>{isBackPrint ? 'Back print preview (shown on the tee photo)' : customizer.viewMode === 'back' ? 'Back' : 'Front'} · {formatPrice(breakdown.total)} each</figcaption>
               </figure>
               {colour?.backImage ? (
               <fieldset>
@@ -179,8 +186,15 @@ export function ProductPage() {
                     <label htmlFor="artwork-search">Search artwork</label>
                     <input id="artwork-search" name="artwork-search" type="search" value={designQuery} onChange={(event) => setDesignQuery(event.target.value)} />
                   </div>
+                  <div className="field">
+                    <label htmlFor="artwork-collection">Collection</label>
+                    <select id="artwork-collection" name="artwork-collection" value={designCollection} onChange={(event) => setDesignCollection(event.target.value)}>
+                      <option value="All">All collections</option>
+                      {getDesignCollections().map((entry) => <option key={entry} value={entry}>{entry}</option>)}
+                    </select>
+                  </div>
                   <fieldset className="artwork-picker">
-                    <legend>Artwork <span className="legend-note">+{formatPrice(designs[0].additionalPrice)} with a design</span></legend>
+                    <legend>Artwork <span className="legend-note">from +{formatPrice(getMinArtworkPrice())}, depends on print position</span></legend>
                     <div className="artwork-grid">
                       <label className="artwork-option">
                         <input
@@ -211,7 +225,7 @@ export function ProductPage() {
                   {designQuery && !visibleDesigns.length ? <p>No artwork matches that search.</p> : null}
                   {design ? (
                     <fieldset>
-                      <legend>Placement</legend>
+                      <legend>Print position</legend>
                       {getPlacementsForDesign(design.id).map((entry) => (
                         <label key={entry.id} className="choice">
                           <input
@@ -221,7 +235,7 @@ export function ProductPage() {
                             checked={customizer.selectedPlacement === entry.id}
                             onChange={() => { customizer.setPlacement(entry.id); commit() }}
                           />
-                          {entry.name}
+                          {entry.name} <span className="legend-note">+{formatPrice(entry.price)}</span>
                         </label>
                       ))}
                     </fieldset>

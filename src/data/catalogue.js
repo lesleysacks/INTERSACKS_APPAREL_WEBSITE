@@ -46,7 +46,7 @@ const plannedProducts = [
 
 garments.push(...plannedProducts);
 
-const designDefaults = { additionalPrice:50, compatibleGarments:["classic-tee"], placements:["front-small","front-center"], active:true, printable:true };
+const designDefaults = { additionalPrice:50, compatibleGarments:["classic-tee"], placements:["front-small","front-center","back-center","left-sleeve"], active:true, printable:true };
 const designManifest = [
   ["design-001","Midnight Snake","assets/Designs/0ceea4478c03705b4283b673023e1450.jpg","Graphic",true],
   ["design-002","Crowned Icon","assets/Designs/104e5a912c34fd6898133b672a492a89.jpg","Character",true],
@@ -143,9 +143,23 @@ export const unclassifiedAssets = [
 ];
 
 const placementConfigs = {
-  "front-small":{name:"Front Small",styles:{width:"18%",top:"25%",left:"50%",transform:"translateX(-50%)"}},
-  "front-center":{name:"Front Centre",styles:{width:"34%",top:"31%",left:"50%",transform:"translateX(-50%)"}}
+  "front-small":{name:"Front Small",price:50,view:"front",styles:{width:"18%",top:"25%",left:"50%",transform:"translateX(-50%)"}},
+  "front-center":{name:"Front Centre",price:50,view:"front",styles:{width:"34%",top:"31%",left:"50%",transform:"translateX(-50%)"}},
+  "back-center":{name:"Back Centre",price:80,view:"back",styles:{width:"44%",top:"24%",left:"50%",transform:"translateX(-50%)"}},
+  "left-sleeve":{name:"Left Sleeve",price:40,view:"front",styles:{width:"9%",top:"26%",left:"80%",transform:"translateX(-50%) rotate(-28deg)"}}
 };
+
+/* Design collections. Ids not listed fall back to the design's category. */
+const COLLECTION_BY_DESIGN = {
+  "design-034":"Panther",
+  "design-013":"Faith","design-015":"Faith","design-016":"Faith","design-038":"Faith","design-043":"Faith",
+  "design-004":"Grind","design-018":"Grind","design-025":"Grind","design-030":"Grind","design-032":"Grind","design-041":"Grind","design-045":"Grind",
+  "design-005":"Street","design-008":"Street","design-010":"Street","design-019":"Street","design-021":"Street","design-042":"Street","design-048":"Street",
+  "design-001":"Wild","design-007":"Wild","design-046":"Wild",
+  "design-003":"Pups","design-014":"Pups","design-037":"Pups","design-039":"Pups"
+};
+export const COLLECTION_ORDER = ["Panther","Built Different","Mzansi","Mascot","Skull & Rose","Faith","Grind","Street","Wild","Pups"];
+for (const design of designs) design.collection = design.collection || COLLECTION_BY_DESIGN[design.id] || design.category;
 
 export function getGarments(){return garments.filter(g=>g.active)}
 export function getGarmentById(id){return garments.find(g=>g.id===id)}
@@ -160,7 +174,22 @@ export function getPlacementConfig(id){return placementConfigs[id]}
 export function getPlacementsForDesign(id){const d=getDesignById(id);return d?d.placements.map(p=>({id:p,...placementConfigs[p]})):[]}
 export function getDesignCategories(){return [...new Set(getDesigns().map(d=>d.category))].sort()}
 export function getGarmentCategories(){return [...new Set(getGarments().map(g=>g.category))].sort()}
-export function calculatePrice(garmentId,designId=null){const g=getGarmentById(garmentId);const d=designId?getDesignById(designId):null;return g?g.basePrice+(d?.active?d.additionalPrice:0):0}
+export function artworkPrice(design, placementId = null) {
+  if (!design?.active) return 0
+  return placementConfigs[placementId]?.price ?? design.additionalPrice
+}
+export function calculatePrice(garmentId, designId = null, placementId = null) {
+  const g = getGarmentById(garmentId)
+  const d = designId ? getDesignById(designId) : null
+  return g ? g.basePrice + artworkPrice(d, placementId) : 0
+}
+export function getMinArtworkPrice() {
+  return Math.min(...Object.values(placementConfigs).map((p) => p.price))
+}
+export function getDesignCollections() {
+  const present = new Set(getDesigns().map((d) => d.collection))
+  return [...COLLECTION_ORDER.filter((c) => present.has(c)), ...[...present].filter((c) => !COLLECTION_ORDER.includes(c)).sort()]
+}
 export function formatPrice(amount){return `${STORE_CONFIG.currency}${amount}`}
 
 export function isPurchasable(garment) {
@@ -179,9 +208,9 @@ export function getPurchasableCategories() {
   return [...new Set(getPurchasableGarments().map((garment) => garment.category))].sort()
 }
 
-export function getPriceBreakdown(garmentId, designId = null) {
+export function getPriceBreakdown(garmentId, designId = null, placementId = null) {
   const base = calculatePrice(garmentId, null)
-  const total = calculatePrice(garmentId, designId)
+  const total = calculatePrice(garmentId, designId, placementId)
   return { base, artwork: total - base, total }
 }
 
@@ -218,12 +247,13 @@ export function filterGarments(list, { category = 'All', query = '' } = {}) {
   })
 }
 
-export function filterDesigns(list, { category = 'All', query = '' } = {}) {
+export function filterDesigns(list, { category = 'All', collection = 'All', query = '' } = {}) {
   const needle = query.trim().toLowerCase()
   return list.filter((design) => {
     const categoryMatch = category === 'All' || design.category === category
     if (!categoryMatch) return false
+    if (collection !== 'All' && design.collection !== collection) return false
     if (!needle) return true
-    return [design.name, design.category].filter(Boolean).some((value) => value.toLowerCase().includes(needle))
+    return [design.name, design.category, design.collection].filter(Boolean).some((value) => value.toLowerCase().includes(needle))
   })
 }

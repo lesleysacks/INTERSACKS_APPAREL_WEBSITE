@@ -5,6 +5,9 @@ import {
   RIGHTS_HOLD,
   designs as allDesigns,
   calculatePrice,
+  filterDesigns,
+  getDesignCollections,
+  getPriceBreakdown,
   filterGarments,
   formatPrice,
   getDesigns,
@@ -15,7 +18,7 @@ import {
 } from '../src/data/catalogue.js'
 import { Cart, createMemoryStorage } from '../src/services/cart.js'
 import { Customizer } from '../src/services/customizer.js'
-import { createOrderReference, generateWhatsAppMessage } from '../src/services/orders.js'
+import { createOrderReference, generateCustomEnquiryMessage, generateWhatsAppMessage } from '../src/services/orders.js'
 
 test('Baseline: Store configuration matches expected InterSacks brand settings', () => {
   assert.equal(STORE_CONFIG.brandName, 'InterSacks Apparel')
@@ -256,4 +259,40 @@ test('Order message carries the customer name, area and reference', () => {
   assert.ok(message.includes(`(ref ${reference})`))
   assert.ok(message.includes('Name: Thabo\n'))
   assert.ok(message.includes('Delivery Area: Soweto'))
+})
+
+test('Print position sets the artwork price', () => {
+  assert.equal(calculatePrice('classic-tee', 'design-001', 'front-small'), 399)
+  assert.equal(calculatePrice('classic-tee', 'design-001', 'back-center'), 429)
+  assert.equal(calculatePrice('classic-tee', 'design-001', 'left-sleeve'), 389)
+  assert.equal(getPriceBreakdown('classic-tee', 'design-001', 'back-center').artwork, 80)
+  const customizer = new Customizer()
+  customizer.setGarment('classic-tee')
+  customizer.setDesign('design-001')
+  customizer.setPlacement('back-center')
+  const item = customizer.createCartItem()
+  assert.equal(item.unitPrice, 429)
+  assert.equal(item.placement, 'back-center')
+})
+
+test('Designs can be filtered by collection', () => {
+  const collections = getDesignCollections()
+  assert.ok(collections.includes('Faith'))
+  assert.ok(collections.includes('Panther'))
+  const faith = filterDesigns(getDesigns(), { collection: 'Faith' })
+  assert.ok(faith.length >= 5)
+  assert.ok(faith.every((design) => design.collection === 'Faith'))
+  assert.ok(getDesigns().every((design) => design.collection))
+})
+
+test('Custom order enquiry message lists the request', () => {
+  const message = generateCustomEnquiryMessage({ occasion: 'matric', garment: 'Classic Tee', quantity: '40', date: '2027-09-01', printText: 'Class of 2027', name: 'Ayanda', reference: 'IS-270101-AAAA' })
+  assert.ok(message.includes('Occasion: Matric & graduation'))
+  assert.ok(message.includes('Quantity: 40'))
+  assert.ok(message.includes('Text / names to print: Class of 2027'))
+  assert.ok(message.includes('Name: Ayanda'))
+  assert.ok(message.includes('(ref IS-270101-AAAA)'))
+  const blank = generateCustomEnquiryMessage({ name: 'Sipho' })
+  assert.ok(blank.includes('Garment: Not sure yet'))
+  assert.ok(!blank.includes('Notes:'))
 })
