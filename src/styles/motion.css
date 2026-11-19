@@ -1,0 +1,312 @@
+/* InterSacks motion layer.
+   Native CSS only: view transitions, scroll-driven animations, @starting-style.
+   Every movement is opt-in under prefers-reduced-motion: no-preference.
+   Colour and shadow feedback stays on for everyone. Content is visible at rest. */
+
+:root {
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 160ms;
+  --dur-med: 280ms;
+  --lift-shadow: 0 14px 30px -18px rgb(0 0 0 / 0.55);
+}
+
+/* ---------- 1. Page-to-page transitions (MPA view transitions) ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  .site-header { view-transition-name: site-header; }
+  .announcement { view-transition-name: announcement; }
+
+  ::view-transition-old(root) {
+    animation: 220ms ease-in both vt-page-out;
+  }
+  ::view-transition-new(root) {
+    animation: 360ms var(--ease-out) both vt-page-in;
+  }
+  ::view-transition-group(product-photo) {
+    animation-duration: 420ms;
+    animation-timing-function: var(--ease-out);
+  }
+}
+
+@keyframes vt-page-out {
+  to { opacity: 0; translate: 0 -12px; }
+}
+@keyframes vt-page-in {
+  from { opacity: 0; translate: 0 24px; }
+}
+
+/* The customiser's preview is the landing spot for the card photo morph. */
+.preview-photo { view-transition-name: product-photo; }
+
+/* ---------- 2. Hover, press and focus feedback ---------- */
+
+.btn,
+.text-button,
+.chip {
+  transition:
+    background-color var(--dur-fast) ease-out,
+    color var(--dur-fast) ease-out,
+    border-color var(--dur-fast) ease-out,
+    box-shadow var(--dur-fast) ease-out,
+    scale var(--dur-fast) ease-out;
+}
+
+.btn:hover {
+  box-shadow: var(--lift-shadow);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--paper);
+}
+.btn-ghost:hover,
+.text-button:hover,
+.chip:hover:not([aria-pressed="true"]) {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn:active,
+  .text-button:active,
+  .chip:active {
+    scale: 0.97;
+  }
+}
+
+/* Nav links: an underline that grows from the left. */
+.site-menu a:not([aria-current="page"]) {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 85%;
+  background-size: 0% 2px;
+  transition: background-size var(--dur-med) var(--ease-out), color var(--dur-fast) ease-out;
+}
+.site-menu a:not([aria-current="page"]):is(:hover, :focus-visible) {
+  background-size: 100% 2px;
+}
+
+/* Product, design and collection cards: lift, zoom the photo, slide the price. */
+.product-card,
+.collection-tile {
+  transition: box-shadow var(--dur-med) ease-out, background-color var(--dur-med) ease-out;
+}
+.product-card:is(:hover, :focus-within) {
+  box-shadow: var(--lift-shadow);
+}
+.collection-tile:is(:hover, :focus-visible) {
+  background: var(--paper-2);
+}
+
+.product-link picture,
+.collection-tile picture {
+  display: block;
+  overflow: clip;
+}
+.product-link img,
+.collection-tile img {
+  transition: scale 500ms var(--ease-out);
+}
+
+.product-card .price,
+.product-card .availability {
+  transition: color var(--dur-fast) ease-out;
+}
+.product-card:is(:hover, :focus-within) .price {
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .product-card {
+    transition: box-shadow var(--dur-med) ease-out, translate var(--dur-med) var(--ease-out);
+  }
+  .product-card:is(:hover, :focus-within) {
+    translate: 0 -4px;
+  }
+  .product-card:is(:hover, :focus-within) .product-link img,
+  .collection-tile:is(:hover, :focus-visible) img {
+    scale: 1.06;
+  }
+  .collection-tile span strong {
+    display: inline-block;
+    transition: translate var(--dur-med) var(--ease-out);
+  }
+  .collection-tile:is(:hover, :focus-visible) span strong {
+    translate: 6px 0;
+  }
+}
+
+/* Selectable tiles: artwork thumbnails and occasion cards. */
+.artwork-option,
+.occasion-card {
+  transition: border-color var(--dur-fast) ease-out, box-shadow var(--dur-fast) ease-out, background-color var(--dur-fast) ease-out;
+}
+.artwork-option:hover,
+.occasion-card:hover {
+  box-shadow: var(--lift-shadow);
+}
+.artwork-option:has(input:checked) {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .artwork-option,
+  .occasion-card {
+    transition:
+      border-color var(--dur-fast) ease-out,
+      box-shadow var(--dur-fast) ease-out,
+      translate var(--dur-fast) ease-out,
+      scale var(--dur-med) ease-out;
+    /* Spring settle; browsers without linear() keep the ease-out above. */
+    transition-timing-function: ease-out, ease-out, ease-out, linear(0, 0.45 15%, 1.08 35%, 0.97 55%, 1.01 75%, 1);
+  }
+  .artwork-option:hover,
+  .occasion-card:hover {
+    translate: 0 -3px;
+  }
+  .artwork-option:has(input:checked),
+  .occasion-card:has(input:checked) {
+    scale: 1.03;
+  }
+}
+
+/* Touch screens: nothing hides behind hover, so there is nothing to reveal. */
+
+/* ---------- 3. Scroll reveals ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    .section-head,
+    .product-grid > *,
+    .collection-grid > *,
+    .steps > li,
+    .story-photos > *,
+    .contact-grid > *,
+    .planned-list,
+    .occasion-grid > li {
+      animation: reveal-up auto linear backwards;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; translate: 0 32px; }
+}
+
+/* ---------- 4. Hero entrance ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-copy > * {
+    animation: hero-rise 700ms var(--ease-out) backwards;
+  }
+  .hero-copy > :nth-child(1) { animation-delay: 60ms; }
+  .hero-copy > :nth-child(2) { animation-delay: 140ms; }
+  .hero-copy > :nth-child(3) { animation-delay: 240ms; }
+  .hero-copy > :nth-child(4) { animation-delay: 340ms; }
+
+  /* The photo itself appears at once (it is the LCP image); only its frame drifts on scroll. */
+  @supports (animation-timeline: scroll()) {
+    .hero-figure picture {
+      display: block;
+      animation: hero-drift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 80vh;
+    }
+  }
+}
+
+@keyframes hero-rise {
+  from { opacity: 0; translate: 0 28px; }
+}
+@keyframes hero-drift {
+  to { translate: 0 -48px; scale: 1.04; }
+}
+
+/* ---------- 5. Mobile menu popover ---------- */
+
+.site-menu[popover] {
+  transition-property: opacity, translate, scale, display, overlay;
+  transition-duration: 220ms;
+  transition-timing-function: var(--ease-out);
+  transition-behavior: allow-discrete;
+  opacity: 0;
+}
+.site-menu[popover]:is(:popover-open, .\:popover-open) {
+  opacity: 1;
+  @starting-style {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .site-menu[popover] {
+    transform-origin: top right;
+    scale: 0.96;
+    translate: 0 -6px;
+  }
+  .site-menu[popover]:is(:popover-open, .\:popover-open) {
+    scale: 1;
+    translate: 0 0;
+    @starting-style {
+      scale: 0.96;
+      translate: 0 -6px;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-menu[popover] {
+    transition-duration: 100ms;
+  }
+}
+
+/* ---------- 6. Shopping micro-interactions ---------- */
+
+.cart-count {
+  display: inline-block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cart-count.is-bumped {
+    animation: badge-pop 450ms linear(0, 0.6 20%, 1.25 40%, 0.95 65%, 1.02 82%, 1);
+  }
+}
+@keyframes badge-pop {
+  from { scale: 0.4; }
+}
+
+.btn.is-added {
+  background: #1f7a3d;
+  border-color: #1f7a3d;
+  color: #fff;
+}
+
+.added-note p {
+  transition: opacity var(--dur-med) ease-out;
+  @starting-style {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .added-note > * {
+    transition: opacity var(--dur-med) ease-out, translate var(--dur-med) var(--ease-out);
+    @starting-style {
+      opacity: 0;
+      translate: 0 8px;
+    }
+  }
+}
+
+/* Artwork swap on the tee preview cross-fades via a same-document view transition. */
+.design-layer { view-transition-name: tee-artwork; }
+::view-transition-group(tee-artwork) {
+  animation-duration: 260ms;
+}
+
+/* During a preview swap only the tee changes; the rest of the page stays put. */
+html.vt-preview::view-transition-old(root),
+html.vt-preview::view-transition-new(root) {
+  animation: none;
+}

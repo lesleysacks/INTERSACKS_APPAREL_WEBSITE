@@ -7,6 +7,10 @@ import { ProductPage } from './pages/ProductPage.jsx'
 import { CartPage } from './pages/CartPage.jsx'
 import { CustomPage } from './pages/CustomPage.jsx'
 import './styles/global.css'
+import './styles/motion.css'
+import { installPageTransitions } from './lib/pageTransitions.js'
+
+installPageTransitions()
 
 const page = document.body.dataset.page
 const PAGES = { product: ProductPage, cart: CartPage, custom: CustomPage }
