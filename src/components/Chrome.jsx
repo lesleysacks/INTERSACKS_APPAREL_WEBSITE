@@ -23,9 +23,9 @@ const LINKS = [
   { href: 'cart.html', label: 'Cart', page: 'cart' }
 ]
 
-export function ExternalLink({ href, children }) {
+export function ExternalLink({ href, children, className }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
+    <a href={href} className={className} target="_blank" rel="noopener noreferrer">
       {children}
       <span className="visually-hidden"> (opens in a new tab)</span>
     </a>
@@ -109,7 +109,7 @@ export function SiteHeader({ current }) {
               <li key={link.label}>
                 <a href={link.href} aria-current={link.page === current ? 'page' : undefined}>
                   {link.label}
-                  {link.page === 'cart' ? <span className="cart-count">{count}</span> : null}
+                  {link.page === 'cart' && count ? <span className="cart-count"><span className="visually-hidden">, </span>{count}<span className="visually-hidden"> items</span></span> : null}
                 </a>
               </li>
             ))}
@@ -146,8 +146,9 @@ export function SiteFooter() {
             <li><ExternalLink href={WHATSAPP_DESK_URL}>WhatsApp order desk</ExternalLink></li>
             <li><a href="index.html#how">How customisation works</a></li>
             <li><a href="mailto:hello@intersacks.co.za">hello@intersacks.co.za</a></li>
+            <li><ExternalLink href="https://www.instagram.com/intersacks.apparel/">Instagram @intersacks.apparel</ExternalLink></li>
           </ul>
-          <p>Orders are confirmed on WhatsApp before anything is made. Online payment is not available.</p>
+          <p>Orders are confirmed on WhatsApp before anything is made.</p>
         </div>
       </div>
       <div className="wrap footer-base">
@@ -161,7 +162,7 @@ export function Layout({ current, children }) {
   return (
     <div className="page">
       <a className="skip-link visually-hidden" href="#content">Skip to content</a>
-      <p className="announcement">Made to order in South Africa. Orders are confirmed on WhatsApp. Online payment is not available yet.</p>
+      <p className="announcement">Made to order in South Africa · Order in minutes on WhatsApp</p>
       <SiteHeader current={current} />
       <main id="content">{children}</main>
       <SiteFooter />

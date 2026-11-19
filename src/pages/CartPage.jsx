@@ -3,12 +3,14 @@ import { Layout } from '../components/Chrome.jsx'
 import { Photo } from '../components/Photo.jsx'
 import { useCart } from '../context/CartContext.jsx'
 import { formatPrice, getCartItemImage, placementLabel } from '../data/catalogue.js'
-import { whatsAppOrderUrl } from '../services/orders.js'
+import { createOrderReference, whatsAppOrderUrl } from '../services/orders.js'
 
 export function CartPage() {
   const { items, subtotal, empty, updateQuantity, removeItem, clear, cart } = useCart()
   const [confirmEmpty, setConfirmEmpty] = useState(false)
   const [error, setError] = useState('')
+  const [name, setName] = useState('')
+  const [area, setArea] = useState('')
 
   function changeQuantity(index, value) {
     try {
@@ -19,8 +21,9 @@ export function CartPage() {
     }
   }
 
-  function proceed() {
-    const url = whatsAppOrderUrl(cart)
+  function proceed(event) {
+    event.preventDefault()
+    const url = whatsAppOrderUrl(cart, { name, area, reference: createOrderReference() })
     if (!url) return
     window.open(url, '_blank', 'noopener,noreferrer')
   }
@@ -80,8 +83,18 @@ export function CartPage() {
                   <div><dt>Total</dt><dd>{formatPrice(subtotal)}</dd></div>
                 </dl>
                 {error ? <p role="alert">{error}</p> : null}
-                <button type="button" className="btn" onClick={proceed}>Proceed to order</button>
-                <p>This opens WhatsApp with your bag written out. Online payment is not available.</p>
+                <form className="checkout-fields" onSubmit={proceed}>
+                  <div className="field">
+                    <label htmlFor="order-name">Your name</label>
+                    <input id="order-name" name="name" autoComplete="name" required value={name} onChange={(event) => setName(event.target.value)} />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="order-area">Delivery area</label>
+                    <input id="order-area" name="area" autoComplete="address-level2" placeholder="e.g. Soweto, Johannesburg" required value={area} onChange={(event) => setArea(event.target.value)} />
+                  </div>
+                  <button type="submit" className="btn">Send order on WhatsApp</button>
+                </form>
+                <p className="fine-print">This opens WhatsApp with your order written out. We confirm delivery and payment with you there. Nothing is charged on this website.</p>
                 <a className="btn btn-ghost" href="index.html#shop">Continue shopping</a>
                 {confirmEmpty ? (
                   <div>

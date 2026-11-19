@@ -19,7 +19,8 @@ export function ProductPage() {
   const [, setVersion] = useState(0)
   const [status, setStatus] = useState('')
   const [quantityError, setQuantityError] = useState('')
-  const { addItem } = useCart()
+  const { addItem, count } = useCart()
+  const [justAdded, setJustAdded] = useState(false)
   const commit = () => setVersion((version) => version + 1)
 
   if (!customizerRef.current) {
@@ -43,6 +44,7 @@ export function ProductPage() {
   function selectGarment(garmentId) {
     customizer.setGarment(garmentId)
     setStatus('')
+    setJustAdded(false)
     setQuantityError('')
     commit()
   }
@@ -73,10 +75,12 @@ export function ProductPage() {
       }
       const item = customizer.createCartItem()
       addItem(item)
-      setStatus(`${item.garmentName} added to the bag.`)
+      setStatus(`${item.quantity} × ${item.garmentName} added to your bag.`)
+      setJustAdded(true)
     } catch (error) {
       setQuantityError(error.message)
       setStatus('')
+      setJustAdded(false)
     }
   }
 
@@ -84,9 +88,10 @@ export function ProductPage() {
     <Layout current="product">
       <section className="band" aria-labelledby="product-title">
         <div className="wrap">
-          <p className="kicker">Customise</p>
+          <p className="kicker">{designs.length ? 'Customise' : garment?.category}</p>
           <h1 id="product-title">{garment ? garment.name : 'Choose a piece'}</h1>
-          <p className="lede">{garment?.description} {designs.length ? 'Artwork from the archive can be placed on this garment.' : 'This piece is sold as shown.'}</p>
+          <p className="lede">{garment?.description} {designs.length ? 'Pick a design from the archive and see it on the garment.' : ''}</p>
+          <p className="price product-price">{formatPrice(breakdown.total)}</p>
           <form className="studio-layout" onSubmit={addToBag} aria-labelledby="product-title">
             <div className="preview-panel">
               <figure className="preview-stage">
@@ -110,6 +115,7 @@ export function ProductPage() {
                 ) : null}
                 <figcaption>{customizer.viewMode === 'back' ? 'Back' : 'Front'} · {formatPrice(breakdown.total)} each</figcaption>
               </figure>
+              {colour?.backImage ? (
               <fieldset>
                 <legend>View</legend>
                 <label className="choice">
@@ -122,13 +128,12 @@ export function ProductPage() {
                     name="view"
                     value="back"
                     checked={customizer.viewMode === 'back'}
-                    disabled={!colour?.backImage}
                     onChange={() => { customizer.setViewMode('back'); commit() }}
                   />
                   Back
                 </label>
               </fieldset>
-              {colour?.backImage ? null : <p id="back-note">Back image not available for this colour.</p>}
+              ) : null}
             </div>
 
             <div className="option-panel">
@@ -174,24 +179,35 @@ export function ProductPage() {
                     <label htmlFor="artwork-search">Search artwork</label>
                     <input id="artwork-search" name="artwork-search" type="search" value={designQuery} onChange={(event) => setDesignQuery(event.target.value)} />
                   </div>
-                  <div className="field">
-                    <label htmlFor="artwork">Artwork</label>
-                    <select
-                      id="artwork"
-                      name="artwork"
-                      value={customizer.selectedDesignId || ''}
-                      onChange={(event) => {
-                        if (event.target.value) customizer.setDesign(event.target.value)
-                        else customizer.clearDesign()
-                        commit()
-                      }}
-                    >
-                      <option value="">Plain garment</option>
+                  <fieldset className="artwork-picker">
+                    <legend>Artwork <span className="legend-note">+{formatPrice(designs[0].additionalPrice)} with a design</span></legend>
+                    <div className="artwork-grid">
+                      <label className="artwork-option">
+                        <input
+                          type="radio"
+                          name="artwork"
+                          value=""
+                          checked={!customizer.selectedDesignId}
+                          onChange={() => { customizer.clearDesign(); commit() }}
+                        />
+                        <span className="artwork-plain" aria-hidden="true">Plain</span>
+                        <span className="artwork-name">No design</span>
+                      </label>
                       {visibleDesigns.map((entry) => (
-                        <option key={entry.id} value={entry.id}>{entry.name} (+{formatPrice(entry.additionalPrice)})</option>
+                        <label key={entry.id} className="artwork-option">
+                          <input
+                            type="radio"
+                            name="artwork"
+                            value={entry.id}
+                            checked={customizer.selectedDesignId === entry.id}
+                            onChange={() => { customizer.setDesign(entry.id); commit() }}
+                          />
+                          <Photo layout="thumb" framed={false} src={entry.image} alt="" />
+                          <span className="artwork-name">{entry.name}</span>
+                        </label>
                       ))}
-                    </select>
-                  </div>
+                    </div>
+                  </fieldset>
                   {designQuery && !visibleDesigns.length ? <p>No artwork matches that search.</p> : null}
                   {design ? (
                     <fieldset>
@@ -211,7 +227,7 @@ export function ProductPage() {
                     </fieldset>
                   ) : null}
                 </>
-              ) : <p>No archive artwork is available for this garment.</p>}
+              ) : null}
 
               <div className="field">
                 <label htmlFor="quantity">Quantity</label>
@@ -238,10 +254,12 @@ export function ProductPage() {
                 <div><dt>Each</dt><dd>{formatPrice(breakdown.total)}</dd></div>
                 <div><dt>Line total</dt><dd>{formatPrice(breakdown.total * (Number(customizer.quantity) || 0))}</dd></div>
               </dl>
-              <p>Available to order. The final order is confirmed on WhatsApp.</p>
-              <button className="btn" type="submit">Add to bag</button>
-              <p aria-live="polite">{status}</p>
-              <a href="cart.html">Go to cart</a>
+              <button className="btn" type="submit">Add to bag · {formatPrice(breakdown.total * (Number(customizer.quantity) || 0))}</button>
+              <div className="added-note" aria-live="polite">
+                {status ? <p>✓ {status}</p> : null}
+                {justAdded ? <a className="btn btn-ghost" href="cart.html">View bag ({count})</a> : null}
+              </div>
+              <p className="fine-print">Made to order. We confirm sizing and delivery with you on WhatsApp before anything is made.</p>
             </div>
           </form>
         </div>

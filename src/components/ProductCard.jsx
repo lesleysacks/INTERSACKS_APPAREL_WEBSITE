@@ -15,8 +15,7 @@ export function ProductCard({ garment }) {
       <p className="price">{formatPrice(garment.basePrice)}</p>
       <p>{colours}</p>
       <p>Sizes {garment.sizes.join(', ')}</p>
-      <p className="availability">Available to order</p>
-      {garment.customizable ? <p>Custom artwork available</p> : <p>Sold as shown</p>}
+      {garment.customizable ? <p className="availability">Add your own design</p> : null}
     </article>
   )
 }

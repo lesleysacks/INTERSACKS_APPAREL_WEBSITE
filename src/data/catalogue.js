@@ -51,7 +51,7 @@ const designManifest = [
   ["design-001","Midnight Snake","assets/Designs/0ceea4478c03705b4283b673023e1450.jpg","Graphic",true],
   ["design-002","Crowned Icon","assets/Designs/104e5a912c34fd6898133b672a492a89.jpg","Character",true],
   ["design-003","Pocket Pup","assets/Designs/185ac590435857a9da23b5b7e50d5b99.jpg","Character",false],
-  ["design-004","No Pain No Gain","assets/Designs/1a1bb04ef96cca4968e4442c9401c49e.jpg","Typography",false],
+  ["design-004","No Pain No Gain","assets/Designs/1a1bb04ef96cca4968e4442c9401c49e.jpg","Typography",true],
   ["design-005","Street Motion","assets/Designs/2.jpg","Graphic",true],
   ["design-006","Swoosh Bear","assets/Designs/210865ccdb490c7bffd0b20d0aabf8c0.jpg","Character",false],
   ["design-007","Ocean Eye","assets/Designs/2f70647aa2391d1f174627eb0437412d.jpg","Abstract",false],
@@ -63,7 +63,7 @@ const designManifest = [
   ["design-013","Crown of Thorns","assets/Designs/43847d66a48aa157b606ceaa49f8b386.jpg","Graphic",false],
   ["design-014","Denim Pocket Pup","assets/Designs/4774e8359a7a443c2a00923c0bb19764.jpg","Character",false],
   ["design-015","Psalm 23","assets/Designs/4cba37fb0760fa6073f9b05260a00a42.jpg","Typography",false],
-  ["design-016","Let God Handle It","assets/Designs/4cfed7e87630e3a9e7f03c089546cb34.jpg","Typography",false],
+  ["design-016","Let God Handle It","assets/Designs/4cfed7e87630e3a9e7f03c089546cb34.jpg","Typography",true],
   ["design-017","Street Kid","assets/Designs/5.jpg","Character",false],
   ["design-018","Rise Above Limits","assets/Designs/5aec2daaddea1c879fa2fa0465ffb314.jpg","Typography",false],
   ["design-019","Watercolour Lips","assets/Designs/61d2bdc94edd88fb2b640eeead1780ab.jpg","Abstract",false],
@@ -85,7 +85,7 @@ const designManifest = [
   ["design-035","Neon Mouse","assets/Designs/c0a17b20fbd83b6a0b96f8f2b154495b.jpg","Character",false],
   ["design-036","Swoosh Collage","assets/Designs/c2d72669feb4303a398b54a9bff14357.jpg","Graphic",false],
   ["design-037","Gold Chain Dog","assets/Designs/c39314c8bf0e0e06a61058a4b50163da.jpg","Character",false],
-  ["design-038","Trust God and Pray","assets/Designs/c7ba146fa0f0f376177e2b7f32f6495e.jpg","Typography",false],
+  ["design-038","Trust God and Pray","assets/Designs/c7ba146fa0f0f376177e2b7f32f6495e.jpg","Typography",true],
   ["design-039","Blue Hat Dog","assets/Designs/c8792f0286f156be8719539bbb3b3e46.jpg","Character",false],
   ["design-040","Classic Swoosh","assets/Designs/dcc13fb91b7a8b4d114cba7e588c98d8.jpg","Typography",false],
   ["design-041","Boss","assets/Designs/ddc04068f181bfd8b41b7517022b71a4.jpg","Typography",false],
@@ -100,7 +100,41 @@ const designManifest = [
   ["design-050","PJH Crest","assets/Designs/LOGOS/images.jpg","Logo",false]
 ];
 
-export const designs = designManifest.map(([id,name,image,category,featured,transparent]) => ({ ...designDefaults, id,name,image,category,featured, transparentImage:transparent ? image : null, hasUsableTransparency:Boolean(transparent) }));
+/* Artwork and garments hidden from the shop because they show other people's
+   trademarks, characters, real people, or another artist's signature.
+   The image files are kept. Remove an id here only once you own the rights or
+   have written permission to sell it. */
+export const RIGHTS_HOLD = {
+  "design-002": "The Notorious B.I.G. likeness",
+  "design-006": "Nike logo",
+  "design-009": "Kratos (God of War)",
+  "design-011": "Kratos (God of War)",
+  "design-012": "The Notorious B.I.G. likeness",
+  "design-017": "Another creator's watermark (TP Store Creations)",
+  "design-020": "adidas logo and Hulk (Marvel)",
+  "design-022": "Another artist's signature (Urban Surgery)",
+  "design-023": "Tupac Shakur likeness",
+  "design-024": "One Piece (Straw Hat Jolly Roger)",
+  "design-026": "Lil Wayne likeness",
+  "design-027": "adidas logo and Goku (Dragon Ball)",
+  "design-028": "Zoro (One Piece)",
+  "design-029": "Cocomelon character and Nike logo",
+  "design-031": "adidas logo",
+  "design-033": "Nike logo and Cocomelon character",
+  "design-035": "Mickey Mouse (Disney) and Chanel logo",
+  "design-036": "Nike logo and Toy Story characters",
+  "design-040": "Nike logo",
+  "design-044": "Tupac Shakur likeness",
+  "design-047": "The Joker (DC)",
+  "design-049": "GOAT Records logo (another business)",
+  "design-050": "PJH school crest",
+  "cocomelon-sweatshirt": "Cocomelon character and Nike logo",
+  "rose-tracksuit": "Nissan GT-R logo"
+};
+
+export const designs = designManifest.map(([id,name,image,category,featured,transparent]) => ({ ...designDefaults, id,name,image,category,featured, transparentImage:transparent ? image : null, hasUsableTransparency:Boolean(transparent), active: !RIGHTS_HOLD[id] }));
+
+for (const garment of garments) if (RIGHTS_HOLD[garment.id]) garment.active = false;
 
 export const unclassifiedAssets = [
   "assets/Designs/download (2).png",

@@ -2,6 +2,8 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
   STORE_CONFIG,
+  RIGHTS_HOLD,
+  designs as allDesigns,
   calculatePrice,
   filterGarments,
   formatPrice,
@@ -13,7 +15,7 @@ import {
 } from '../src/data/catalogue.js'
 import { Cart, createMemoryStorage } from '../src/services/cart.js'
 import { Customizer } from '../src/services/customizer.js'
-import { generateWhatsAppMessage } from '../src/services/orders.js'
+import { createOrderReference, generateWhatsAppMessage } from '../src/services/orders.js'
 
 test('Baseline: Store configuration matches expected InterSacks brand settings', () => {
   assert.equal(STORE_CONFIG.brandName, 'InterSacks Apparel')
@@ -22,13 +24,14 @@ test('Baseline: Store configuration matches expected InterSacks brand settings',
   assert.equal(STORE_CONFIG.whatsappNumber, '27843252262')
 })
 
-test('Baseline: Garment catalogue integrity (11 active real products, 18 planned)', () => {
+test('Garment catalogue integrity (9 active real products, 18 planned)', () => {
   const allGarments = getGarments()
   const realGarments = allGarments.filter((garment) => garment.available !== false)
   const plannedGarments = allGarments.filter((garment) => garment.available === false)
 
-  assert.equal(allGarments.length, 29, 'Total garments should be 29 (11 real + 18 planned)')
-  assert.equal(realGarments.length, 11, 'Real active garments should be 11')
+  assert.equal(allGarments.length, 27, 'Total active garments should be 27 (9 real + 18 planned)')
+  assert.equal(realGarments.length, 9, 'Real active garments should be 9')
+  assert.ok(realGarments.every((garment) => !RIGHTS_HOLD[garment.id]))
   assert.equal(plannedGarments.length, 18, 'Planned garments should be 18')
 
   realGarments.forEach((garment) => {
@@ -44,9 +47,11 @@ test('Baseline: Garment catalogue integrity (11 active real products, 18 planned
   })
 })
 
-test('Baseline: Design catalogue integrity (50 designs in manifest)', () => {
+test('Design catalogue integrity (50 in manifest, rights-held designs hidden)', () => {
   const designs = getDesigns()
-  assert.equal(designs.length, 50, 'There should be 50 designs')
+  assert.equal(allDesigns.length, 50, 'There should be 50 designs in the manifest')
+  assert.equal(designs.length, 50 - Object.keys(RIGHTS_HOLD).filter((id) => id.startsWith('design-')).length)
+  assert.ok(designs.every((design) => !RIGHTS_HOLD[design.id]))
   designs.forEach((design) => {
     assert.ok(design.id, 'Design must have id')
     assert.ok(design.name, 'Design must have name')
@@ -156,7 +161,7 @@ test('Baseline: WhatsApp order message format generation', () => {
   assert.ok(message.includes('Colour: Black'))
   assert.ok(message.includes('Size: M'))
   assert.ok(message.includes('Design: Midnight Snake'))
-  assert.ok(message.includes('Placement: front-center'))
+  assert.ok(message.includes('Placement: Front Centre'))
   assert.ok(message.includes('TOTAL: R798'))
   assert.ok(message.includes('Name:'))
   assert.ok(message.includes('Delivery Area:'))
@@ -222,4 +227,33 @@ test('Custom quantity is priced per unit and rejected outside 1 to 10', () => {
   cart.addItem(item)
   assert.equal(cart.getSubtotal(), 1047)
   assert.throws(() => cart.updateQuantity(0, 11), /1 to 10/)
+})
+
+test('Adding the same piece again cannot push a line past 10', () => {
+  const cart = new Cart(createMemoryStorage())
+  const item = { garmentId: 'classic-tee', garmentName: 'Classic Tee', colour: 'Black', size: 'M', designId: null, designName: 'None', placement: 'N/A', unitPrice: 349, quantity: 8 }
+  cart.addItem(item)
+  assert.throws(() => cart.addItem(item), /up to 10/)
+  assert.equal(cart.items[0].quantity, 8)
+  cart.addItem({ ...item, quantity: 2 })
+  assert.equal(cart.items[0].quantity, 10)
+})
+
+test('Saved bag lines for pieces no longer in the shop are dropped', () => {
+  const cart = new Cart(createMemoryStorage())
+  cart.addItem({ garmentId: 'classic-tee', colour: 'Black', size: 'M', designId: null, placement: 'N/A', unitPrice: 349, quantity: 1 })
+  cart.addItem({ garmentId: 'rose-tracksuit', colour: 'Black / Pink', size: 'M', designId: null, placement: 'N/A', unitPrice: 899, quantity: 1 })
+  cart.prune((entry) => entry.garmentId !== 'rose-tracksuit')
+  assert.deepEqual(cart.items.map((entry) => entry.garmentId), ['classic-tee'])
+})
+
+test('Order message carries the customer name, area and reference', () => {
+  const cart = new Cart(createMemoryStorage())
+  cart.addItem({ garmentId: 'classic-tee', garmentName: 'Classic Tee', colour: 'Black', size: 'M', designId: null, designName: 'None', placement: 'N/A', unitPrice: 349, quantity: 1 })
+  const reference = createOrderReference(new Date(2026, 10, 19), () => 0.5)
+  assert.match(reference, /^IS-261119-[0-9A-Z]{4}$/)
+  const message = generateWhatsAppMessage(cart, { name: ' Thabo ', area: 'Soweto', reference })
+  assert.ok(message.includes(`(ref ${reference})`))
+  assert.ok(message.includes('Name: Thabo\n'))
+  assert.ok(message.includes('Delivery Area: Soweto'))
 })

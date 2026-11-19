@@ -1,4 +1,5 @@
 export const CART_STORAGE_KEY = 'intersacks-cart'
+export const MAX_QUANTITY = 10
 
 export function createMemoryStorage() {
   const data = {}
@@ -63,7 +64,11 @@ export class Cart {
     )
 
     if (existingIndex >= 0) {
-      this.items[existingIndex].quantity += quantity
+      const current = this.items[existingIndex].quantity
+      if (current + quantity > MAX_QUANTITY) {
+        throw new Error(`You can order up to ${MAX_QUANTITY} of the same piece. Your bag already has ${current}.`)
+      }
+      this.items[existingIndex].quantity = current + quantity
     } else {
       this.items.push({ ...item, quantity })
     }
@@ -97,6 +102,16 @@ export class Cart {
 
   getItemCount() {
     return this.items.reduce((total, item) => total + item.quantity, 0)
+  }
+
+  /* Drop saved lines that can no longer be ordered, such as pieces taken out of the shop. */
+  prune(isValid) {
+    const kept = this.items.filter(isValid)
+    if (kept.length !== this.items.length) {
+      this.items = kept
+      this.saveToStorage()
+    }
+    return this.items
   }
 
   isEmpty() {
