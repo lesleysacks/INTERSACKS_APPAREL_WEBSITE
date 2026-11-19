@@ -52,8 +52,8 @@ test('Garment catalogue integrity (9 active real products, 18 planned)', () => {
 
 test('Design catalogue integrity (50 in manifest, rights-held designs hidden)', () => {
   const designs = getDesigns()
-  assert.equal(allDesigns.length, 50, 'There should be 50 designs in the manifest')
-  assert.equal(designs.length, 50 - Object.keys(RIGHTS_HOLD).filter((id) => id.startsWith('design-')).length)
+  assert.equal(allDesigns.length, 62, 'There should be 62 designs in the manifest')
+  assert.equal(designs.length, 62 - Object.keys(RIGHTS_HOLD).filter((id) => id.startsWith('design-')).length)
   assert.ok(designs.every((design) => !RIGHTS_HOLD[design.id]))
   designs.forEach((design) => {
     assert.ok(design.id, 'Design must have id')
@@ -295,4 +295,13 @@ test('Custom order enquiry message lists the request', () => {
   const blank = generateCustomEnquiryMessage({ name: 'Sipho' })
   assert.ok(blank.includes('Garment: Not sure yet'))
   assert.ok(!blank.includes('Notes:'))
+})
+
+test('InterSacks 2026 originals are live, transparent and grouped', () => {
+  const originals = getDesigns().filter((design) => design.image.includes('InterSacks_2026'))
+  assert.equal(originals.length, 12)
+  assert.ok(originals.every((design) => design.active && design.hasUsableTransparency && design.transparentImage === design.image))
+  for (const collection of ['Panther', 'Built Different', 'Mzansi', 'Mascot', 'Skull & Rose']) {
+    assert.ok(originals.some((design) => design.collection === collection), collection)
+  }
 })

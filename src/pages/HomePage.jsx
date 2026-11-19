@@ -27,6 +27,8 @@ function initialCategory() {
 }
 
 const DESIGN_PREVIEW = 12
+/* Featured artwork first (newest originals lead), then the rest in catalogue order. */
+const ARCHIVE_ORDER = [...getDesigns()].sort((a, b) => Number(b.featured) - Number(a.featured) || (b.image.includes('InterSacks_2026') - a.image.includes('InterSacks_2026')))
 
 export function HomePage() {
   const purchasable = getPurchasableGarments()
@@ -46,7 +48,7 @@ export function HomePage() {
   const [designQuery, setDesignQuery] = useState('')
   const [showAllDesigns, setShowAllDesigns] = useState(false)
   const designs = useMemo(
-    () => filterDesigns(getDesigns(), { category: designCategory, collection: designCollection, query: designQuery }),
+    () => filterDesigns(ARCHIVE_ORDER, { category: designCategory, collection: designCollection, query: designQuery }),
     [designCategory, designCollection, designQuery]
   )
   const classic = purchasable.find((garment) => garment.id === 'classic-tee')

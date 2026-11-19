@@ -97,7 +97,20 @@ const designManifest = [
   ["design-047","Wild Card","assets/Designs/f98a975d6804ffc745270de2efc0cb51.jpg","Character",true],
   ["design-048","Hip-Hop Animation","assets/Designs/hiphop animation.jpg","Character",false],
   ["design-049","GOAT Records","assets/Designs/LOGOS/494270673_708313071721779_281460282416568802_n.jpg","Logo",false],
-  ["design-050","PJH Crest","assets/Designs/LOGOS/images.jpg","Logo",false]
+  ["design-050","PJH Crest","assets/Designs/LOGOS/images.jpg","Logo",false],
+  /* InterSacks 2026 originals, made in Canva with transparent backgrounds */
+  ["design-051","Panther Claw","assets/Designs/InterSacks_2026/panther-claw.png","Graphic",true,true],
+  ["design-052","Panther Eye","assets/Designs/InterSacks_2026/panther-eye.png","Graphic",false,true],
+  ["design-053","Panther Prowl","assets/Designs/InterSacks_2026/panther-prowl.png","Graphic",true,true],
+  ["design-054","Built Different","assets/Designs/InterSacks_2026/built-different.png","Typography",true,true],
+  ["design-055","IS Crest","assets/Designs/InterSacks_2026/is-crest.png","Logo",true,true],
+  ["design-056","Next Stop: Success","assets/Designs/InterSacks_2026/next-stop-success.png","Graphic",true,true],
+  ["design-057","Mzansi Skyline","assets/Designs/InterSacks_2026/mzansi-skyline.png","Graphic",false,true],
+  ["design-058","Sharp Sharp","assets/Designs/InterSacks_2026/sharp-sharp.png","Typography",false,true],
+  ["design-059","Braai Master Cub","assets/Designs/InterSacks_2026/mascot-braai.png","Character",true,true],
+  ["design-060","Graduate Cub","assets/Designs/InterSacks_2026/mascot-graduate.png","Character",false,true],
+  ["design-061","Skull & Roses","assets/Designs/InterSacks_2026/skull-roses.png","Graphic",true,true],
+  ["design-062","Rose Vine","assets/Designs/InterSacks_2026/rose-vine.png","Graphic",false,true]
 ];
 
 /* Artwork and garments hidden from the shop because they show other people's
@@ -156,7 +169,8 @@ const COLLECTION_BY_DESIGN = {
   "design-004":"Grind","design-018":"Grind","design-025":"Grind","design-030":"Grind","design-032":"Grind","design-041":"Grind","design-045":"Grind",
   "design-005":"Street","design-008":"Street","design-010":"Street","design-019":"Street","design-021":"Street","design-042":"Street","design-048":"Street",
   "design-001":"Wild","design-007":"Wild","design-046":"Wild",
-  "design-003":"Pups","design-014":"Pups","design-037":"Pups","design-039":"Pups"
+  "design-003":"Pups","design-014":"Pups","design-037":"Pups","design-039":"Pups",
+  "design-051":"Panther","design-052":"Panther","design-053":"Panther","design-054":"Built Different","design-055":"Built Different","design-056":"Mzansi","design-057":"Mzansi","design-058":"Mzansi","design-059":"Mascot","design-060":"Mascot","design-061":"Skull & Rose","design-062":"Skull & Rose"
 };
 export const COLLECTION_ORDER = ["Panther","Built Different","Mzansi","Mascot","Skull & Rose","Faith","Grind","Street","Wild","Pups"];
 for (const design of designs) design.collection = design.collection || COLLECTION_BY_DESIGN[design.id] || design.category;
