@@ -298,8 +298,12 @@ ul, ol {
 
 .cart-count {
   min-inline-size: 1.4rem;
-  padding-inline: 0.35rem;
-  border: 1px solid var(--line);
+  margin-inline-start: 0.35rem;
+  padding-inline: 0.4rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--paper);
+  font-weight: 700;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
@@ -553,15 +557,18 @@ fieldset {
 
 .planned-list {
   list-style: none;
-  display: grid;
-  gap: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin-block: 1.25rem;
 }
 
 .planned-list li {
-  display: grid;
-  gap: 0.15rem;
-  padding-block-end: 0.8rem;
-  border-block-end: 1px solid var(--line);
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.92rem;
 }
 
 .story {
@@ -740,7 +747,6 @@ fieldset {
 @container page (min-width: 40rem) {
   .filters,
   .contact-grid,
-  .footer-grid,
   .story-grid,
   .customise-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -780,7 +786,8 @@ fieldset {
   .studio-layout,
   .cart-layout,
   .footer-grid {
-    grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 24rem);
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
   }
 
   .preview-panel {
@@ -805,4 +812,220 @@ fieldset {
   .choice {
     min-block-size: 2.75rem;
   }
+}
+
+.site-footer h2 {
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-block-end: 0.5rem;
+}
+
+.product-price {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-block: 0.25rem 1rem;
+}
+
+.artwork-picker {
+  display: block;
+  min-width: 0;
+}
+
+.legend-note {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.artwork-grid {
+  display: grid;
+  inline-size: 100%;
+  margin-block-start: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(5.25rem, 1fr));
+  gap: 0.5rem;
+  max-height: 26rem;
+  overflow-y: auto;
+  padding: 0.25rem;
+}
+
+.artwork-option {
+  position: relative;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  border: 2px solid transparent;
+  background: var(--paper-2);
+  cursor: pointer;
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.artwork-option input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  cursor: pointer;
+}
+
+.artwork-option:has(input:checked) {
+  border-color: var(--ink);
+}
+
+.artwork-option:has(input:focus-visible) {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.artwork-option img,
+.artwork-plain {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: #fff;
+  color: #161513;
+}
+
+.added-note {
+  display: grid;
+  gap: 0.5rem;
+  min-height: 1.5rem;
+}
+
+.added-note p {
+  font-weight: 700;
+}
+
+.fine-print {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.more-row {
+  display: flex;
+  justify-content: center;
+  margin-block-start: 1.5rem;
+}
+
+.checkout-fields {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.collection-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block: 0.5rem 1.25rem;
+}
+
+.chip {
+  min-block-size: 2.5rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--button-bg);
+}
+
+.chip:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+textarea {
+  inline-size: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--paper-2);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+
+.occasion-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: 0.75rem;
+  padding: 0;
+  margin-block: 1.5rem 2rem;
+}
+
+.occasion-card {
+  position: relative;
+  display: grid;
+  gap: 0.35rem;
+  block-size: 100%;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+  cursor: pointer;
+}
+
+.occasion-card input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.occasion-card:has(input:checked) {
+  border: 2px solid var(--ink);
+  padding: calc(1rem - 1px);
+}
+
+.occasion-card:has(input:focus-visible) {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.occasion-card span {
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.custom-layout {
+  display: grid;
+  gap: 2rem;
+}
+
+.custom-form,
+.custom-aside {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: 1rem;
+}
+
+.steps-compact li::before {
+  font-size: 1.4rem;
+}
+
+@media (min-width: 52rem) {
+  .custom-layout {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: 3rem;
+  }
+}
+
+.custom-aside .steps-compact {
+  grid-template-columns: 1fr;
 }

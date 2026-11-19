@@ -82,7 +82,8 @@ export default defineConfig({
       input: {
         main: path.resolve('index.html'),
         product: path.resolve('product.html'),
-        cart: path.resolve('cart.html')
+        cart: path.resolve('cart.html'),
+        custom: path.resolve('custom.html')
       }
     }
   }

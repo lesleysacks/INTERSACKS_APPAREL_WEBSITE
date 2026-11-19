@@ -65,7 +65,7 @@ assets/
 
 Catalogue metadata lives in `src/data/catalogue.js`. Prices are whole rands. The bag is stored under the `intersacks-cart` key. Orders use WhatsApp number `27843252262`.
 
-The catalogue has 11 garments that can be ordered and 18 planned garments. Planned garments have no price, colour, size, or image, and they cannot be added to the bag. There are 50 archive designs. Artwork adds R50 and can be placed only on the Classic Tee, at Front Small or Front Centre. Back photographs are not in the catalogue, so the back view stays unavailable.
+The catalogue lists 11 garments and 62 archive designs, including 12 InterSacks 2026 originals made in Canva (transparent 2048px PNGs in `assets/Designs/InterSacks_2026/`). Pieces whose ids are in `RIGHTS_HOLD` in `src/data/catalogue.js` are hidden from the shop because they show other people's trademarks, characters, real people, or another artist's signature; today that leaves 9 garments and 39 designs. Their files stay in `assets/`. Remove an id from `RIGHTS_HOLD` only once you own the rights or have written permission. The 18 planned garments have no price, colour, size, or image, and they cannot be added to the bag. Artwork can be placed only on the Classic Tee. The price depends on the print position: Front Small or Front Centre +R50, Back Centre +R80, Left Sleeve +R40. Designs are grouped into collections (Panther, Built Different, Mzansi, Mascot, Skull & Rose, Faith, Grind, Street, Wild, Pups). Back photographs are not in the catalogue, so the back view stays unavailable.
 
 ## Images
 
@@ -77,7 +77,7 @@ Repository: https://github.com/lesleysacks/INTERSACKS_APPAREL_WEBSITE
 
 Production URL: https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/
 
-Publishing is a manual GitHub Actions workflow, `.github/workflows/pages.yml`. It does not run on push. When the owner starts it, the workflow:
+Publishing is the GitHub Actions workflow `.github/workflows/pages.yml`. It runs on every push to `main`, and can also be started by hand from the Actions tab. The workflow:
 
 1. Runs `npm ci` to install dependencies.
 2. Runs `npm test`.
@@ -87,7 +87,7 @@ Publishing is a manual GitHub Actions workflow, `.github/workflows/pages.yml`. I
 
 The Pages source for this workflow is GitHub Actions. Publishing the `main` branch itself would upload the unbuilt source, including `src/main.jsx`, and would not produce this site. FTP is not the deployment process.
 
-This repository copy does not deploy or change the live site. The live URL updates only after the workflow has been run on GitHub.
+The live URL updates a minute or two after a push to `main`, once the workflow finishes.
 
 ## Not included
 

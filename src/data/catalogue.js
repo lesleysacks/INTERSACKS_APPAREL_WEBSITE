@@ -46,12 +46,12 @@ const plannedProducts = [
 
 garments.push(...plannedProducts);
 
-const designDefaults = { additionalPrice:50, compatibleGarments:["classic-tee"], placements:["front-small","front-center"], active:true, printable:true };
+const designDefaults = { additionalPrice:50, compatibleGarments:["classic-tee"], placements:["front-small","front-center","back-center","left-sleeve"], active:true, printable:true };
 const designManifest = [
   ["design-001","Midnight Snake","assets/Designs/0ceea4478c03705b4283b673023e1450.jpg","Graphic",true],
   ["design-002","Crowned Icon","assets/Designs/104e5a912c34fd6898133b672a492a89.jpg","Character",true],
   ["design-003","Pocket Pup","assets/Designs/185ac590435857a9da23b5b7e50d5b99.jpg","Character",false],
-  ["design-004","No Pain No Gain","assets/Designs/1a1bb04ef96cca4968e4442c9401c49e.jpg","Typography",false],
+  ["design-004","No Pain No Gain","assets/Designs/1a1bb04ef96cca4968e4442c9401c49e.jpg","Typography",true],
   ["design-005","Street Motion","assets/Designs/2.jpg","Graphic",true],
   ["design-006","Swoosh Bear","assets/Designs/210865ccdb490c7bffd0b20d0aabf8c0.jpg","Character",false],
   ["design-007","Ocean Eye","assets/Designs/2f70647aa2391d1f174627eb0437412d.jpg","Abstract",false],
@@ -63,7 +63,7 @@ const designManifest = [
   ["design-013","Crown of Thorns","assets/Designs/43847d66a48aa157b606ceaa49f8b386.jpg","Graphic",false],
   ["design-014","Denim Pocket Pup","assets/Designs/4774e8359a7a443c2a00923c0bb19764.jpg","Character",false],
   ["design-015","Psalm 23","assets/Designs/4cba37fb0760fa6073f9b05260a00a42.jpg","Typography",false],
-  ["design-016","Let God Handle It","assets/Designs/4cfed7e87630e3a9e7f03c089546cb34.jpg","Typography",false],
+  ["design-016","Let God Handle It","assets/Designs/4cfed7e87630e3a9e7f03c089546cb34.jpg","Typography",true],
   ["design-017","Street Kid","assets/Designs/5.jpg","Character",false],
   ["design-018","Rise Above Limits","assets/Designs/5aec2daaddea1c879fa2fa0465ffb314.jpg","Typography",false],
   ["design-019","Watercolour Lips","assets/Designs/61d2bdc94edd88fb2b640eeead1780ab.jpg","Abstract",false],
@@ -85,7 +85,7 @@ const designManifest = [
   ["design-035","Neon Mouse","assets/Designs/c0a17b20fbd83b6a0b96f8f2b154495b.jpg","Character",false],
   ["design-036","Swoosh Collage","assets/Designs/c2d72669feb4303a398b54a9bff14357.jpg","Graphic",false],
   ["design-037","Gold Chain Dog","assets/Designs/c39314c8bf0e0e06a61058a4b50163da.jpg","Character",false],
-  ["design-038","Trust God and Pray","assets/Designs/c7ba146fa0f0f376177e2b7f32f6495e.jpg","Typography",false],
+  ["design-038","Trust God and Pray","assets/Designs/c7ba146fa0f0f376177e2b7f32f6495e.jpg","Typography",true],
   ["design-039","Blue Hat Dog","assets/Designs/c8792f0286f156be8719539bbb3b3e46.jpg","Character",false],
   ["design-040","Classic Swoosh","assets/Designs/dcc13fb91b7a8b4d114cba7e588c98d8.jpg","Typography",false],
   ["design-041","Boss","assets/Designs/ddc04068f181bfd8b41b7517022b71a4.jpg","Typography",false],
@@ -97,10 +97,57 @@ const designManifest = [
   ["design-047","Wild Card","assets/Designs/f98a975d6804ffc745270de2efc0cb51.jpg","Character",true],
   ["design-048","Hip-Hop Animation","assets/Designs/hiphop animation.jpg","Character",false],
   ["design-049","GOAT Records","assets/Designs/LOGOS/494270673_708313071721779_281460282416568802_n.jpg","Logo",false],
-  ["design-050","PJH Crest","assets/Designs/LOGOS/images.jpg","Logo",false]
+  ["design-050","PJH Crest","assets/Designs/LOGOS/images.jpg","Logo",false],
+  /* InterSacks 2026 originals, made in Canva with transparent backgrounds */
+  ["design-051","Panther Claw","assets/Designs/InterSacks_2026/panther-claw.png","Graphic",true,true],
+  ["design-052","Panther Eye","assets/Designs/InterSacks_2026/panther-eye.png","Graphic",false,true],
+  ["design-053","Panther Prowl","assets/Designs/InterSacks_2026/panther-prowl.png","Graphic",true,true],
+  ["design-054","Built Different","assets/Designs/InterSacks_2026/built-different.png","Typography",true,true],
+  ["design-055","IS Crest","assets/Designs/InterSacks_2026/is-crest.png","Logo",true,true],
+  ["design-056","Next Stop: Success","assets/Designs/InterSacks_2026/next-stop-success.png","Graphic",true,true],
+  ["design-057","Mzansi Skyline","assets/Designs/InterSacks_2026/mzansi-skyline.png","Graphic",false,true],
+  ["design-058","Sharp Sharp","assets/Designs/InterSacks_2026/sharp-sharp.png","Typography",false,true],
+  ["design-059","Braai Master Cub","assets/Designs/InterSacks_2026/mascot-braai.png","Character",true,true],
+  ["design-060","Graduate Cub","assets/Designs/InterSacks_2026/mascot-graduate.png","Character",false,true],
+  ["design-061","Skull & Roses","assets/Designs/InterSacks_2026/skull-roses.png","Graphic",true,true],
+  ["design-062","Rose Vine","assets/Designs/InterSacks_2026/rose-vine.png","Graphic",false,true]
 ];
 
-export const designs = designManifest.map(([id,name,image,category,featured,transparent]) => ({ ...designDefaults, id,name,image,category,featured, transparentImage:transparent ? image : null, hasUsableTransparency:Boolean(transparent) }));
+/* Artwork and garments hidden from the shop because they show other people's
+   trademarks, characters, real people, or another artist's signature.
+   The image files are kept. Remove an id here only once you own the rights or
+   have written permission to sell it. */
+export const RIGHTS_HOLD = {
+  "design-002": "The Notorious B.I.G. likeness",
+  "design-006": "Nike logo",
+  "design-009": "Kratos (God of War)",
+  "design-011": "Kratos (God of War)",
+  "design-012": "The Notorious B.I.G. likeness",
+  "design-017": "Another creator's watermark (TP Store Creations)",
+  "design-020": "adidas logo and Hulk (Marvel)",
+  "design-022": "Another artist's signature (Urban Surgery)",
+  "design-023": "Tupac Shakur likeness",
+  "design-024": "One Piece (Straw Hat Jolly Roger)",
+  "design-026": "Lil Wayne likeness",
+  "design-027": "adidas logo and Goku (Dragon Ball)",
+  "design-028": "Zoro (One Piece)",
+  "design-029": "Cocomelon character and Nike logo",
+  "design-031": "adidas logo",
+  "design-033": "Nike logo and Cocomelon character",
+  "design-035": "Mickey Mouse (Disney) and Chanel logo",
+  "design-036": "Nike logo and Toy Story characters",
+  "design-040": "Nike logo",
+  "design-044": "Tupac Shakur likeness",
+  "design-047": "The Joker (DC)",
+  "design-049": "GOAT Records logo (another business)",
+  "design-050": "PJH school crest",
+  "cocomelon-sweatshirt": "Cocomelon character and Nike logo",
+  "rose-tracksuit": "Nissan GT-R logo"
+};
+
+export const designs = designManifest.map(([id,name,image,category,featured,transparent]) => ({ ...designDefaults, id,name,image,category,featured, transparentImage:transparent ? image : null, hasUsableTransparency:Boolean(transparent), active: !RIGHTS_HOLD[id] }));
+
+for (const garment of garments) if (RIGHTS_HOLD[garment.id]) garment.active = false;
 
 export const unclassifiedAssets = [
   "assets/Designs/download (2).png",
@@ -109,9 +156,24 @@ export const unclassifiedAssets = [
 ];
 
 const placementConfigs = {
-  "front-small":{name:"Front Small",styles:{width:"18%",top:"25%",left:"50%",transform:"translateX(-50%)"}},
-  "front-center":{name:"Front Centre",styles:{width:"34%",top:"31%",left:"50%",transform:"translateX(-50%)"}}
+  "front-small":{name:"Front Small",price:50,view:"front",styles:{width:"18%",top:"25%",left:"50%",transform:"translateX(-50%)"}},
+  "front-center":{name:"Front Centre",price:50,view:"front",styles:{width:"34%",top:"31%",left:"50%",transform:"translateX(-50%)"}},
+  "back-center":{name:"Back Centre",price:80,view:"back",styles:{width:"44%",top:"24%",left:"50%",transform:"translateX(-50%)"}},
+  "left-sleeve":{name:"Left Sleeve",price:40,view:"front",styles:{width:"9%",top:"26%",left:"80%",transform:"translateX(-50%) rotate(-28deg)"}}
 };
+
+/* Design collections. Ids not listed fall back to the design's category. */
+const COLLECTION_BY_DESIGN = {
+  "design-034":"Panther",
+  "design-013":"Faith","design-015":"Faith","design-016":"Faith","design-038":"Faith","design-043":"Faith",
+  "design-004":"Grind","design-018":"Grind","design-025":"Grind","design-030":"Grind","design-032":"Grind","design-041":"Grind","design-045":"Grind",
+  "design-005":"Street","design-008":"Street","design-010":"Street","design-019":"Street","design-021":"Street","design-042":"Street","design-048":"Street",
+  "design-001":"Wild","design-007":"Wild","design-046":"Wild",
+  "design-003":"Pups","design-014":"Pups","design-037":"Pups","design-039":"Pups",
+  "design-051":"Panther","design-052":"Panther","design-053":"Panther","design-054":"Built Different","design-055":"Built Different","design-056":"Mzansi","design-057":"Mzansi","design-058":"Mzansi","design-059":"Mascot","design-060":"Mascot","design-061":"Skull & Rose","design-062":"Skull & Rose"
+};
+export const COLLECTION_ORDER = ["Panther","Built Different","Mzansi","Mascot","Skull & Rose","Faith","Grind","Street","Wild","Pups"];
+for (const design of designs) design.collection = design.collection || COLLECTION_BY_DESIGN[design.id] || design.category;
 
 export function getGarments(){return garments.filter(g=>g.active)}
 export function getGarmentById(id){return garments.find(g=>g.id===id)}
@@ -126,7 +188,22 @@ export function getPlacementConfig(id){return placementConfigs[id]}
 export function getPlacementsForDesign(id){const d=getDesignById(id);return d?d.placements.map(p=>({id:p,...placementConfigs[p]})):[]}
 export function getDesignCategories(){return [...new Set(getDesigns().map(d=>d.category))].sort()}
 export function getGarmentCategories(){return [...new Set(getGarments().map(g=>g.category))].sort()}
-export function calculatePrice(garmentId,designId=null){const g=getGarmentById(garmentId);const d=designId?getDesignById(designId):null;return g?g.basePrice+(d?.active?d.additionalPrice:0):0}
+export function artworkPrice(design, placementId = null) {
+  if (!design?.active) return 0
+  return placementConfigs[placementId]?.price ?? design.additionalPrice
+}
+export function calculatePrice(garmentId, designId = null, placementId = null) {
+  const g = getGarmentById(garmentId)
+  const d = designId ? getDesignById(designId) : null
+  return g ? g.basePrice + artworkPrice(d, placementId) : 0
+}
+export function getMinArtworkPrice() {
+  return Math.min(...Object.values(placementConfigs).map((p) => p.price))
+}
+export function getDesignCollections() {
+  const present = new Set(getDesigns().map((d) => d.collection))
+  return [...COLLECTION_ORDER.filter((c) => present.has(c)), ...[...present].filter((c) => !COLLECTION_ORDER.includes(c)).sort()]
+}
 export function formatPrice(amount){return `${STORE_CONFIG.currency}${amount}`}
 
 export function isPurchasable(garment) {
@@ -145,9 +222,9 @@ export function getPurchasableCategories() {
   return [...new Set(getPurchasableGarments().map((garment) => garment.category))].sort()
 }
 
-export function getPriceBreakdown(garmentId, designId = null) {
+export function getPriceBreakdown(garmentId, designId = null, placementId = null) {
   const base = calculatePrice(garmentId, null)
-  const total = calculatePrice(garmentId, designId)
+  const total = calculatePrice(garmentId, designId, placementId)
   return { base, artwork: total - base, total }
 }
 
@@ -184,12 +261,13 @@ export function filterGarments(list, { category = 'All', query = '' } = {}) {
   })
 }
 
-export function filterDesigns(list, { category = 'All', query = '' } = {}) {
+export function filterDesigns(list, { category = 'All', collection = 'All', query = '' } = {}) {
   const needle = query.trim().toLowerCase()
   return list.filter((design) => {
     const categoryMatch = category === 'All' || design.category === category
     if (!categoryMatch) return false
+    if (collection !== 'All' && design.collection !== collection) return false
     if (!needle) return true
-    return [design.name, design.category].filter(Boolean).some((value) => value.toLowerCase().includes(needle))
+    return [design.name, design.category, design.collection].filter(Boolean).some((value) => value.toLowerCase().includes(needle))
   })
 }
