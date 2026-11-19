@@ -38,6 +38,11 @@ export function SiteHeader({ current }) {
   const innerRef = useRef(null)
   const menuRef = useRef(null)
   const { count } = useCart()
+  const previousCount = useRef(count)
+  const bumped = count > previousCount.current
+  useEffect(() => {
+    previousCount.current = count
+  }, [count])
 
   useEffect(() => {
     const header = headerRef.current
@@ -110,7 +115,7 @@ export function SiteHeader({ current }) {
               <li key={link.label}>
                 <a href={link.href} aria-current={link.page === current ? 'page' : undefined}>
                   {link.label}
-                  {link.page === 'cart' && count ? <span className="cart-count"><span className="visually-hidden">, </span>{count}<span className="visually-hidden"> items</span></span> : null}
+                  {link.page === 'cart' && count ? <span key={count} className={`cart-count${bumped ? ' is-bumped' : ''}`}><span className="visually-hidden">, </span>{count}<span className="visually-hidden"> items</span></span> : null}
                 </a>
               </li>
             ))}

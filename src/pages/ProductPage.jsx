@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { Layout } from '../components/Chrome.jsx'
 import { ArtworkLayer, Photo } from '../components/Photo.jsx'
 import { useCart } from '../context/CartContext.jsx'
@@ -15,6 +16,7 @@ import {
   getPurchasableGarments
 } from '../data/catalogue.js'
 import { Customizer, initCustomizerFromUrl } from '../services/customizer.js'
+import { withPreviewTransition } from '../lib/pageTransitions.js'
 
 export function ProductPage() {
   const customizerRef = useRef(null)
@@ -23,7 +25,15 @@ export function ProductPage() {
   const [quantityError, setQuantityError] = useState('')
   const { addItem, count } = useCart()
   const [justAdded, setJustAdded] = useState(false)
+  const [flash, setFlash] = useState(false)
+  useEffect(() => {
+    if (!flash) return undefined
+    const timer = setTimeout(() => setFlash(false), 1600)
+    return () => clearTimeout(timer)
+  }, [flash])
   const commit = () => setVersion((version) => version + 1)
+  /* Visual changes to the tee cross-fade where view transitions are supported. */
+  const commitPreview = (change) => withPreviewTransition(() => flushSync(() => { change(); commit() }))
 
   if (!customizerRef.current) {
     const customizer = new Customizer()
@@ -84,6 +94,7 @@ export function ProductPage() {
       addItem(item)
       setStatus(`${item.quantity} × ${item.garmentName} added to your bag.`)
       setJustAdded(true)
+      setFlash(true)
     } catch (error) {
       setQuantityError(error.message)
       setStatus('')
@@ -162,7 +173,7 @@ export function ProductPage() {
                       name="colour"
                       value={entry.value}
                       checked={customizer.selectedColourValue === entry.value}
-                      onChange={() => { customizer.setColour(entry.value, entry.name); commit() }}
+                      onChange={() => commitPreview(() => customizer.setColour(entry.value, entry.name))}
                     />
                     <span className="swatch" style={{ '--swatch': entry.value }} />
                     {entry.name}
@@ -202,7 +213,7 @@ export function ProductPage() {
                           name="artwork"
                           value=""
                           checked={!customizer.selectedDesignId}
-                          onChange={() => { customizer.clearDesign(); commit() }}
+                          onChange={() => commitPreview(() => customizer.clearDesign())}
                         />
                         <span className="artwork-plain" aria-hidden="true">Plain</span>
                         <span className="artwork-name">No design</span>
@@ -214,7 +225,7 @@ export function ProductPage() {
                             name="artwork"
                             value={entry.id}
                             checked={customizer.selectedDesignId === entry.id}
-                            onChange={() => { customizer.setDesign(entry.id); commit() }}
+                            onChange={() => commitPreview(() => customizer.setDesign(entry.id))}
                           />
                           <Photo layout="thumb" framed={false} src={entry.image} alt="" />
                           <span className="artwork-name">{entry.name}</span>
@@ -233,7 +244,7 @@ export function ProductPage() {
                             name="placement"
                             value={entry.id}
                             checked={customizer.selectedPlacement === entry.id}
-                            onChange={() => { customizer.setPlacement(entry.id); commit() }}
+                            onChange={() => commitPreview(() => customizer.setPlacement(entry.id))}
                           />
                           {entry.name} <span className="legend-note">+{formatPrice(entry.price)}</span>
                         </label>
@@ -268,7 +279,7 @@ export function ProductPage() {
                 <div><dt>Each</dt><dd>{formatPrice(breakdown.total)}</dd></div>
                 <div><dt>Line total</dt><dd>{formatPrice(breakdown.total * (Number(customizer.quantity) || 0))}</dd></div>
               </dl>
-              <button className="btn" type="submit">Add to bag · {formatPrice(breakdown.total * (Number(customizer.quantity) || 0))}</button>
+              <button className={`btn${flash ? ' is-added' : ''}`} type="submit">{flash ? '✓ Added to bag' : `Add to bag · ${formatPrice(breakdown.total * (Number(customizer.quantity) || 0))}`}</button>
               <div className="added-note" aria-live="polite">
                 {status ? <p>✓ {status}</p> : null}
                 {justAdded ? <a className="btn btn-ghost" href="cart.html">View bag ({count})</a> : null}

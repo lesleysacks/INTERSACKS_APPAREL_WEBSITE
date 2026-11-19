@@ -7,7 +7,7 @@ export function ProductCard({ garment }) {
 
   return (
     <article className="product-card">
-      <a className="product-link" href={href}>
+      <a className="product-link" href={href} data-vt="garment">
         <Photo src={garment.image} alt="" />
         <p className="kicker">{garment.category}</p>
         <h3>{garment.name}</h3>
