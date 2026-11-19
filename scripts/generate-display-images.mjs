@@ -145,7 +145,8 @@ for (const name of existsSync(displayRoot) ? readdirSync(displayRoot) : []) {
 }
 
 const purchasable = getPurchasableGarments()
-const hero = purchasable.find((garment) => garment.id === 'panther-long-sleeve') || purchasable.find((garment) => garment.featured) || purchasable[0]
+/* The home hero opens on the first lookbook sheet (src/data/lookbook.js). */
+const hero = { image: 'assets/lookbook/street-moves.jpg' }
 const product = purchasable[0]
 const preload = {}
 if (hero?.image && manifest[hero.image]) {
