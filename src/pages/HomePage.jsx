@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { ProductCard } from '../components/ProductCard.jsx'
 import { HeroShowcase } from '../components/HeroShowcase.jsx'
 import { Lookbook } from '../components/Lookbook.jsx'
+import { SearchCombobox } from '../components/SearchCombobox.jsx'
 import { Photo } from '../components/Photo.jsx'
 import { ExternalLink, Layout, visibleWhatsAppNumber, WHATSAPP_DESK_URL } from '../components/Chrome.jsx'
 import {
@@ -110,20 +111,23 @@ export function HomePage() {
             <p className="kicker">03 — Shop</p>
             <h2 id="shop-title">Available to order</h2>
           </div>
-          <search aria-labelledby="shop-title">
-            <form className="filters" onSubmit={(event) => event.preventDefault()}>
-              <div className="field">
-                <label htmlFor="shop-search">Search products</label>
-                <input id="shop-search" name="q" type="search" value={query} onChange={(event) => setQuery(event.target.value)} />
+          <search aria-labelledby="shop-title" className="shop-search">
+            <SearchCombobox value={query} onSearch={setQuery} onCategory={setCategory} />
+            <div className="shop-toolbar">
+              <div className="collection-chips" role="group" aria-label="Shop categories">
+                {['All', ...categories].map((entry) => (
+                  <button
+                    key={entry}
+                    type="button"
+                    className="chip"
+                    aria-pressed={category === entry}
+                    onClick={() => setCategory(entry)}
+                  >
+                    {entry === 'All' ? 'Everything' : entry}
+                  </button>
+                ))}
               </div>
-              <div className="field">
-                <label htmlFor="shop-category">Category</label>
-                <select id="shop-category" name="category" value={category} onChange={(event) => setCategory(event.target.value)}>
-                  <option value="All">All</option>
-                  {categories.map((entry) => <option key={entry} value={entry}>{entry}</option>)}
-                </select>
-              </div>
-              <div className="field">
+              <div className="field sort-field">
                 <label htmlFor="shop-sort">Sort</label>
                 <select id="shop-sort" name="sort" value={sort} onChange={(event) => setSort(event.target.value)}>
                   <option value="featured">Featured</option>
@@ -132,10 +136,9 @@ export function HomePage() {
                   <option value="name">Name</option>
                 </select>
               </div>
-              <button className="btn" type="submit">Search</button>
-            </form>
+            </div>
           </search>
-          <p aria-live="polite">{shopItems.length} {shopItems.length === 1 ? 'piece' : 'pieces'}</p>
+          <p aria-live="polite" className="result-count">{shopItems.length} {shopItems.length === 1 ? 'piece' : 'pieces'}{query ? ` matching “${query}”` : ''}{category !== 'All' ? ` in ${category}` : ''}</p>
           {shopItems.length ? (
             <div className="product-grid">
               {shopItems.map((garment) => <ProductCard key={garment.id} garment={garment} />)}
@@ -160,21 +163,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section id="about" className="story" aria-labelledby="about-title">
-        <div className="wrap story-grid">
-          <div>
-            <p className="kicker">The label</p>
-            <h2 id="about-title">Not fast fashion. Never was.</h2>
-            <p>InterSacks Apparel is an independent South African streetwear brand focused on original artwork, quality garments, and limited releases.</p>
-            <p>Every piece is made to order, so nothing sits in a warehouse. You choose it, we confirm the details with you on WhatsApp, then we make it.</p>
-            <a className="btn" href="#shop">View the shop</a>
-          </div>
-          <div className="story-photos">
-            <Photo src="assets/products/product-1.png" alt="Skull Tracksuit, black hoodie and joggers with purple and green skull artwork" />
-            <Photo src="assets/products/product-4.jpg" alt="Rose Panel Shirt, white button-up with black panels and red roses" />
-          </div>
-        </div>
-      </section>
+      {/* Best sellers go here once there is sales data. */}
 
       <section id="how" className="band" aria-labelledby="how-title">
         <div className="wrap">
