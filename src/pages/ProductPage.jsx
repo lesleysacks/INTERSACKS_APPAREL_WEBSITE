@@ -18,6 +18,7 @@ import {
 import { Customizer, initCustomizerFromUrl } from '../services/customizer.js'
 import { withPreviewTransition } from '../lib/pageTransitions.js'
 import { ZoomStage } from '../components/ZoomStage.jsx'
+import { Tee3D } from '../components/Tee3D.jsx'
 
 export function ProductPage() {
   const customizerRef = useRef(null)
@@ -53,6 +54,7 @@ export function ProductPage() {
   const designs = getCompatibleDesigns(customizer.selectedGarmentId)
   const [designQuery, setDesignQuery] = useState('')
   const [designCollection, setDesignCollection] = useState('All')
+  const [mode, setMode] = useState('2d')
   const visibleDesigns = designs.filter((entry) =>
     (designCollection === 'All' || entry.collection === designCollection) &&
     [entry.name, entry.collection].some((value) => value.toLowerCase().includes(designQuery.trim().toLowerCase()))
@@ -111,6 +113,21 @@ export function ProductPage() {
       <section className="studio-band" aria-labelledby="product-title">
         <form className="studio wrap" onSubmit={addToBag} aria-labelledby="product-title">
           <div className="studio-stage">
+            {garment?.customizable ? (
+            <div className="collection-chips view-mode" role="group" aria-label="Preview mode">
+              <button type="button" className="chip" aria-pressed={mode === '2d'} onClick={() => setMode('2d')}>Photo</button>
+              <button type="button" className="chip" aria-pressed={mode === '3d'} onClick={() => setMode('3d')}>3D view</button>
+            </div>
+            ) : null}
+            {mode === '3d' && garment?.customizable ? (
+              <Tee3D
+                colour={customizer.selectedColourValue}
+                designSrc={design ? design.transparentImage || design.image : null}
+                placement={design ? placement : null}
+                label={`3D ${garment?.name || 'tee'} in ${customizer.selectedColourName || 'the selected colour'}${design ? ` with ${design.name} on the ${placement?.name}` : ''}. Drag to rotate.`}
+                onUnavailable={() => setMode('2d')}
+              />
+            ) : (
             <ZoomStage
               resetKey={`${customizer.selectedGarmentId}-${customizer.selectedColourValue}`}
               label={garment ? `${garment.name}, ${customizer.selectedColourName || 'selected colour'}, ${viewLabel.toLowerCase()}` : 'Selected garment'}
@@ -136,6 +153,7 @@ export function ProductPage() {
                 ) : null}
               </figure>
             </ZoomStage>
+            )}
             <p className="stage-caption">
               <span>{viewLabel}{isBackPrint ? ' (shown on the tee photo)' : ''}</span>
               {design ? <span> · {design.name}, {placement?.name}</span> : null}

@@ -514,7 +514,7 @@
     align-items: stretch;
   }
   .studio-stage {
-    grid-template-rows: minmax(0, 1fr) auto auto;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
     align-content: start;
     min-block-size: 0;
   }
@@ -540,5 +540,74 @@
   .studio-options {
     overflow-y: auto;
     overscroll-behavior: contain;
+  }
+}
+
+/* ---------- 3D tee ---------- */
+
+.view-mode {
+  justify-self: start;
+}
+
+.tee3d {
+  position: relative;
+  display: grid;
+  gap: 0.5rem;
+  inline-size: 100%;
+  justify-items: center;
+}
+
+.tee3d-host {
+  position: relative;
+  inline-size: 100%;
+  aspect-ratio: 1;
+  overflow: clip;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: radial-gradient(70% 70% at 50% 40%, #ffffff, #e9e5de);
+  touch-action: none;
+  cursor: grab;
+}
+.tee3d-host:active {
+  cursor: grabbing;
+}
+.tee3d-canvas {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.tee3d-status {
+  position: absolute;
+  inset: 40% 0 auto;
+  margin: 0;
+  text-align: center;
+  color: #5c584f;
+  font-weight: 650;
+  pointer-events: none;
+}
+
+@media (max-width: 51.99rem) {
+  .tee3d-host {
+    inline-size: min(100%, 32svh);
+  }
+  .tee3d-bar .zoom-hint {
+    display: none;
+  }
+}
+
+@media (min-width: 52rem) {
+  .tee3d {
+    grid-template-rows: minmax(0, 1fr) auto;
+    block-size: 100%;
+    min-block-size: 0;
+  }
+  .tee3d-host {
+    inline-size: auto;
+    block-size: 100%;
+    max-inline-size: 100%;
+  }
+  .tee3d-bar {
+    inline-size: min(100%, 40rem);
   }
 }
