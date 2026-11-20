@@ -8,6 +8,7 @@ import { CartPage } from './pages/CartPage.jsx'
 import { CustomPage } from './pages/CustomPage.jsx'
 import './styles/global.css'
 import './styles/motion.css'
+import './styles/studio.css'
 import { installPageTransitions } from './lib/pageTransitions.js'
 
 installPageTransitions()

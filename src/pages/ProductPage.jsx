@@ -17,6 +17,7 @@ import {
 } from '../data/catalogue.js'
 import { Customizer, initCustomizerFromUrl } from '../services/customizer.js'
 import { withPreviewTransition } from '../lib/pageTransitions.js'
+import { ZoomStage } from '../components/ZoomStage.jsx'
 
 export function ProductPage() {
   const customizerRef = useRef(null)
@@ -102,16 +103,18 @@ export function ProductPage() {
     }
   }
 
+  const lineTotal = breakdown.total * (Number(customizer.quantity) || 0)
+  const viewLabel = isBackPrint ? 'Back print preview' : customizer.viewMode === 'back' ? 'Back' : 'Front'
+
   return (
     <Layout current="product">
-      <section className="band" aria-labelledby="product-title">
-        <div className="wrap">
-          <p className="kicker">{designs.length ? 'Customise' : garment?.category}</p>
-          <h1 id="product-title">{garment ? garment.name : 'Choose a piece'}</h1>
-          <p className="lede">{garment?.description} {designs.length ? 'Pick a design from the archive and see it on the garment.' : ''}</p>
-          <p className="price product-price">{formatPrice(breakdown.total)}</p>
-          <form className="studio-layout" onSubmit={addToBag} aria-labelledby="product-title">
-            <div className="preview-panel">
+      <section className="studio-band" aria-labelledby="product-title">
+        <form className="studio wrap" onSubmit={addToBag} aria-labelledby="product-title">
+          <div className="studio-stage">
+            <ZoomStage
+              resetKey={`${customizer.selectedGarmentId}-${customizer.selectedColourValue}`}
+              label={garment ? `${garment.name}, ${customizer.selectedColourName || 'selected colour'}, ${viewLabel.toLowerCase()}` : 'Selected garment'}
+            >
               <figure className="preview-stage">
                 <Photo
                   priority
@@ -131,30 +134,32 @@ export function ProductPage() {
                     }}
                   />
                 ) : null}
-                <figcaption>{isBackPrint ? 'Back print preview (shown on the tee photo)' : customizer.viewMode === 'back' ? 'Back' : 'Front'} · {formatPrice(breakdown.total)} each</figcaption>
               </figure>
-              {colour?.backImage ? (
-              <fieldset>
-                <legend>View</legend>
-                <label className="choice">
-                  <input type="radio" name="view" value="front" checked={customizer.viewMode === 'front'} onChange={() => { customizer.setViewMode('front'); commit() }} />
-                  Front
-                </label>
-                <label className="choice">
-                  <input
-                    type="radio"
-                    name="view"
-                    value="back"
-                    checked={customizer.viewMode === 'back'}
-                    onChange={() => { customizer.setViewMode('back'); commit() }}
-                  />
-                  Back
-                </label>
-              </fieldset>
-              ) : null}
-            </div>
+            </ZoomStage>
+            <p className="stage-caption">
+              <span>{viewLabel}{isBackPrint ? ' (shown on the tee photo)' : ''}</span>
+              {design ? <span> · {design.name}, {placement?.name}</span> : null}
+            </p>
+            {colour?.backImage ? (
+              <div className="collection-chips" role="group" aria-label="View">
+                {['front', 'back'].map((mode) => (
+                  <button key={mode} type="button" className="chip" aria-pressed={customizer.viewMode === mode} onClick={() => { customizer.setViewMode(mode); commit() }}>
+                    {mode === 'front' ? 'Front' : 'Back'}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
 
-            <div className="option-panel">
+          <div className="studio-panel">
+            <header className="studio-head">
+              <p className="kicker">{designs.length ? 'Customise' : garment?.category}</p>
+              <h1 id="product-title">{garment ? garment.name : 'Choose a piece'}</h1>
+              <p className="studio-price">{formatPrice(breakdown.total)} <span>each</span></p>
+              <p className="studio-desc">{garment?.description}</p>
+            </header>
+
+            <div className="studio-options">
               <div className="field">
                 <label htmlFor="garment">Garment</label>
                 <select id="garment" name="garment" value={customizer.selectedGarmentId || ''} onChange={(event) => selectGarment(event.target.value)}>
@@ -164,10 +169,10 @@ export function ProductPage() {
                 </select>
               </div>
 
-              <fieldset>
-                <legend>Colour</legend>
+              <fieldset className="pill-group">
+                <legend>Colour <span className="legend-note">{customizer.selectedColourName}</span></legend>
                 {garment?.colours.map((entry) => (
-                  <label key={entry.name} className="choice">
+                  <label key={entry.name} className="pill swatch-pill" title={entry.name}>
                     <input
                       type="radio"
                       name="colour"
@@ -176,36 +181,34 @@ export function ProductPage() {
                       onChange={() => commitPreview(() => customizer.setColour(entry.value, entry.name))}
                     />
                     <span className="swatch" style={{ '--swatch': entry.value }} />
-                    {entry.name}
+                    <span>{entry.name}</span>
                   </label>
                 ))}
               </fieldset>
 
-              <fieldset>
+              <fieldset className="pill-group">
                 <legend>Size</legend>
                 {garment?.sizes.map((size) => (
-                  <label key={size} className="choice">
+                  <label key={size} className="pill">
                     <input type="radio" name="size" value={size} checked={customizer.selectedSize === size} onChange={() => { customizer.setSize(size); commit() }} />
-                    {size}
+                    <span>{size}</span>
                   </label>
                 ))}
               </fieldset>
 
               {designs.length ? (
                 <>
-                  <div className="field">
-                    <label htmlFor="artwork-search">Search artwork</label>
-                    <input id="artwork-search" name="artwork-search" type="search" value={designQuery} onChange={(event) => setDesignQuery(event.target.value)} />
-                  </div>
-                  <div className="field">
-                    <label htmlFor="artwork-collection">Collection</label>
-                    <select id="artwork-collection" name="artwork-collection" value={designCollection} onChange={(event) => setDesignCollection(event.target.value)}>
-                      <option value="All">All collections</option>
-                      {getDesignCollections().map((entry) => <option key={entry} value={entry}>{entry}</option>)}
-                    </select>
-                  </div>
                   <fieldset className="artwork-picker">
-                    <legend>Artwork <span className="legend-note">from +{formatPrice(getMinArtworkPrice())}, depends on print position</span></legend>
+                    <legend>Artwork <span className="legend-note">from +{formatPrice(getMinArtworkPrice())}</span></legend>
+                    <div className="artwork-filters">
+                      <label htmlFor="artwork-search" className="visually-hidden">Search artwork</label>
+                      <input id="artwork-search" name="artwork-search" type="search" placeholder="Search designs…" autoComplete="off" value={designQuery} onChange={(event) => setDesignQuery(event.target.value)} />
+                      <label htmlFor="artwork-collection" className="visually-hidden">Collection</label>
+                      <select id="artwork-collection" name="artwork-collection" value={designCollection} onChange={(event) => setDesignCollection(event.target.value)}>
+                        <option value="All">All collections</option>
+                        {getDesignCollections().map((entry) => <option key={entry} value={entry}>{entry}</option>)}
+                      </select>
+                    </div>
                     <div className="artwork-grid">
                       <label className="artwork-option">
                         <input
@@ -232,13 +235,13 @@ export function ProductPage() {
                         </label>
                       ))}
                     </div>
+                    {(designQuery || designCollection !== 'All') && !visibleDesigns.length ? <p>No artwork matches that search.</p> : null}
                   </fieldset>
-                  {designQuery && !visibleDesigns.length ? <p>No artwork matches that search.</p> : null}
                   {design ? (
-                    <fieldset>
+                    <fieldset className="pill-group">
                       <legend>Print position</legend>
                       {getPlacementsForDesign(design.id).map((entry) => (
-                        <label key={entry.id} className="choice">
+                        <label key={entry.id} className="pill">
                           <input
                             type="radio"
                             name="placement"
@@ -246,48 +249,55 @@ export function ProductPage() {
                             checked={customizer.selectedPlacement === entry.id}
                             onChange={() => commitPreview(() => customizer.setPlacement(entry.id))}
                           />
-                          {entry.name} <span className="legend-note">+{formatPrice(entry.price)}</span>
+                          <span>{entry.name} <small>+{formatPrice(entry.price)}</small></span>
                         </label>
                       ))}
                     </fieldset>
                   ) : null}
                 </>
-              ) : null}
+              ) : <p className="fine-print">Sold as shown. Pick your colour and size.</p>}
+              <p className="fine-print">Made to order. We confirm sizing and delivery with you on WhatsApp before anything is made.</p>
+            </div>
 
-              <div className="field">
-                <label htmlFor="quantity">Quantity</label>
-                <input
-                  id="quantity"
-                  name="quantity"
-                  type="number"
-                  inputMode="numeric"
-                  min="1"
-                  max="10"
-                  required
-                  value={customizer.quantity}
-                  aria-invalid={quantityError ? 'true' : undefined}
-                  aria-describedby={quantityError ? 'quantity-error' : 'quantity-hint'}
-                  onChange={(event) => changeQuantity(event.target.value)}
-                />
-                <p id="quantity-hint">Enter a number from 1 to 10.</p>
-                {quantityError ? <p id="quantity-error" role="alert">{quantityError}</p> : null}
+            <footer className="studio-buy">
+              <div className="buy-row">
+                <div className="field qty-stepper">
+                  <label htmlFor="quantity">Qty</label>
+                  <div className="stepper">
+                    <button type="button" aria-label="One fewer" onClick={() => changeQuantity(String(Math.max(1, (Number(customizer.quantity) || 1) - 1)))}>−</button>
+                    <input
+                      id="quantity"
+                      name="quantity"
+                      type="number"
+                      inputMode="numeric"
+                      min="1"
+                      max="10"
+                      required
+                      value={customizer.quantity}
+                      aria-invalid={quantityError ? 'true' : undefined}
+                      aria-describedby={quantityError ? 'quantity-error' : undefined}
+                      onChange={(event) => changeQuantity(event.target.value)}
+                    />
+                    <button type="button" aria-label="One more" onClick={() => changeQuantity(String(Math.min(10, (Number(customizer.quantity) || 0) + 1)))}>+</button>
+                  </div>
+                </div>
+                <button className={`btn btn-buy${flash ? ' is-added' : ''}`} type="submit">
+                  {flash ? '✓ Added to bag' : <>Add to bag · {formatPrice(lineTotal)}</>}
+                </button>
               </div>
-
-              <dl className="price-list">
-                <div><dt>Garment</dt><dd>{formatPrice(breakdown.base)}</dd></div>
-                <div><dt>Artwork</dt><dd>{breakdown.artwork ? `+${formatPrice(breakdown.artwork)}` : formatPrice(0)}</dd></div>
-                <div><dt>Each</dt><dd>{formatPrice(breakdown.total)}</dd></div>
-                <div><dt>Line total</dt><dd>{formatPrice(breakdown.total * (Number(customizer.quantity) || 0))}</dd></div>
-              </dl>
-              <button className={`btn${flash ? ' is-added' : ''}`} type="submit">{flash ? '✓ Added to bag' : `Add to bag · ${formatPrice(breakdown.total * (Number(customizer.quantity) || 0))}`}</button>
+              <p className="buy-breakdown">
+                Garment {formatPrice(breakdown.base)}
+                {breakdown.artwork ? ` + artwork ${formatPrice(breakdown.artwork)}` : ''}
+                {Number(customizer.quantity) > 1 ? ` × ${customizer.quantity}` : ''}
+              </p>
+              {quantityError ? <p id="quantity-error" role="alert" className="buy-error">{quantityError}</p> : null}
               <div className="added-note" aria-live="polite">
                 {status ? <p>✓ {status}</p> : null}
                 {justAdded ? <a className="btn btn-ghost" href="cart.html">View bag ({count})</a> : null}
               </div>
-              <p className="fine-print">Made to order. We confirm sizing and delivery with you on WhatsApp before anything is made.</p>
-            </div>
-          </form>
-        </div>
+            </footer>
+          </div>
+        </form>
       </section>
     </Layout>
   )

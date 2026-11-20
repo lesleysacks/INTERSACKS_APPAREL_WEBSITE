@@ -305,3 +305,24 @@ test('InterSacks 2026 originals are live, transparent and grouped', () => {
     assert.ok(originals.some((design) => design.collection === collection), collection)
   }
 })
+
+test('Search suggestions rank prefixes first and skip hidden designs', async () => {
+  const { getSearchSuggestions, matchText } = await import('../src/data/search.js')
+  assert.deepEqual(getSearchSuggestions(''), [])
+  assert.deepEqual(getSearchSuggestions('   '), [])
+  const pan = getSearchSuggestions('pan')
+  assert.ok(pan.length > 0)
+  assert.ok(pan[0].label.toLowerCase().startsWith('pan'), 'a prefix match comes first')
+  assert.ok(pan.some((item) => item.type === 'garment' && item.id === 'panther-vest'))
+  assert.ok(pan.some((item) => item.type === 'collection' && item.label === 'Panther'))
+  assert.equal(pan[0].match.start, 0)
+  // Rights-held designs never show up.
+  assert.ok(!getSearchSuggestions('swoosh').length)
+  assert.ok(!getSearchSuggestions('straw hat').some((item) => item.type === 'design'))
+  // Word-start beats a match in the middle of a word.
+  assert.ok(matchText('No Pain No Gain', 'pain').rank === 1)
+  assert.ok(matchText('Champain', 'pain').rank === 2)
+  assert.ok(getSearchSuggestions('faith').some((item) => item.type === 'collection'))
+  assert.ok(getSearchSuggestions('t-sh').some((item) => item.type === 'category' && item.category === 'T-Shirts'))
+  assert.ok(getSearchSuggestions('a', 5).length <= 5)
+})

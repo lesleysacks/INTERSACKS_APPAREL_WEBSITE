@@ -384,7 +384,6 @@ ul, ol {
 .contact-grid,
 .collection-grid,
 .product-grid,
-.story-grid,
 .customise-grid,
 .cart-layout,
 .footer-grid {
@@ -571,22 +570,6 @@ fieldset {
   font-size: 0.92rem;
 }
 
-.story {
-  padding-block: clamp(3.5rem, 2rem + 4vw, 6rem);
-  background: var(--ink);
-  color: var(--paper);
-}
-
-.story .kicker,
-.story p {
-  color: #ddd8ce;
-}
-
-.story-photos {
-  display: grid;
-  gap: 0.8rem;
-}
-
 .steps {
   list-style: none;
   display: grid;
@@ -657,7 +640,6 @@ fieldset {
   color: var(--muted);
 }
 
-.studio-layout,
 .option-panel,
 .preview-panel {
   display: grid;
@@ -747,7 +729,6 @@ fieldset {
 @container page (min-width: 40rem) {
   .filters,
   .contact-grid,
-  .story-grid,
   .customise-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -783,17 +764,12 @@ fieldset {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .studio-layout,
   .cart-layout,
   .footer-grid {
     grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr);
     gap: 2rem;
   }
 
-  .preview-panel {
-    position: sticky;
-    inset-block-start: 5.5rem;
-  }
 
   .contact-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
