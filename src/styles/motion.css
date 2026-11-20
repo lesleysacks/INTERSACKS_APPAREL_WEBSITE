@@ -310,3 +310,237 @@ html.vt-preview::view-transition-old(root),
 html.vt-preview::view-transition-new(root) {
   animation: none;
 }
+
+/* ---------- 7. Hero showcase (lookbook sheets) ---------- */
+
+.hero-showcase {
+  position: relative;
+  gap: 0.75rem;
+  background:
+    radial-gradient(60% 55% at 50% 45%, rgb(10 63 145 / 0.55), transparent 70%),
+    #0c0c0c;
+  color: var(--hero-text);
+  overflow: clip;
+}
+
+.showcase-stage {
+  display: grid;
+  inline-size: min(100%, 34rem);
+  perspective: 1200px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.showcase-slide {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition: opacity 700ms ease-out;
+}
+.showcase-slide.is-active {
+  opacity: 1;
+}
+
+.showcase-slide .hero-photo {
+  inline-size: 100%;
+  border-radius: 6px;
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.9), 0 0 0 1px rgb(255 255 255 / 0.06);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .showcase-stage > .showcase-slide {
+    transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    transition: opacity 700ms ease-out, transform 300ms var(--ease-out);
+  }
+  .showcase-slide.is-active .hero-photo {
+    animation: ken-burns 6s ease-out both;
+  }
+}
+@keyframes ken-burns {
+  from { scale: 1.06; }
+  to { scale: 1; }
+}
+
+.showcase-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  inline-size: min(100%, 34rem);
+  padding: 0;
+  color: var(--hero-text);
+}
+.hero .showcase-bar { color: var(--hero-text); }
+
+.showcase-caption {
+  display: grid;
+  min-width: 0;
+}
+.showcase-caption span {
+  color: #ddd8ce;
+  font-size: 0.9rem;
+}
+
+.showcase-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.showcase-dot {
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+.showcase-dot::before {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  translate: -50% -50%;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.35);
+  transition: background-color var(--dur-fast) ease-out, inline-size var(--dur-med) var(--ease-out);
+}
+.showcase-dot[aria-current="true"]::before {
+  inline-size: 1.6rem;
+  background: #fff;
+}
+.showcase-dot:hover::before {
+  background: rgb(255 255 255 / 0.7);
+}
+.showcase-dot:focus-visible,
+.showcase-toggle:focus-visible {
+  outline: 3px solid #b9d0ff;
+  outline-offset: 2px;
+}
+
+.showcase-toggle {
+  min-block-size: 2.75rem;
+  padding-inline: 0.9rem;
+  border: 1px solid rgb(255 255 255 / 0.5);
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) ease-out, color var(--dur-fast) ease-out;
+}
+.showcase-toggle:hover {
+  background: #fff;
+  color: #0c0c0c;
+}
+
+/* ---------- 8. Lookbook row ---------- */
+
+.lookbook-band {
+  background: #0c0c0c;
+  color: #f4f1eb;
+}
+.lookbook-band .kicker,
+.lookbook-band .section-head p {
+  color: #ddd8ce;
+}
+
+.lookbook-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.lookbook-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+.lookbook-nav .btn {
+  color: #f4f1eb;
+  min-inline-size: 2.75rem;
+}
+.lookbook-nav .btn:hover {
+  background: #f4f1eb;
+  border-color: #f4f1eb;
+  color: #0c0c0c;
+}
+
+.lookbook-track {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin-block-start: 1.5rem;
+  padding: 0 0 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: #5c584f transparent;
+}
+
+.lookbook-card {
+  flex: 0 0 min(80%, 22rem);
+  scroll-snap-align: start;
+}
+
+.lookbook-card a {
+  display: grid;
+  gap: 0.6rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.lookbook-card picture {
+  display: block;
+  overflow: clip;
+  border-radius: 6px;
+}
+.lookbook-card img {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  transition: scale 500ms var(--ease-out);
+}
+
+.lookbook-meta {
+  display: grid;
+  gap: 0.15rem;
+}
+.lookbook-meta span {
+  color: #ddd8ce;
+  font-size: 0.9rem;
+}
+.lookbook-meta .lookbook-cta {
+  color: #b9d0ff;
+  font-weight: 650;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lookbook-card a:is(:hover, :focus-visible) img {
+    scale: 1.05;
+  }
+  .lookbook-cta {
+    transition: translate var(--dur-med) var(--ease-out);
+  }
+  .lookbook-card a:is(:hover, :focus-visible) .lookbook-cta {
+    translate: 6px 0;
+  }
+
+  /* Cards grow as they slide into the row and shrink as they leave. */
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    .lookbook-card {
+      animation: look-grow auto linear backwards, look-shrink auto linear forwards;
+      animation-timeline: view(inline);
+      animation-range: entry, exit;
+    }
+  }
+}
+@keyframes look-grow {
+  from { scale: 0.88; opacity: 0.5; }
+}
+@keyframes look-shrink {
+  to { scale: 0.88; opacity: 0.5; }
+}

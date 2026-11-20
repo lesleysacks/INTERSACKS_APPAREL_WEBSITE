@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 import { ProductCard } from '../components/ProductCard.jsx'
+import { HeroShowcase } from '../components/HeroShowcase.jsx'
+import { Lookbook } from '../components/Lookbook.jsx'
 import { Photo } from '../components/Photo.jsx'
 import { ExternalLink, Layout, visibleWhatsAppNumber, WHATSAPP_DESK_URL } from '../components/Chrome.jsx'
 import {
@@ -34,7 +36,6 @@ export function HomePage() {
   const purchasable = getPurchasableGarments()
   const categories = getPurchasableCategories()
   const featured = purchasable.filter((garment) => garment.featured)
-  const hero = purchasable.find((garment) => garment.id === 'skull-tracksuit') || featured[0]
   const collections = categories.map((category) => {
     const items = purchasable.filter((garment) => garment.category === category)
     return { category, count: items.length, lead: items.find((item) => item.featured) || items[0] }
@@ -63,22 +64,13 @@ export function HomePage() {
           <p className="lede">Heavyweight garments and original artwork from an independent label. Shop the pieces in the catalogue, or start with a plain tee and place a design on it.</p>
           <div className="hero-actions">
             <a className="btn" href="#shop">Shop now</a>
-            <a className="btn btn-ghost" href="custom.html">Custom orders</a>
+            <a className="btn btn-ghost" href="#lookbook">View lookbook</a>
           </div>
         </div>
-        {hero ? (
-          <figure className="hero-figure">
-            <Photo
-              priority
-              layout="hero"
-              className="hero-photo"
-              src={hero.image}
-              alt={`${hero.name}, ${hero.colours.map((colour) => colour.name).join(', ')}`}
-            />
-            <figcaption>{hero.name} · {formatPrice(hero.basePrice)}</figcaption>
-          </figure>
-        ) : null}
+        <HeroShowcase />
       </section>
+
+      <Lookbook />
 
       <section id="collections" className="band" aria-labelledby="collections-title">
         <div className="wrap">
