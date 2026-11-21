@@ -23,27 +23,40 @@ import {
   WebGLRenderer
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { drawPrint, loadImage } from './printComposite.js'
 
 const SIZE = 2 // world units across the square
 const DEPTH = 0.06 // body thickness before bevel
 const BEVEL = 0.07
 const TEX = 1024
 
-/* Outline points in square coordinates (u right, v down), traced from the plain tee photo. */
+/* Outline points in square coordinates (u right, v down), measured on the Canva AI tee photo. */
 const OUTLINE = [
-  [0.4, 0.035],
-  [0.34, 0.045],
-  [0.03, 0.3],
-  [0.14, 0.455],
-  [0.235, 0.335],
-  [0.225, 0.965],
-  [0.5, 0.975],
-  [0.775, 0.965],
-  [0.765, 0.335],
-  [0.86, 0.455],
-  [0.97, 0.3],
-  [0.66, 0.045],
-  [0.6, 0.035]
+  [0.393, 0.08],
+  [0.305, 0.12],
+  [0.239, 0.15],
+  [0.186, 0.2],
+  [0.131, 0.3],
+  [0.1, 0.36],
+  [0.13, 0.425],
+  [0.228, 0.45],
+  [0.281, 0.5],
+  [0.279, 0.7],
+  [0.268, 0.9],
+  [0.272, 0.925],
+  [0.5, 0.932],
+  [0.728, 0.925],
+  [0.732, 0.9],
+  [0.721, 0.7],
+  [0.719, 0.5],
+  [0.772, 0.45],
+  [0.87, 0.425],
+  [0.9, 0.36],
+  [0.869, 0.3],
+  [0.814, 0.2],
+  [0.761, 0.15],
+  [0.695, 0.12],
+  [0.607, 0.08]
 ]
 
 const toWorld = ([u, v]) => new Vector2((u - 0.5) * SIZE, (0.5 - v) * SIZE)
@@ -54,9 +67,9 @@ function teeShape() {
   shape.moveTo(first.x, first.y)
   for (const point of rest) shape.lineTo(point.x, point.y)
   // Neckline: a curve dipping from the right collar back to the left collar.
-  const right = toWorld([0.6, 0.035])
-  const left = toWorld([0.4, 0.035])
-  const dip = toWorld([0.5, 0.11])
+  const right = toWorld([0.607, 0.08])
+  const left = toWorld([0.393, 0.08])
+  const dip = toWorld([0.5, 0.14])
   shape.bezierCurveTo(right.x - 0.05, dip.y, left.x + 0.05, dip.y, left.x, left.y)
   return shape
 }
@@ -72,25 +85,14 @@ function squareUVs(geometry, mirror) {
   uv.needsUpdate = true
 }
 
-function loadImage(src) {
-  return new Promise((resolve) => {
-    if (!src) return resolve(null)
-    const image = new Image()
-    image.decoding = 'async'
-    image.onload = () => resolve(image)
-    image.onerror = () => resolve(null)
-    image.src = src
-  })
-}
-
 function shade(hex, amount) {
   const color = new Color(hex)
   color.offsetHSL(0, 0, amount)
   return `#${color.getHexString()}`
 }
 
-/* Draw fabric + optional artwork onto a canvas, using the 2D placement styles (percentages). */
-function paintFace(canvas, fabric, image, placement) {
+/* Draw fabric + every print for this face, using the 2D placement styles (percentages). */
+function paintFace(canvas, fabric, prints) {
   const ctx = canvas.getContext('2d')
   ctx.clearRect(0, 0, TEX, TEX)
   const grad = ctx.createLinearGradient(0, 0, TEX, 0)
@@ -110,18 +112,7 @@ function paintFace(canvas, fabric, image, placement) {
     ctx.fillRect(TEX * (x - 0.03), TEX * 0.35, TEX * 0.06, TEX * 0.6)
   }
   ctx.globalAlpha = 1
-  if (!image || !placement) return
-  const pct = (value) => parseFloat(value) / 100
-  const width = pct(placement.styles.width) * TEX
-  const height = width * (image.naturalHeight / image.naturalWidth)
-  const centreX = pct(placement.styles.left) * TEX
-  const top = pct(placement.styles.top) * TEX
-  const rotate = /rotate\((-?[\d.]+)deg\)/.exec(placement.styles.transform || '')
-  ctx.save()
-  ctx.translate(centreX, top + height / 2)
-  if (rotate) ctx.rotate((parseFloat(rotate[1]) * Math.PI) / 180)
-  ctx.drawImage(image, -width / 2, -height / 2, width, height)
-  ctx.restore()
+  for (const { image, styles } of prints) drawPrint(ctx, image, styles, TEX)
 }
 
 export function supportsWebGL() {
@@ -197,7 +188,7 @@ export function createTeeViewer(container, { reducedMotion = false } = {}) {
   sctx.fillRect(0, 0, 128, 128)
   const shadow = new Mesh(new PlaneGeometry(2.2, 0.7), new MeshStandardMaterial({ map: new CanvasTexture(shadowCanvas), transparent: true, depthWrite: false }))
   shadow.rotation.x = -Math.PI / 2
-  shadow.position.y = -SIZE / 2 - 0.02
+  shadow.position.y = (0.5 - 0.94) * SIZE
   scene.add(shadow)
 
   const controls = new OrbitControls(camera, renderer.domElement)
@@ -261,14 +252,16 @@ export function createTeeViewer(container, { reducedMotion = false } = {}) {
   resize()
 
   let requestId = 0
-  async function update({ colour, designSrc, placement }) {
+  const withImages = (prints = []) =>
+    Promise.all(prints.map(async (print) => ({ image: await loadImage(print.src), styles: print.styles }))).then((list) => list.filter((entry) => entry.image))
+
+  async function update({ colour, front: frontPrints, back: backPrints }) {
     const id = ++requestId
     bodyMaterial.color.set(shade(colour || '#111111', -0.02))
-    const image = await loadImage(designSrc)
+    const [onFront, onBack] = await Promise.all([withImages(frontPrints), withImages(backPrints)])
     if (disposed || id !== requestId) return
-    const onBack = placement?.view === 'back'
-    paintFace(front.canvas, colour || '#111111', onBack ? null : image, onBack ? null : placement)
-    paintFace(back.canvas, colour || '#111111', onBack ? image : null, onBack ? placement : null)
+    paintFace(front.canvas, colour || '#111111', onFront)
+    paintFace(back.canvas, colour || '#111111', onBack)
     front.texture.needsUpdate = true
     back.texture.needsUpdate = true
     wake()

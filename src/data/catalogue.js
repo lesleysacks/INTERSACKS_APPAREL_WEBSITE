@@ -1,13 +1,12 @@
 /* InterSacks Apparel — curated storefront manifest.
    Edit catalogue metadata here; machine audit data lives in data/assets.json. */
 
+import { TEE_COLOURS } from "./teeColours.js";
+
 export const STORE_CONFIG = { whatsappNumber: "27843252262", brandName: "InterSacks Apparel", tagline: "Built Different.", currency: "R" };
 
 export const garments = [
-  { id:"classic-tee", name:"Classic Tee", category:"T-Shirts", description:"A clean short-sleeve base for custom InterSacks artwork.", basePrice:349, colours:[
-    {name:"Black",value:"#111111",frontImage:"assets/Designs/plain black tshirt.png",backImage:null},
-    {name:"White",value:"#f5f5f5",frontImage:"assets/Designs/plain white tshirt.png",backImage:null}
-  ], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:true, image:"assets/Designs/plain black tshirt.png" },
+  { id:"classic-tee", name:"Classic Tee", category:"T-Shirts", description:"A clean short-sleeve base for custom InterSacks artwork.", basePrice:349, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:true, image:"assets/garments/classic-tee/black-front.webp" },
   { id:"panther-long-sleeve", name:"Panther Long Sleeve", category:"Long Sleeves", description:"Blue and black Panther long-sleeve set shown from the front and back.", basePrice:499, colours:[{name:"Blue / Black",value:"#1256a3",frontImage:"assets/products/pantherPJ_longsleeve(blue&black) (2).png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/pantherPJ_longsleeve(blue&black) (2).png" },
   { id:"panther-vest", name:"Panther Vest", category:"Vests", description:"Blue and black Panther basketball vest shown from the front and back.", basePrice:399, colours:[{name:"Blue / Black",value:"#1256a3",frontImage:"assets/products/pantherPJ_Vest(blue&black) (1).png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/pantherPJ_Vest(blue&black) (1).png" },
   { id:"skull-tracksuit", name:"Skull Tracksuit", category:"Sets", description:"Black hoodie-and-jogger set with purple skull artwork.", basePrice:899, colours:[{name:"Black / Purple",value:"#17131d",frontImage:"assets/products/product-1.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/product-1.png" },
@@ -46,7 +45,7 @@ const plannedProducts = [
 
 garments.push(...plannedProducts);
 
-const designDefaults = { additionalPrice:50, compatibleGarments:["classic-tee"], placements:["front-small","front-center","back-center","left-sleeve"], active:true, printable:true };
+const designDefaults = { additionalPrice:50, compatibleGarments:["classic-tee"], placements:["front-center","front-small","back-center","left-sleeve","right-sleeve"], active:true, printable:true };
 const designManifest = [
   ["design-001","Midnight Snake","assets/Designs/0ceea4478c03705b4283b673023e1450.jpg","Graphic",true],
   ["design-002","Crowned Icon","assets/Designs/104e5a912c34fd6898133b672a492a89.jpg","Character",true],
@@ -145,7 +144,22 @@ export const RIGHTS_HOLD = {
   "rose-tracksuit": "Nissan GT-R logo"
 };
 
-export const designs = designManifest.map(([id,name,image,category,featured,transparent]) => ({ ...designDefaults, id,name,image,category,featured, transparentImage:transparent ? image : null, hasUsableTransparency:Boolean(transparent), active: !RIGHTS_HOLD[id] }));
+/* Background-free versions made with Canva's background remover, so the art sits in the fabric. */
+const CUTOUTS = {
+  "design-001":"assets/Designs/cutouts/design-001.webp","design-003":"assets/Designs/cutouts/design-003.webp","design-004":"assets/Designs/cutouts/design-004.webp",
+  "design-005":"assets/Designs/cutouts/design-005.webp","design-008":"assets/Designs/cutouts/design-008.webp","design-010":"assets/Designs/cutouts/design-010.webp",
+  "design-013":"assets/Designs/cutouts/design-013.webp","design-014":"assets/Designs/cutouts/design-014.webp","design-015":"assets/Designs/cutouts/design-015.webp",
+  "design-018":"assets/Designs/cutouts/design-018.webp","design-019":"assets/Designs/cutouts/design-019.webp","design-025":"assets/Designs/cutouts/design-025.webp",
+  "design-030":"assets/Designs/cutouts/design-030.webp","design-034":"assets/Designs/cutouts/design-034.webp","design-037":"assets/Designs/cutouts/design-037.webp",
+  "design-038":"assets/Designs/cutouts/design-038.webp","design-039":"assets/Designs/cutouts/design-039.webp","design-041":"assets/Designs/cutouts/design-041.webp",
+  "design-043":"assets/Designs/cutouts/design-043.webp","design-045":"assets/Designs/cutouts/design-045.webp","design-046":"assets/Designs/cutouts/design-046.webp",
+  "design-048":"assets/Designs/cutouts/design-048.webp"
+};
+
+export const designs = designManifest.map(([id,name,image,category,featured,transparent]) => {
+  const transparentImage = CUTOUTS[id] || (transparent ? image : null);
+  return { ...designDefaults, id,name,image,category,featured, transparentImage, hasUsableTransparency:Boolean(transparentImage), active: !RIGHTS_HOLD[id] };
+});
 
 for (const garment of garments) if (RIGHTS_HOLD[garment.id]) garment.active = false;
 
@@ -155,12 +169,23 @@ export const unclassifiedAssets = [
   "assets/Designs/WhatsApp Image 2026-07-20 at 16.09.56.jpeg"
 ];
 
+/* Print spots. Each zone takes one design; the front offers two sizes.
+   Positions are percentages of the square tee photo (measured on the Canva AI tee). */
 const placementConfigs = {
-  "front-small":{name:"Front Small",price:50,view:"front",styles:{width:"18%",top:"25%",left:"50%",transform:"translateX(-50%)"}},
-  "front-center":{name:"Front Centre",price:50,view:"front",styles:{width:"34%",top:"31%",left:"50%",transform:"translateX(-50%)"}},
-  "back-center":{name:"Back Centre",price:80,view:"back",styles:{width:"44%",top:"24%",left:"50%",transform:"translateX(-50%)"}},
-  "left-sleeve":{name:"Left Sleeve",price:40,view:"front",styles:{width:"9%",top:"26%",left:"80%",transform:"translateX(-50%) rotate(-28deg)"}}
+  "front-center":{name:"Front Centre",zone:"front",price:50,view:"front",styles:{width:"30%",top:"23%",left:"50%",transform:"translateX(-50%)"}},
+  "front-small":{name:"Front Small",zone:"front",price:50,view:"front",styles:{width:"14%",top:"21%",left:"60%",transform:"translateX(-50%)"}},
+  "back-center":{name:"Back",zone:"back",price:80,view:"back",styles:{width:"36%",top:"21%",left:"50%",transform:"translateX(-50%)"}},
+  "left-sleeve":{name:"Left Sleeve",zone:"left-sleeve",price:40,view:"front",styles:{width:"7%",top:"30%",left:"82%",transform:"translateX(-50%) rotate(-24deg)"}},
+  "right-sleeve":{name:"Right Sleeve",zone:"right-sleeve",price:40,view:"front",styles:{width:"7%",top:"30%",left:"18%",transform:"translateX(-50%) rotate(24deg)"}}
 };
+
+/* The four print spots, in the order they are listed everywhere. */
+export const PRINT_ZONES = [
+  { id:"front", name:"Front", view:"front", placements:["front-center","front-small"] },
+  { id:"back", name:"Back", view:"back", placements:["back-center"] },
+  { id:"left-sleeve", name:"Left sleeve", view:"front", placements:["left-sleeve"] },
+  { id:"right-sleeve", name:"Right sleeve", view:"front", placements:["right-sleeve"] }
+];
 
 /* Design collections. Ids not listed fall back to the design's category. */
 const COLLECTION_BY_DESIGN = {
@@ -226,6 +251,46 @@ export function getPriceBreakdown(garmentId, designId = null, placementId = null
   const base = calculatePrice(garmentId, null)
   const total = calculatePrice(garmentId, designId, placementId)
   return { base, artwork: total - base, total }
+}
+
+export function zoneForPlacement(placementId) {
+  return placementConfigs[placementId]?.zone || null
+}
+
+/* Normalise a list of prints: known spots only, one design per zone, in zone order. */
+export function normalizePrints(prints = []) {
+  const byZone = new Map()
+  for (const print of prints || []) {
+    const zone = zoneForPlacement(print?.placement)
+    if (zone && print.designId) byZone.set(zone, { placement: print.placement, designId: print.designId })
+  }
+  return PRINT_ZONES.filter((zone) => byZone.has(zone.id)).map((zone) => byZone.get(zone.id))
+}
+
+/* Garment price plus every print spot that carries an active design. */
+export function calculatePrintsPrice(garmentId, prints = []) {
+  const garment = getGarmentById(garmentId)
+  if (!garment) return 0
+  return normalizePrints(prints).reduce((total, print) => total + artworkPrice(getDesignById(print.designId), print.placement), garment.basePrice)
+}
+
+/* Older saved bags held a single design and placement. */
+export function printsForItem(item) {
+  if (Array.isArray(item?.prints)) return normalizePrints(item.prints)
+  if (item?.designId && item.placement && item.placement !== 'N/A') return normalizePrints([{ placement: item.placement, designId: item.designId }])
+  return []
+}
+
+export function printsKey(prints = []) {
+  return normalizePrints(prints).map((print) => `${print.placement}:${print.designId}`).join('|')
+}
+
+export function describePrints(prints = []) {
+  return normalizePrints(prints).map((print) => ({
+    ...print,
+    label: placementLabel(print.placement),
+    designName: getDesignById(print.designId)?.name || print.designId
+  }))
 }
 
 export function placementLabel(placementId) {

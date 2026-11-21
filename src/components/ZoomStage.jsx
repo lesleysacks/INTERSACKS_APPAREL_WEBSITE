@@ -10,7 +10,7 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 /* A square stage whose contents (tee photo + artwork layer) zoom and pan together.
    Buttons, wheel, double-click/tap, drag, pinch and keyboard all drive one transform
    on an inner layer (translate + scale, compositor-friendly). Standard pointer events only. */
-export function ZoomStage({ label, children, resetKey }) {
+export function ZoomStage({ label, children, resetKey, focus }) {
   const stageRef = useRef(null)
   const pointers = useRef(new Map())
   const gesture = useRef(null)
@@ -44,6 +44,17 @@ export function ZoomStage({ label, children, resetKey }) {
   useEffect(() => {
     setView({ scale: 1, x: 0, y: 0 })
   }, [resetKey])
+
+  /* focus = { key, scale, u, v }: zoom so the point (u, v), as fractions of the stage, sits in the centre. */
+  useEffect(() => {
+    if (!focus) return
+    const size = stageRef.current?.clientWidth || 0
+    const px = (focus.u - 0.5) * size
+    const py = (focus.v - 0.5) * size
+    setView(limit({ scale: focus.scale, x: -px * focus.scale, y: -py * focus.scale }))
+    // Only a new focus request (new key) moves the stage.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focus?.key, limit])
 
   /* Wheel zooms around the cursor. Page scroll is only taken over while zoomed in or with Ctrl held. */
   useEffect(() => {

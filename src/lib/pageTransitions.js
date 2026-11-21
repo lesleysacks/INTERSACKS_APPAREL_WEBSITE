@@ -43,5 +43,9 @@ export function withPreviewTransition(update) {
   const root = document.documentElement
   root.classList.add('vt-preview')
   const transition = document.startViewTransition(update)
-  transition.finished.finally(() => root.classList.remove('vt-preview'))
+  // A quick second change skips the running cross-fade; that is expected, not an error.
+  const quiet = () => {}
+  transition.ready.catch(quiet)
+  transition.updateCallbackDone.catch(quiet)
+  transition.finished.catch(quiet).finally(() => root.classList.remove('vt-preview'))
 }

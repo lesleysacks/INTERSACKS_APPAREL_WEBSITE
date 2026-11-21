@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Layout } from '../components/Chrome.jsx'
 import { Photo } from '../components/Photo.jsx'
 import { useCart } from '../context/CartContext.jsx'
-import { formatPrice, getCartItemImage, placementLabel } from '../data/catalogue.js'
+import { formatPrice, getGarmentById, placementLabel } from '../data/catalogue.js'
+import { TeeMock } from '../components/TeeMock.jsx'
 import { createOrderReference, whatsAppOrderUrl } from '../services/orders.js'
 
 export function CartPage() {
@@ -44,14 +45,18 @@ export function CartPage() {
             <div className="cart-layout">
               <ul className="cart-list">
                 {items.map((item, index) => (
-                  <li key={`${item.garmentId}-${item.colour}-${item.size}-${item.designId}-${item.placement}`} className="cart-item">
-                    <Photo src={getCartItemImage(item)} alt="" />
+                  <li key={`${item.garmentId}-${item.colour}-${item.size}-${(item.prints || []).map((print) => `${print.placement}:${print.designId}`).join('|')}`} className="cart-item">
+                    <CartThumb item={item} />
                     <div>
                       <h2>{item.garmentName}</h2>
                       <p>Colour: {item.colour}</p>
                       <p>Size: {item.size}</p>
-                      {item.designName !== 'None' ? (
-                        <p>Design: {item.designName} ({placementLabel(item.placement)})</p>
+                      {item.prints?.length ? (
+                        <ul className="cart-prints">
+                          {item.prints.map((print) => (
+                            <li key={print.placement}>{placementLabel(print.placement)}: {print.designName}</li>
+                          ))}
+                        </ul>
                       ) : null}
                       <p>Each {formatPrice(item.unitPrice)}</p>
                       <div className="field qty-field">
@@ -112,5 +117,20 @@ export function CartPage() {
         </div>
       </section>
     </Layout>
+  )
+}
+
+/* The bag shows the tee as built: front view, with the back too when it carries a print. */
+function CartThumb({ item }) {
+  const garment = getGarmentById(item.garmentId)
+  const colour = garment?.colours.find((entry) => entry.name === item.colour) || garment?.colours[0]
+  if (!garment?.customizable || !colour) return <Photo src={colour?.frontImage || garment?.image} alt="" />
+  const prints = item.prints || []
+  const hasBack = prints.some((print) => print.placement === 'back-center')
+  return (
+    <div className={`cart-thumb${hasBack ? ' has-back' : ''}`}>
+      <TeeMock colour={colour} view="front" prints={prints} layout="thumb" size={480} alt="" />
+      {hasBack ? <TeeMock colour={colour} view="back" prints={prints} layout="thumb" size={480} alt="" /> : null}
+    </div>
   )
 }
