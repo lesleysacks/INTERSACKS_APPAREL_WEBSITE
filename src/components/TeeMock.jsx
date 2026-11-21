@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { getDesignById, getPlacementConfig } from '../data/catalogue.js'
 import { TEE_SHADE } from '../data/teeColours.js'
 import { composePrints } from '../lib/printComposite.js'
+import { displayFileFor } from '../lib/displayImage.js'
 import { Photo } from './Photo.jsx'
 
 /* The printable artwork for a design: the background-free cut-out when there is one. */
@@ -12,7 +13,7 @@ export function printsForView(prints, view) {
   return prints
     .map((print) => ({ config: getPlacementConfig(print.placement), design: getDesignById(print.designId) }))
     .filter(({ config, design }) => config && design && config.view === view)
-    .map(({ config, design }) => ({ src: printSrc(design), styles: config.styles, key: `${config.zone}:${design.id}:${config.name}` }))
+    .map(({ config, design }) => ({ src: displayFileFor(printSrc(design), 960), styles: config.styles, key: `${config.zone}:${design.id}:${config.name}` }))
 }
 
 /* A canvas over the tee photo holding every print for this view, shaded by the fabric. */
@@ -26,7 +27,7 @@ export function PrintLayer({ prints, view, size = 1200, className = 'print-layer
     const target = ref.current
     if (!target) return undefined
     const scratch = document.createElement('canvas')
-    composePrints(scratch, { prints: list, shadeSrc: TEE_SHADE[view], size }).then(() => {
+    composePrints(scratch, { prints: list, shadeSrc: displayFileFor(TEE_SHADE[view], size), size }).then(() => {
       if (cancelled || !ref.current) return
       target.width = target.height = size
       const ctx = target.getContext('2d')

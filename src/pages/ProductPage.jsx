@@ -306,7 +306,7 @@ export function ProductPage() {
                             name="artwork"
                             value={entry.id}
                             checked={activeDesign?.id === entry.id}
-                            onChange={() => { setFocus(null); commitPreview(() => { customizer.setViewMode(activeZone.view); customizer.setDesign(entry.id) }) }}
+                            onChange={() => { setFocus(null); commitPreview(() => { customizer.setDesign(entry.id); customizer.setActiveZone(customizer.activeZone) }) }}
                           />
                           <Photo layout="thumb" framed={false} src={entry.image} alt="" />
                           <span className="artwork-name">{entry.name}</span>
