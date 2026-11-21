@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 
 /* React wrapper for the 3D tee. three.js is imported only when this mounts,
-   so the rest of the site never downloads it. */
-export function Tee3D({ colour, designSrc, placement, label, onUnavailable }) {
+   so the rest of the site never downloads it.
+   front / back: [{ src, styles }] prints for each face. */
+export function Tee3D({ colour, front, back, side, label, onUnavailable, onSide }) {
   const hostRef = useRef(null)
   const viewerRef = useRef(null)
   const [state, setState] = useState('loading')
-  const latest = useRef({ colour, designSrc, placement })
-  latest.current = { colour, designSrc, placement }
+  const latest = useRef({ colour, front, back })
+  latest.current = { colour, front, back }
+  const signature = JSON.stringify([colour, front, back])
 
   useEffect(() => {
     let cancelled = false
@@ -18,7 +20,7 @@ export function Tee3D({ colour, designSrc, placement, label, onUnavailable }) {
         const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
         viewerRef.current = createTeeViewer(hostRef.current, { reducedMotion })
         viewerRef.current.update(latest.current)
-        if (latest.current.placement?.view === 'back') viewerRef.current.showSide('back')
+        if (side === 'back') viewerRef.current.showSide('back')
         setState('ready')
       })
       .catch(() => {
@@ -36,12 +38,17 @@ export function Tee3D({ colour, designSrc, placement, label, onUnavailable }) {
   }, [])
 
   useEffect(() => {
-    viewerRef.current?.update({ colour, designSrc, placement })
-  }, [colour, designSrc, placement])
+    viewerRef.current?.update(latest.current)
+  }, [signature])
 
   useEffect(() => {
-    if (placement?.view === 'back') viewerRef.current?.showSide('back')
-  }, [placement?.view])
+    viewerRef.current?.showSide(side === 'back' ? 'back' : 'front')
+  }, [side])
+
+  const turn = (next) => {
+    viewerRef.current?.showSide(next)
+    onSide?.(next)
+  }
 
   return (
     <div className="tee3d">
@@ -49,8 +56,8 @@ export function Tee3D({ colour, designSrc, placement, label, onUnavailable }) {
       {state === 'loading' ? <p className="tee3d-status">Loading 3D view…</p> : null}
       {state === 'failed' ? <p className="tee3d-status">3D view is not available on this device.</p> : null}
       <div className="zoom-bar tee3d-bar">
-        <button type="button" className="zoom-btn" onClick={() => viewerRef.current?.showSide('front')}>Front</button>
-        <button type="button" className="zoom-btn" onClick={() => viewerRef.current?.showSide('back')}>Back</button>
+        <button type="button" className="zoom-btn" onClick={() => turn('front')}>Front</button>
+        <button type="button" className="zoom-btn" onClick={() => turn('back')}>Back</button>
         <span className="zoom-hint">Drag to spin · scroll or pinch to zoom</span>
       </div>
     </div>

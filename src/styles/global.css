@@ -653,15 +653,6 @@ fieldset {
   background: var(--studio);
 }
 
-.design-layer {
-  position: absolute;
-  inline-size: var(--design-width);
-  inset-block-start: var(--design-top);
-  inset-inline-start: var(--design-left);
-  transform: var(--design-transform);
-  pointer-events: none;
-  object-fit: contain;
-}
 
 .price-list {
   display: grid;
@@ -699,6 +690,22 @@ fieldset {
 .cart-item .photo-fallback {
   aspect-ratio: 1;
   max-inline-size: 9rem;
+}
+.cart-thumb {
+  display: grid;
+  gap: 0.3rem;
+  max-inline-size: 9rem;
+}
+.cart-thumb .tee-mock {
+  border-radius: 0.6rem;
+  overflow: hidden;
+}
+.cart-thumb.has-back {
+  grid-template-columns: 1fr 1fr;
+}
+.cart-prints {
+  margin: 0;
+  padding-inline-start: 1.1rem;
 }
 
 .cart-summary {

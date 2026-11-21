@@ -11,3 +11,12 @@ export function displayFor(src) {
     height: entry.height
   }
 }
+
+/* A single generated file close to `width` pixels wide, for drawing onto a canvas.
+   WebP decodes everywhere canvas does; falls back to the source when no variants exist. */
+export function displayFileFor(src, width = 960) {
+  const variants = manifest[src]?.variants
+  if (!variants?.length) return src
+  const pick = variants.find((variant) => variant.width >= width) || variants[variants.length - 1]
+  return pick.webp || src
+}

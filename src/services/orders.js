@@ -1,4 +1,4 @@
-import { formatPrice, placementLabel, STORE_CONFIG } from '../data/catalogue.js'
+import { formatPrice, placementLabel, printsForItem, STORE_CONFIG } from '../data/catalogue.js'
 
 export function createOrderReference(date = new Date(), random = Math.random) {
   const stamp = `${String(date.getFullYear()).slice(2)}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`
@@ -18,9 +18,13 @@ export function generateWhatsAppMessage(cart, { name = '', area = '', reference 
     message += `Colour: ${item.colour}\n`
     message += `Size: ${item.size}\n`
 
-    if (item.designName !== 'None') {
-      message += `Design: ${item.designName}\n`
-      message += `Placement: ${placementLabel(item.placement)}\n`
+    const prints = printsForItem(item)
+    if (prints.length) {
+      message += prints.length > 1 ? `Prints (${prints.length}):\n` : 'Print:\n'
+      for (const print of prints) {
+        const saved = item.prints?.find((entry) => entry.placement === print.placement)
+        message += `• ${placementLabel(print.placement)}: ${saved?.designName || item.designName}\n`
+      }
     }
 
     message += `Price: ${formatPrice(item.unitPrice * item.quantity)}\n`

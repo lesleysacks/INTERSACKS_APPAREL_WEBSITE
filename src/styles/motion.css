@@ -299,8 +299,8 @@
 }
 
 /* Artwork swap on the tee preview cross-fades via a same-document view transition. */
-.design-layer { view-transition-name: tee-artwork; }
-::view-transition-group(tee-artwork) {
+.zoom-layer .tee-mock { view-transition-name: tee-preview; }
+::view-transition-group(tee-preview) {
   animation-duration: 260ms;
 }
 

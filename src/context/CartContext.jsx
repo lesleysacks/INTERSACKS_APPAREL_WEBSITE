@@ -1,10 +1,10 @@
 import { createContext, useContext, useRef, useState } from 'react'
 import { Cart } from '../services/cart.js'
-import { getDesignById, getGarmentById, isPurchasable } from '../data/catalogue.js'
+import { getDesignById, getGarmentById, isPurchasable, printsForItem } from '../data/catalogue.js'
 
 function stillOrderable(item) {
   if (!isPurchasable(getGarmentById(item?.garmentId))) return false
-  return !item.designId || Boolean(getDesignById(item.designId)?.active)
+  return printsForItem(item).every((print) => Boolean(getDesignById(print.designId)?.active))
 }
 
 const CartContext = createContext(null)

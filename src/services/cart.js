@@ -1,3 +1,5 @@
+import { printsForItem, printsKey } from '../data/catalogue.js'
+
 export const CART_STORAGE_KEY = 'intersacks-cart'
 export const MAX_QUANTITY = 10
 
@@ -33,6 +35,15 @@ export function normalizeQuantity(value) {
   return quantity
 }
 
+/* Every line carries `prints` ([{ placement, designId, designName }]).
+   Bags saved before multi-spot printing held one designId + placement; convert those. */
+export function withPrints(item) {
+  if (Array.isArray(item.prints)) return item
+  const prints = printsForItem(item).map((print) => ({ ...print, designName: item.designName }))
+  const { designId: _designId, placement: _placement, ...rest } = item
+  return { ...rest, prints }
+}
+
 export class Cart {
   constructor(storage = browserStorage()) {
     this.storage = storage
@@ -43,7 +54,7 @@ export class Cart {
     try {
       const stored = this.storage.getItem(CART_STORAGE_KEY)
       const parsed = stored ? JSON.parse(stored) : []
-      return Array.isArray(parsed) ? parsed : []
+      return Array.isArray(parsed) ? parsed.filter((item) => item && typeof item === 'object').map(withPrints) : []
     } catch {
       return []
     }
@@ -55,12 +66,13 @@ export class Cart {
 
   addItem(item) {
     const quantity = normalizeQuantity(item.quantity ?? 1)
+    item = withPrints(item)
+    const key = printsKey(item.prints)
     const existingIndex = this.items.findIndex((entry) =>
       entry.garmentId === item.garmentId &&
       entry.colour === item.colour &&
       entry.size === item.size &&
-      entry.designId === item.designId &&
-      entry.placement === item.placement
+      printsKey(entry.prints) === key
     )
 
     if (existingIndex >= 0) {

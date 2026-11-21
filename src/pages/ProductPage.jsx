@@ -1,19 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { Layout } from '../components/Chrome.jsx'
-import { ArtworkLayer, Photo } from '../components/Photo.jsx'
+import { Photo } from '../components/Photo.jsx'
+import { printSrc, printsForView, TeeMock } from '../components/TeeMock.jsx'
 import { useCart } from '../context/CartContext.jsx'
 import {
   formatPrice,
   getCompatibleDesigns,
   getDesignCollections,
-  getMinArtworkPrice,
   getDesignById,
   getGarmentById,
   getPlacementConfig,
-  getPlacementsForDesign,
-  getPriceBreakdown,
-  getPurchasableGarments
+  getPurchasableGarments,
+  PRINT_ZONES
 } from '../data/catalogue.js'
 import { Customizer, initCustomizerFromUrl } from '../services/customizer.js'
 import { withPreviewTransition } from '../lib/pageTransitions.js'
@@ -47,10 +46,15 @@ export function ProductPage() {
   const customizer = customizerRef.current
   const garment = getGarmentById(customizer.selectedGarmentId)
   const colour = garment?.colours.find((entry) => entry.value === customizer.selectedColourValue)
-  const design = customizer.selectedDesignId ? getDesignById(customizer.selectedDesignId) : null
-  const placement = customizer.selectedPlacement ? getPlacementConfig(customizer.selectedPlacement) : null
-  const previewSrc = customizer.viewMode === 'back' ? colour?.backImage : colour?.frontImage
-  const breakdown = getPriceBreakdown(customizer.selectedGarmentId, customizer.selectedDesignId, customizer.selectedPlacement)
+  const prints = customizer.getPrints()
+  const printDetails = customizer.getPrintDetails()
+  const activeZone = PRINT_ZONES.find((zone) => zone.id === customizer.activeZone) || PRINT_ZONES[0]
+  const activePrint = customizer.prints[activeZone.id] || null
+  const activeDesign = activePrint ? getDesignById(activePrint.designId) : null
+  const view = customizer.viewMode
+  const total = customizer.getPrice()
+  const base = garment?.basePrice || 0
+  const [focus, setFocus] = useState(null)
   const designs = getCompatibleDesigns(customizer.selectedGarmentId)
   const [designQuery, setDesignQuery] = useState('')
   const [designCollection, setDesignCollection] = useState('All')
@@ -59,7 +63,27 @@ export function ProductPage() {
     (designCollection === 'All' || entry.collection === designCollection) &&
     [entry.name, entry.collection].some((value) => value.toLowerCase().includes(designQuery.trim().toLowerCase()))
   )
-  const isBackPrint = placement?.view === 'back'
+  const onThisView = printDetails.filter((print) => print.view === view)
+
+  function showView(next) {
+    setFocus(null)
+    commitPreview(() => customizer.setViewMode(next))
+  }
+
+  function pickZone(zoneId) {
+    setFocus(null)
+    commitPreview(() => customizer.setActiveZone(zoneId))
+  }
+
+  /* Zoom the stage onto the active print, like the close-up panel on the lookbook sheets. */
+  function showDetail() {
+    const print = activePrint || prints.find((entry) => getPlacementConfig(entry.placement).view === view) || prints[0]
+    if (!print) return
+    const config = getPlacementConfig(print.placement)
+    commitPreview(() => customizer.setViewMode(config.view))
+    const width = parseFloat(config.styles.width) / 100
+    setFocus({ key: Date.now(), scale: width < 0.12 ? 3.2 : width < 0.2 ? 2.6 : 1.9, u: parseFloat(config.styles.left) / 100, v: parseFloat(config.styles.top) / 100 + width * 0.5 })
+  }
 
   function selectGarment(garmentId) {
     customizer.setGarment(garmentId)
@@ -105,8 +129,7 @@ export function ProductPage() {
     }
   }
 
-  const lineTotal = breakdown.total * (Number(customizer.quantity) || 0)
-  const viewLabel = isBackPrint ? 'Back print preview' : customizer.viewMode === 'back' ? 'Back' : 'Front'
+  const lineTotal = total * (Number(customizer.quantity) || 0)
 
   return (
     <Layout current="product">
@@ -122,49 +145,47 @@ export function ProductPage() {
             {mode === '3d' && garment?.customizable ? (
               <Tee3D
                 colour={customizer.selectedColourValue}
-                designSrc={design ? design.transparentImage || design.image : null}
-                placement={design ? placement : null}
-                label={`3D ${garment?.name || 'tee'} in ${customizer.selectedColourName || 'the selected colour'}${design ? ` with ${design.name} on the ${placement?.name}` : ''}. Drag to rotate.`}
+                front={printsForView(prints, 'front')}
+                back={printsForView(prints, 'back')}
+                side={view}
+                label={`3D ${garment?.name || 'tee'} in ${customizer.selectedColourName || 'the selected colour'}${printDetails.length ? ` with ${printDetails.map((print) => `${print.designName} on the ${print.label.toLowerCase()}`).join(', ')}` : ''}. Drag to rotate.`}
                 onUnavailable={() => setMode('2d')}
+                onSide={(side) => { customizer.setViewMode(side); commit() }}
               />
             ) : (
             <ZoomStage
-              resetKey={`${customizer.selectedGarmentId}-${customizer.selectedColourValue}`}
-              label={garment ? `${garment.name}, ${customizer.selectedColourName || 'selected colour'}, ${viewLabel.toLowerCase()}` : 'Selected garment'}
+              resetKey={`${customizer.selectedGarmentId}-${customizer.selectedColourValue}-${view}`}
+              focus={focus}
+              label={garment ? `${garment.name}, ${customizer.selectedColourName || 'selected colour'}, ${view}` : 'Selected garment'}
             >
-              <figure className="preview-stage">
-                <Photo
-                  priority
-                  layout="preview"
-                  className="preview-photo"
-                  src={previewSrc || garment?.image}
-                  alt={garment ? `${garment.name}, ${customizer.selectedColourName || 'selected colour'}, ${customizer.viewMode}` : 'Selected garment'}
-                />
-                {design && placement ? (
-                  <ArtworkLayer
-                    src={design.transparentImage || design.image}
-                    style={{
-                      '--design-width': placement.styles.width,
-                      '--design-top': placement.styles.top,
-                      '--design-left': placement.styles.left,
-                      '--design-transform': placement.styles.transform
-                    }}
-                  />
-                ) : null}
-              </figure>
+              <TeeMock
+                priority
+                className="preview-stage"
+                colour={colour || { frontImage: garment?.image }}
+                view={view}
+                prints={prints}
+                alt={garment ? `${garment.name}, ${customizer.selectedColourName || 'selected colour'}, ${view}${onThisView.length ? ` with ${onThisView.map((print) => `${print.designName} (${print.label})`).join(', ')}` : ''}` : 'Selected garment'}
+              />
             </ZoomStage>
             )}
             <p className="stage-caption">
-              <span>{viewLabel}{isBackPrint ? ' (shown on the tee photo)' : ''}</span>
-              {design ? <span> · {design.name}, {placement?.name}</span> : null}
+              <span>{view === 'back' ? 'Back' : 'Front'}</span>
+              {onThisView.length ? <span> · {onThisView.map((print) => `${print.designName}, ${print.label}`).join(' · ')}</span> : null}
             </p>
             {colour?.backImage ? (
-              <div className="collection-chips" role="group" aria-label="View">
-                {['front', 'back'].map((mode) => (
-                  <button key={mode} type="button" className="chip" aria-pressed={customizer.viewMode === mode} onClick={() => { customizer.setViewMode(mode); commit() }}>
-                    {mode === 'front' ? 'Front' : 'Back'}
+              <div className="lookbook-strip" role="group" aria-label="Views">
+                {['front', 'back'].map((side) => (
+                  <button key={side} type="button" className="look-thumb" aria-pressed={view === side && !focus} onClick={() => showView(side)}>
+                    <TeeMock colour={colour} view={side} prints={prints} layout="thumb" size={360} alt="" />
+                    <span>{side === 'front' ? 'Front' : 'Back'}</span>
                   </button>
                 ))}
+                <button type="button" className="look-thumb look-detail" aria-pressed={Boolean(focus)} disabled={!prints.length} onClick={showDetail}>
+                  {activeDesign || prints.length ? (
+                    <Photo layout="thumb" framed={false} src={printSrc(activeDesign || getDesignById(prints[0].designId))} alt="" />
+                  ) : <span className="look-empty" aria-hidden="true">+</span>}
+                  <span>Close-up</span>
+                </button>
               </div>
             ) : null}
           </div>
@@ -173,7 +194,7 @@ export function ProductPage() {
             <header className="studio-head">
               <p className="kicker">{designs.length ? 'Customise' : garment?.category}</p>
               <h1 id="product-title">{garment ? garment.name : 'Choose a piece'}</h1>
-              <p className="studio-price">{formatPrice(breakdown.total)} <span>each</span></p>
+              <p className="studio-price">{formatPrice(total)} <span>each</span></p>
               <p className="studio-desc">{garment?.description}</p>
             </header>
 
@@ -216,8 +237,47 @@ export function ProductPage() {
 
               {designs.length ? (
                 <>
+                  <fieldset className="zone-picker">
+                    <legend>Print spots <span className="legend-note">add art to as many as you like</span></legend>
+                    <div className="zone-tabs">
+                      {PRINT_ZONES.map((zone) => {
+                        const print = customizer.prints[zone.id]
+                        const zoneDesign = print ? getDesignById(print.designId) : null
+                        const price = getPlacementConfig(zone.placements[0]).price
+                        return (
+                          <label key={zone.id} className={`zone-tab${zoneDesign ? ' is-filled' : ''}`}>
+                            <input type="radio" name="zone" value={zone.id} checked={activeZone.id === zone.id} onChange={() => pickZone(zone.id)} />
+                            <span className="zone-thumb" aria-hidden="true">
+                              {zoneDesign ? <Photo layout="thumb" framed={false} src={printSrc(zoneDesign)} alt="" /> : '+'}
+                            </span>
+                            <span className="zone-text">
+                              <span className="zone-name">{zone.name}</span>
+                              <small>{zoneDesign ? `✓ ${zoneDesign.name}` : `+${formatPrice(price)}`}</small>
+                            </span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                    <div className="zone-active">
+                      <p>
+                        <strong>{activeZone.name}:</strong> {activeDesign ? activeDesign.name : 'pick a design below'}
+                      </p>
+                      {activeDesign && activeZone.placements.length > 1 ? (
+                        <div className="zone-sizes" role="group" aria-label={`${activeZone.name} print size`}>
+                          {activeZone.placements.map((id) => (
+                            <button key={id} type="button" className="chip" aria-pressed={activePrint.placement === id} onClick={() => commitPreview(() => customizer.setPlacement(id))}>
+                              {id === 'front-small' ? 'Small (chest)' : 'Centre'}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+                      {activeDesign ? (
+                        <button type="button" className="chip zone-remove" onClick={() => commitPreview(() => customizer.clearDesign())}>Remove</button>
+                      ) : null}
+                    </div>
+                  </fieldset>
                   <fieldset className="artwork-picker">
-                    <legend>Artwork <span className="legend-note">from +{formatPrice(getMinArtworkPrice())}</span></legend>
+                    <legend>Artwork for the {activeZone.name.toLowerCase()} <span className="legend-note">+{formatPrice(getPlacementConfig(activeZone.placements[0]).price)}</span></legend>
                     <div className="artwork-filters">
                       <label htmlFor="artwork-search" className="visually-hidden">Search artwork</label>
                       <input id="artwork-search" name="artwork-search" type="search" placeholder="Search designs…" autoComplete="off" value={designQuery} onChange={(event) => setDesignQuery(event.target.value)} />
@@ -233,11 +293,11 @@ export function ProductPage() {
                           type="radio"
                           name="artwork"
                           value=""
-                          checked={!customizer.selectedDesignId}
+                          checked={!activeDesign}
                           onChange={() => commitPreview(() => customizer.clearDesign())}
                         />
                         <span className="artwork-plain" aria-hidden="true">Plain</span>
-                        <span className="artwork-name">No design</span>
+                        <span className="artwork-name">No print here</span>
                       </label>
                       {visibleDesigns.map((entry) => (
                         <label key={entry.id} className="artwork-option">
@@ -245,8 +305,8 @@ export function ProductPage() {
                             type="radio"
                             name="artwork"
                             value={entry.id}
-                            checked={customizer.selectedDesignId === entry.id}
-                            onChange={() => commitPreview(() => customizer.setDesign(entry.id))}
+                            checked={activeDesign?.id === entry.id}
+                            onChange={() => { setFocus(null); commitPreview(() => { customizer.setDesign(entry.id); customizer.setActiveZone(customizer.activeZone) }) }}
                           />
                           <Photo layout="thumb" framed={false} src={entry.image} alt="" />
                           <span className="artwork-name">{entry.name}</span>
@@ -255,23 +315,6 @@ export function ProductPage() {
                     </div>
                     {(designQuery || designCollection !== 'All') && !visibleDesigns.length ? <p>No artwork matches that search.</p> : null}
                   </fieldset>
-                  {design ? (
-                    <fieldset className="pill-group">
-                      <legend>Print position</legend>
-                      {getPlacementsForDesign(design.id).map((entry) => (
-                        <label key={entry.id} className="pill">
-                          <input
-                            type="radio"
-                            name="placement"
-                            value={entry.id}
-                            checked={customizer.selectedPlacement === entry.id}
-                            onChange={() => commitPreview(() => customizer.setPlacement(entry.id))}
-                          />
-                          <span>{entry.name} <small>+{formatPrice(entry.price)}</small></span>
-                        </label>
-                      ))}
-                    </fieldset>
-                  ) : null}
                 </>
               ) : <p className="fine-print">Sold as shown. Pick your colour and size.</p>}
               <p className="fine-print">Made to order. We confirm sizing and delivery with you on WhatsApp before anything is made.</p>
@@ -304,8 +347,8 @@ export function ProductPage() {
                 </button>
               </div>
               <p className="buy-breakdown">
-                Garment {formatPrice(breakdown.base)}
-                {breakdown.artwork ? ` + artwork ${formatPrice(breakdown.artwork)}` : ''}
+                Garment {formatPrice(base)}
+                {printDetails.map((print) => ` + ${print.label.toLowerCase()} ${formatPrice(print.price)}`).join('')}
                 {Number(customizer.quantity) > 1 ? ` × ${customizer.quantity}` : ''}
               </p>
               {quantityError ? <p id="quantity-error" role="alert" className="buy-error">{quantityError}</p> : null}

@@ -163,8 +163,7 @@ test('Baseline: WhatsApp order message format generation', () => {
   assert.ok(message.includes('2 × Classic Tee'))
   assert.ok(message.includes('Colour: Black'))
   assert.ok(message.includes('Size: M'))
-  assert.ok(message.includes('Design: Midnight Snake'))
-  assert.ok(message.includes('Placement: Front Centre'))
+  assert.ok(message.includes('• Front Centre: Midnight Snake'))
   assert.ok(message.includes('TOTAL: R798'))
   assert.ok(message.includes('Name:'))
   assert.ok(message.includes('Delivery Area:'))
@@ -188,7 +187,7 @@ test('Baseline: Customizer state management and price updates', () => {
 
   customizer.setDesign('design-001')
   assert.equal(customizer.selectedDesignId, 'design-001')
-  assert.equal(customizer.selectedPlacement, 'front-small')
+  assert.equal(customizer.selectedPlacement, 'front-center')
   assert.equal(customizer.getPrice(), 399)
 
   const cartItem = customizer.createCartItem()
@@ -268,11 +267,84 @@ test('Print position sets the artwork price', () => {
   assert.equal(getPriceBreakdown('classic-tee', 'design-001', 'back-center').artwork, 80)
   const customizer = new Customizer()
   customizer.setGarment('classic-tee')
-  customizer.setDesign('design-001')
-  customizer.setPlacement('back-center')
+  customizer.setZoneDesign('back', 'design-001')
   const item = customizer.createCartItem()
   assert.equal(item.unitPrice, 429)
-  assert.equal(item.placement, 'back-center')
+  assert.deepEqual(item.prints.map((print) => print.placement), ['back-center'])
+})
+
+test('Prints on several spots add up: front + back + sleeve = R519', () => {
+  const customizer = new Customizer()
+  customizer.setGarment('classic-tee')
+  customizer.setColour('#1d2a44', 'Navy')
+  customizer.setZoneDesign('front', 'design-051')
+  customizer.setZoneDesign('back', 'design-054')
+  customizer.setActiveZone('right-sleeve')
+  assert.equal(customizer.viewMode, 'front')
+  customizer.setDesign('design-055')
+  assert.equal(customizer.getPrice(), 349 + 50 + 80 + 40)
+  customizer.setZonePlacement('front', 'front-small')
+  assert.equal(customizer.getPrice(), 519)
+  const item = customizer.createCartItem()
+  assert.equal(item.unitPrice, 519)
+  assert.deepEqual(item.prints.map((print) => `${print.placement}:${print.designName}`), [
+    'front-small:Panther Claw',
+    'back-center:Built Different',
+    'right-sleeve:IS Crest'
+  ])
+  customizer.clearZone('back')
+  assert.equal(customizer.getPrice(), 439)
+  customizer.setActiveZone('back')
+  assert.equal(customizer.viewMode, 'back')
+})
+
+test('Bag lines merge only when every print matches', () => {
+  const cart = new Cart(createMemoryStorage())
+  const line = (prints) => ({ garmentId: 'classic-tee', garmentName: 'Classic Tee', colour: 'Navy', size: 'M', prints, designName: 'x', unitPrice: 469, quantity: 1 })
+  cart.addItem(line([{ placement: 'front-center', designId: 'design-051', designName: 'Panther Claw' }, { placement: 'back-center', designId: 'design-054', designName: 'Built Different' }]))
+  cart.addItem(line([{ placement: 'back-center', designId: 'design-054', designName: 'Built Different' }, { placement: 'front-center', designId: 'design-051', designName: 'Panther Claw' }]))
+  assert.equal(cart.items.length, 1)
+  assert.equal(cart.items[0].quantity, 2)
+  cart.addItem(line([{ placement: 'front-center', designId: 'design-051', designName: 'Panther Claw' }]))
+  assert.equal(cart.items.length, 2)
+})
+
+test('A bag saved before multi-spot printing still loads', () => {
+  const storage = createMemoryStorage()
+  storage.setItem('intersacks-cart', JSON.stringify([{ garmentId: 'classic-tee', garmentName: 'Classic Tee', colour: 'Black', size: 'L', designId: 'design-001', designName: 'Midnight Snake', placement: 'left-sleeve', unitPrice: 389, quantity: 1 }]))
+  const cart = new Cart(storage)
+  assert.deepEqual(cart.items[0].prints, [{ placement: 'left-sleeve', designId: 'design-001', designName: 'Midnight Snake' }])
+  assert.equal(cart.items[0].designId, undefined)
+  const message = generateWhatsAppMessage(cart)
+  assert.ok(message.includes('• Left Sleeve: Midnight Snake'))
+})
+
+test('WhatsApp message lists every print on a tee', () => {
+  const customizer = new Customizer()
+  customizer.setGarment('classic-tee')
+  customizer.setZoneDesign('front', 'design-051')
+  customizer.setZoneDesign('back', 'design-054')
+  customizer.setZoneDesign('left-sleeve', 'design-055')
+  const cart = new Cart(createMemoryStorage())
+  cart.addItem(customizer.createCartItem())
+  const message = generateWhatsAppMessage(cart)
+  assert.ok(message.includes('Prints (3):'))
+  assert.ok(message.includes('• Front Centre: Panther Claw'))
+  assert.ok(message.includes('• Back: Built Different'))
+  assert.ok(message.includes('• Left Sleeve: IS Crest'))
+  assert.ok(message.includes('Price: R519'))
+})
+
+test('Every Classic Tee colour has a front and back photo, and cut-outs are used for print', () => {
+  const tee = getGarments().find((garment) => garment.id === 'classic-tee')
+  assert.deepEqual(tee.colours.map((colour) => colour.name), ['Black', 'White', 'Navy', 'Charcoal', 'Sand', 'Olive', 'Pink', 'Light blue'])
+  for (const colour of tee.colours) {
+    assert.match(colour.frontImage, /classic-tee\/.+-front\.webp$/)
+    assert.match(colour.backImage, /classic-tee\/.+-back\.webp$/)
+  }
+  const panther = getDesigns().find((design) => design.id === 'design-034')
+  assert.equal(panther.transparentImage, 'assets/Designs/cutouts/design-034.webp')
+  assert.ok(panther.hasUsableTransparency)
 })
 
 test('Designs can be filtered by collection', () => {

@@ -52,15 +52,3 @@ export function Photo({
     </picture>
   )
 }
-
-export function ArtworkLayer({ src, style }) {
-  const sizes = imageLayouts.artwork
-  const { sources } = sourcesFor(src, sizes)
-  if (!src) return null
-  return (
-    <picture>
-      {sources}
-      <img className="design-layer" src={src} alt="" style={style} decoding="async" />
-    </picture>
-  )
-}

@@ -1,22 +1,29 @@
 import {
-  calculatePrice,
+  calculatePrintsPrice,
+  describePrints,
   getCompatibleDesigns,
   getDesignById,
   getGarmentById,
   getPlacementConfig,
   getPurchasableGarments,
-  isPurchasable
+  isPurchasable,
+  normalizePrints,
+  PRINT_ZONES
 } from '../data/catalogue.js'
 import { normalizeQuantity } from './cart.js'
 
+const zoneById = (id) => PRINT_ZONES.find((zone) => zone.id === id)
+
+/* One tee build: garment, colour, size and up to one design on each print spot
+   (front, back, left sleeve, right sleeve). */
 export class Customizer {
   constructor() {
     this.selectedGarmentId = null
     this.selectedColourValue = null
     this.selectedColourName = null
     this.selectedSize = null
-    this.selectedDesignId = null
-    this.selectedPlacement = null
+    this.prints = {}
+    this.activeZone = 'front'
     this.viewMode = 'front'
     this.quantity = 1
   }
@@ -28,40 +35,85 @@ export class Customizer {
       this.selectedColourValue = garment.colours[0].value
       this.selectedColourName = garment.colours[0].name
       this.selectedSize = garment.sizes[0]
-      this.selectedDesignId = null
-      this.selectedPlacement = null
+      this.prints = {}
+      this.activeZone = 'front'
       this.quantity = 1
-      if (this.viewMode === 'back' && !garment.colours[0].backImage) this.viewMode = 'front'
+      this.viewMode = 'front'
     }
+  }
+
+  getColour() {
+    const garment = getGarmentById(this.selectedGarmentId)
+    return garment?.colours.find((entry) => entry.value === this.selectedColourValue) || null
   }
 
   setColour(colourValue, colourName) {
     this.selectedColourValue = colourValue
     this.selectedColourName = colourName
-    const garment = getGarmentById(this.selectedGarmentId)
-    const colour = garment?.colours.find((entry) => entry.value === colourValue)
-    if (this.viewMode === 'back' && !colour?.backImage) this.viewMode = 'front'
+    if (this.viewMode === 'back' && !this.getColour()?.backImage) this.viewMode = 'front'
   }
 
   setSize(size) {
     this.selectedSize = size
   }
 
+  canPrint(designId) {
+    return Boolean(getDesignById(designId) && getCompatibleDesigns(this.selectedGarmentId).some((entry) => entry.id === designId))
+  }
+
+  /* Pick which print spot the artwork grid fills, and turn the tee to show it. */
+  setActiveZone(zoneId) {
+    const zone = zoneById(zoneId)
+    if (!zone) return
+    this.activeZone = zoneId
+    this.setViewMode(zone.view)
+  }
+
+  setZoneDesign(zoneId, designId) {
+    const zone = zoneById(zoneId)
+    if (!zone || !this.canPrint(designId)) return
+    const current = this.prints[zoneId]
+    const placement = current && zone.placements.includes(current.placement) ? current.placement : zone.placements[0]
+    this.prints = { ...this.prints, [zoneId]: { designId, placement } }
+  }
+
+  clearZone(zoneId) {
+    const next = { ...this.prints }
+    delete next[zoneId]
+    this.prints = next
+  }
+
+  /* Front prints come in two sizes; other spots have one. */
+  setZonePlacement(zoneId, placementId) {
+    const zone = zoneById(zoneId)
+    const current = this.prints[zoneId]
+    if (!zone || !current || !zone.placements.includes(placementId)) return
+    this.prints = { ...this.prints, [zoneId]: { ...current, placement: placementId } }
+  }
+
+  /* Shortcuts that act on the active spot. */
+  get selectedDesignId() {
+    return this.prints[this.activeZone]?.designId || null
+  }
+
+  get selectedPlacement() {
+    return this.prints[this.activeZone]?.placement || null
+  }
+
   setDesign(designId) {
-    const design = getDesignById(designId)
-    if (design && getCompatibleDesigns(this.selectedGarmentId).find((entry) => entry.id === designId)) {
-      this.selectedDesignId = designId
-      this.selectedPlacement = design.placements[0] || null
-    }
+    this.setZoneDesign(this.activeZone, designId)
   }
 
   clearDesign() {
-    this.selectedDesignId = null
-    this.selectedPlacement = null
+    this.clearZone(this.activeZone)
   }
 
   setPlacement(placementId) {
-    this.selectedPlacement = placementId
+    this.setZonePlacement(this.activeZone, placementId)
+  }
+
+  clearAll() {
+    this.prints = {}
   }
 
   setQuantity(quantity) {
@@ -69,27 +121,38 @@ export class Customizer {
   }
 
   setViewMode(viewMode) {
-    const garment = getGarmentById(this.selectedGarmentId)
-    const colour = garment?.colours.find((entry) => entry.value === this.selectedColourValue)
-    if (viewMode === 'back' && !colour?.backImage) return
+    if (viewMode === 'back' && !this.getColour()?.backImage) return
     this.viewMode = viewMode
   }
 
+  /* [{ placement, designId }] in zone order. */
+  getPrints() {
+    return normalizePrints(Object.values(this.prints))
+  }
+
+  /* Prints with labels, design names and prices, for the breakdown and summaries. */
+  getPrintDetails() {
+    return describePrints(this.getPrints()).map((print) => ({
+      ...print,
+      zone: getPlacementConfig(print.placement).zone,
+      view: getPlacementConfig(print.placement).view,
+      price: getPlacementConfig(print.placement).price
+    }))
+  }
+
   getPrice() {
-    return calculatePrice(this.selectedGarmentId, this.selectedDesignId, this.selectedPlacement)
+    return calculatePrintsPrice(this.selectedGarmentId, this.getPrints())
   }
 
   getSummary() {
     const garment = getGarmentById(this.selectedGarmentId)
-    const design = this.selectedDesignId ? getDesignById(this.selectedDesignId) : null
-    const placement = this.selectedPlacement ? getPlacementConfig(this.selectedPlacement) : null
-
+    const prints = this.getPrintDetails()
     return {
       garmentName: garment?.name || 'N/A',
       colour: this.selectedColourName,
       size: this.selectedSize,
-      designName: design?.name || 'None',
-      placement: placement?.name || 'N/A',
+      prints,
+      designName: prints.length ? prints.map((print) => print.designName).join(', ') : 'None',
       price: this.getPrice()
     }
   }
@@ -99,16 +162,14 @@ export class Customizer {
     if (!isPurchasable(garment)) {
       throw new Error('This garment is not available to order.')
     }
-    const design = this.selectedDesignId ? getDesignById(this.selectedDesignId) : null
-
+    const prints = this.getPrintDetails().map(({ placement, designId, designName }) => ({ placement, designId, designName }))
     return {
       garmentId: this.selectedGarmentId,
       garmentName: garment.name,
       colour: this.selectedColourName,
       size: this.selectedSize,
-      designId: this.selectedDesignId,
-      designName: design?.name || 'None',
-      placement: this.selectedPlacement || 'N/A',
+      prints,
+      designName: prints.length ? prints.map((print) => print.designName).join(', ') : 'None',
       unitPrice: this.getPrice(),
       quantity: normalizeQuantity(this.quantity)
     }
@@ -130,6 +191,6 @@ export function initCustomizerFromUrl(customizer, params = {}) {
   }
 
   if (params.design && customizer.selectedGarmentId) {
-    customizer.setDesign(params.design)
+    customizer.setZoneDesign('front', params.design)
   }
 }
