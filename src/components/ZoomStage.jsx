@@ -10,7 +10,7 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 /* A square stage whose contents (tee photo + artwork layer) zoom and pan together.
    Buttons, wheel, double-click/tap, drag, pinch and keyboard all drive one transform
    on an inner layer (translate + scale, compositor-friendly). Standard pointer events only. */
-export function ZoomStage({ label, children, resetKey, focus }) {
+export function ZoomStage({ label, children, resetKey, focus, className = '' }) {
   const stageRef = useRef(null)
   const pointers = useRef(new Map())
   const gesture = useRef(null)
@@ -21,10 +21,12 @@ export function ZoomStage({ label, children, resetKey, focus }) {
 
   const limit = useCallback((next) => {
     const stage = stageRef.current
-    const size = stage ? stage.clientWidth : 0
+    const width = stage ? stage.clientWidth : 0
+    const height = stage ? stage.clientHeight : 0
     const scale = clamp(next.scale, MIN, MAX)
-    const max = ((scale - 1) * size) / 2
-    return { scale, x: clamp(next.x, -max, max), y: clamp(next.y, -max, max) }
+    const maxX = ((scale - 1) * width) / 2
+    const maxY = ((scale - 1) * height) / 2
+    return { scale, x: clamp(next.x, -maxX, maxX), y: clamp(next.y, -maxY, maxY) }
   }, [])
 
   /* Zoom so the point (px, py), relative to the stage centre, stays under the pointer. */
@@ -48,9 +50,8 @@ export function ZoomStage({ label, children, resetKey, focus }) {
   /* focus = { key, scale, u, v }: zoom so the point (u, v), as fractions of the stage, sits in the centre. */
   useEffect(() => {
     if (!focus) return
-    const size = stageRef.current?.clientWidth || 0
-    const px = (focus.u - 0.5) * size
-    const py = (focus.v - 0.5) * size
+    const px = (focus.u - 0.5) * (stageRef.current?.clientWidth || 0)
+    const py = (focus.v - 0.5) * (stageRef.current?.clientHeight || 0)
     setView(limit({ scale: focus.scale, x: -px * focus.scale, y: -py * focus.scale }))
     // Only a new focus request (new key) moves the stage.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -140,7 +141,7 @@ export function ZoomStage({ label, children, resetKey, focus }) {
 
   const zoomed = view.scale > 1
   return (
-    <div className="zoom">
+    <div className={`zoom ${className}`.trim()}>
       <div
         ref={stageRef}
         className={`zoom-stage${zoomed ? ' is-zoomed' : ''}`}

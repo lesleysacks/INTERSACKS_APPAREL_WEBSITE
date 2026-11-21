@@ -808,3 +808,193 @@
     inline-size: min(100%, 40rem);
   }
 }
+
+/* ---------- Tap-to-enlarge photos (shop cards, lookbook) ---------- */
+.photo-open {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: zoom-in;
+  text-align: start;
+}
+.photo-open:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+.photo-open-hint {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+  display: grid;
+  place-items: center;
+  inline-size: 2.2rem;
+  block-size: 2.2rem;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.6);
+  color: #fff;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+.lookbook-card {
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+}
+
+/* ---------- Quick add on ready-made pieces ---------- */
+.quick-add {
+  display: grid;
+  gap: 0.5rem;
+}
+.quick-add .pill-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.quick-add legend {
+  margin-block-end: 0.3rem;
+  font-weight: 700;
+}
+.quick-add.is-compact .pill {
+  min-block-size: 2.5rem;
+  min-inline-size: 2.5rem;
+  padding-inline: 0.6rem;
+}
+.quick-add-btn {
+  inline-size: 100%;
+}
+.quick-add-status {
+  margin: 0;
+  min-block-size: 1.2em;
+  font-size: 0.9rem;
+}
+.quick-add-status:empty {
+  min-block-size: 0;
+}
+.card-customise {
+  justify-self: start;
+}
+
+/* ---------- Fullscreen viewer ---------- */
+html.has-lightbox {
+  overflow: hidden;
+}
+.lightbox {
+  inline-size: 100vw;
+  max-inline-size: 100vw;
+  block-size: 100dvh;
+  max-block-size: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #111;
+  color: #f4f1ea;
+}
+.lightbox::backdrop {
+  background: rgb(0 0 0 / 0.85);
+}
+.lightbox-inner {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0.6rem;
+  block-size: 100%;
+  padding:
+    max(0.6rem, env(safe-area-inset-top, 0px))
+    max(1rem, env(safe-area-inset-right, 0px))
+    max(0.8rem, env(safe-area-inset-bottom, 0px))
+    max(1rem, env(safe-area-inset-left, 0px));
+}
+.lightbox-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.lightbox-head h2 {
+  margin: 0;
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+}
+.lightbox .zoom-btn {
+  border-color: #555;
+  background: #222;
+  color: #f4f1ea;
+}
+.lightbox .zoom-btn:disabled {
+  opacity: 0.4;
+}
+.lightbox .zoom-hint,
+.lightbox .zoom-level,
+.lightbox-label {
+  color: #cfcac0;
+}
+.zoom.is-fill {
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-block-size: 0;
+  block-size: 100%;
+}
+.zoom.is-fill .zoom-stage {
+  aspect-ratio: auto;
+  inline-size: 100%;
+  max-inline-size: none;
+  block-size: 100%;
+  max-block-size: none;
+  min-block-size: 0;
+  border-color: #333;
+  background: #1a1a1a;
+}
+.zoom.is-fill .zoom-layer picture {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+.lightbox-photo {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+.lightbox-foot {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: center;
+  max-inline-size: 40rem;
+  inline-size: 100%;
+  justify-self: center;
+}
+.lightbox-foot .quick-add {
+  inline-size: 100%;
+}
+.lightbox-label {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.lightbox .chip[aria-pressed="false"],
+.lightbox .pill {
+  border-color: #555;
+  background: #222;
+  color: #f4f1ea;
+}
+.lightbox .quick-add-status a {
+  color: #b9d0ff;
+}
+/* Light buttons so the main action stands out on the dark viewer. */
+.lightbox .btn,
+.lightbox .btn-buy {
+  border-color: #f4f1ea;
+  background: #f4f1ea;
+  color: #111;
+}
+.lightbox .btn:hover {
+  background: #fff;
+}
+@media (max-width: 51.99rem) {
+  .lightbox .zoom-hint {
+    display: none;
+  }
+}

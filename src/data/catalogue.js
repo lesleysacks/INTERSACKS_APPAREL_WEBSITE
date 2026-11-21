@@ -7,9 +7,9 @@ export const STORE_CONFIG = { whatsappNumber: "27843252262", brandName: "InterSa
 
 export const garments = [
   { id:"classic-tee", name:"Classic Tee", category:"T-Shirts", description:"A clean short-sleeve base for custom InterSacks artwork.", basePrice:349, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:true, image:"assets/garments/classic-tee/black-front.webp" },
-  { id:"panther-long-sleeve", name:"Panther Long Sleeve", category:"Long Sleeves", description:"Blue and black Panther long-sleeve set shown from the front and back.", basePrice:499, colours:[{name:"Blue / Black",value:"#1256a3",frontImage:"assets/products/pantherPJ_longsleeve(blue&black) (2).png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/pantherPJ_longsleeve(blue&black) (2).png" },
-  { id:"panther-vest", name:"Panther Vest", category:"Vests", description:"Blue and black Panther basketball vest shown from the front and back.", basePrice:399, colours:[{name:"Blue / Black",value:"#1256a3",frontImage:"assets/products/pantherPJ_Vest(blue&black) (1).png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/pantherPJ_Vest(blue&black) (1).png" },
-  { id:"skull-tracksuit", name:"Skull Tracksuit", category:"Sets", description:"Black hoodie-and-jogger set with purple skull artwork.", basePrice:899, colours:[{name:"Black / Purple",value:"#17131d",frontImage:"assets/products/product-1.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/product-1.png" },
+  { id:"panther-long-sleeve", showsBothSides:true, name:"Panther Long Sleeve", category:"Long Sleeves", description:"Blue and black Panther long-sleeve set shown from the front and back.", basePrice:499, colours:[{name:"Blue / Black",value:"#1256a3",frontImage:"assets/products/pantherPJ_longsleeve(blue&black) (2).png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/pantherPJ_longsleeve(blue&black) (2).png" },
+  { id:"panther-vest", showsBothSides:true, name:"Panther Vest", category:"Vests", description:"Blue and black Panther basketball vest shown from the front and back.", basePrice:399, colours:[{name:"Blue / Black",value:"#1256a3",frontImage:"assets/products/pantherPJ_Vest(blue&black) (1).png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/pantherPJ_Vest(blue&black) (1).png" },
+  { id:"skull-tracksuit", showsBothSides:true, name:"Skull Tracksuit", category:"Sets", description:"Black hoodie-and-jogger set with purple skull artwork.", basePrice:899, colours:[{name:"Black / Purple",value:"#17131d",frontImage:"assets/products/product-1.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/product-1.png" },
   { id:"graphic-long-sleeve", name:"23 Graphic Long Sleeve", category:"Long Sleeves", description:"White long sleeve with colourful basketball and sneaker artwork.", basePrice:449, colours:[{name:"White",value:"#f5f5f5",frontImage:"assets/products/product-2.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:false, active:true, customizable:false, image:"assets/products/product-2.png" },
   { id:"cocomelon-sweatshirt", name:"Colour Splash Sweatshirt", category:"Sweatshirts", description:"Black crewneck with colourful character artwork.", basePrice:499, colours:[{name:"Black",value:"#111111",frontImage:"assets/products/product-3.png",backImage:null}], sizes:["Kids S","Kids M","Kids L"], featured:false, active:true, customizable:false, image:"assets/products/product-3.png" },
   { id:"rose-shirt", name:"Rose Panel Shirt", category:"Shirts", description:"White button-up with black panels and red rose detailing.", basePrice:549, colours:[{name:"White / Black",value:"#d8d8d8",frontImage:"assets/products/product-4.jpg",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:false, active:true, customizable:false, image:"assets/products/product-4.jpg" },
@@ -296,6 +296,23 @@ export function describePrints(prints = []) {
 export function placementLabel(placementId) {
   if (!placementId || placementId === 'N/A') return 'N/A'
   return getPlacementConfig(placementId)?.name || placementId
+}
+
+/* Photos for the fullscreen viewer: front, plus back when there is one.
+   Some product photos already show both sides in one image. */
+export function garmentViews(garment, colour = garment?.colours?.[0]) {
+  if (!garment) return []
+  const front = colour?.frontImage || garment.image
+  if (!front) return []
+  const name = `${garment.name}${colour?.name ? `, ${colour.name}` : ''}`
+  if (colour?.backImage) {
+    return [
+      { label: 'Front', src: front, alt: `${name}, front` },
+      { label: 'Back', src: colour.backImage, alt: `${name}, back` }
+    ]
+  }
+  const label = garment.showsBothSides ? 'Front and back' : 'Front'
+  return [{ label, src: front, alt: `${name}, ${label.toLowerCase()}` }]
 }
 
 export function getCartItemImage(item) {
