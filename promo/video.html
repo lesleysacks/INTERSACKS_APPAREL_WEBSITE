@@ -290,6 +290,7 @@
         <div class="display" style="font-size:120px"><span class="line"><span id="zoom-l1">ZOOM INTO</span></span><span class="line"><span id="zoom-l2" class="accent">EVERY DETAIL.</span></span></div>
       </div>
     </div>
+    <div id="pill-l" class="abs" style="width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:#161513;color:#fff;display:grid;place-items:center;font-size:24px">L</div>
     <svg id="cursor" viewBox="0 0 24 24"><path d="M3 2l7.5 19 2.7-7.8L21 10.5 3 2z" fill="#fff" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></svg>
     <div id="ripple" class="ripple"></div>
   </section>
@@ -578,8 +579,8 @@ function renderAt(t) {
     // Cursor: in from bottom right, click size L, then Add to bag.
     const card = { x: 1330, y: 110, w: 420 }
     const cardH = card.w * ($('card-a').naturalHeight / ($('card-a').naturalWidth || 1))
-    const sizeL = { x: card.x + card.w * 0.4, y: card.y + cardH * 0.797 }
-    const addBtn = { x: card.x + card.w * 0.5, y: card.y + cardH * 0.879 }
+    const sizeL = { x: card.x + card.w * 0.4, y: card.y + cardH * 0.858 }
+    const addBtn = { x: card.x + card.w * 0.5, y: card.y + cardH * 0.921 }
     const m1 = ease.inOut(P(t, 39.6, 40.4))
     const m2 = ease.inOut(P(t, 40.7, 41.3))
     let cx = lerp(1880, sizeL.x, m1)
@@ -592,7 +593,8 @@ function renderAt(t) {
     const r = t < 41.3 ? rip(40.45) : rip(41.35)
     const rp = t < 41.3 ? sizeL : addBtn
     style($('ripple'), { left: `${rp.x}px`, top: `${rp.y}px`, opacity: r > 0 && r < 1 ? 1 - r : 0, transform: `scale(${0.2 + r})` })
-    // The L pill and Added state come from the real "after" screenshot.
+    // Selected L pill straight after the tap; then the real "after" screenshot takes over.
+    style($('pill-l'), { left: `${sizeL.x}px`, top: `${sizeL.y}px`, opacity: t > 40.5 && t < 41.8 ? 1 : 0, transform: `scale(${ease.back(P(t, 40.5, 40.75))})` })
     $('card-b').style.opacity = ease.out(P(t, 41.4, 41.7))
     const bag = ease.back(P(t, 41.6, 42.1))
     $('bag-count').textContent = t > 41.6 ? '1' : '0'
