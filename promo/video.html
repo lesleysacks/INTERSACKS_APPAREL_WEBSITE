@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>InterSacks Apparel — 60s promo</title>
+<link rel="stylesheet" href="fonts/faces.css">
+<!--
+  InterSacks Apparel 60-second promo, written entirely in code.
+  Every frame is a pure function of time: window.renderAt(seconds) positions everything.
+  render.cjs steps t from 0 to 60 at 30 fps, screenshots each frame and pipes them to ffmpeg.
+  Open this file in a browser to scrub: add #t=12.5 to the URL, or press Space to play.
+-->
+<style>
+  :root {
+    --ink: #0b0b0c;
+    --paper: #f4f1eb;
+    --blue: #2f6bff;
+    --blue-deep: #0a3f91;
+    --muted: #a7a299;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #000; }
+  #film {
+    position: relative;
+    inline-size: 1920px;
+    block-size: 1080px;
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+  .scene { position: absolute; inset: 0; display: none; }
+  .abs { position: absolute; }
+  .display { font-family: 'Bebas Neue', Impact, sans-serif; font-weight: 400; line-height: 0.9; letter-spacing: 0.01em; }
+  .syne { font-family: 'Syne', 'Plus Jakarta Sans', sans-serif; font-weight: 700; }
+  .kicker { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--blue); }
+  .line { display: block; overflow: hidden; padding-block: 0.04em; }
+  .line > span { display: inline-block; will-change: transform; }
+  .accent { color: var(--blue); }
+  img { display: block; }
+
+  /* Browser window */
+  .browser {
+    position: absolute;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #1b1b1d;
+    box-shadow: 0 40px 120px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.08);
+    transform-origin: center;
+  }
+  .browser .bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    block-size: 46px;
+    padding-inline: 18px;
+    background: #222225;
+  }
+  .browser .bar i { inline-size: 13px; block-size: 13px; border-radius: 50%; background: #555; }
+  .browser .bar i:nth-child(1) { background: #ff5f57; }
+  .browser .bar i:nth-child(2) { background: #febc2e; }
+  .browser .bar i:nth-child(3) { background: #28c840; }
+  .browser .url {
+    margin-inline-start: 18px;
+    padding: 6px 18px;
+    border-radius: 999px;
+    background: #111;
+    color: #cfcac0;
+    font-size: 17px;
+  }
+  .browser .view { position: relative; overflow: hidden; }
+  .browser .view img { inline-size: 100%; transform-origin: 50% 0; }
+
+  /* Phones */
+  .phone {
+    position: absolute;
+    inline-size: 330px;
+    block-size: 714px;
+    border-radius: 54px;
+    padding: 12px;
+    background: #111;
+    box-shadow: 0 50px 110px rgb(0 0 0 / 0.6), inset 0 0 0 2px #333;
+  }
+  .phone img { inline-size: 100%; block-size: 100%; object-fit: cover; object-position: top; border-radius: 42px; }
+  .phone::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 24px;
+    inset-inline-start: 50%;
+    inline-size: 110px;
+    block-size: 30px;
+    translate: -50% 0;
+    border-radius: 20px;
+    background: #000;
+  }
+
+  .card-shadow { box-shadow: 0 40px 100px rgb(0 0 0 / 0.5); }
+  .chip-callout {
+    position: absolute;
+    padding: 14px 26px;
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    white-space: nowrap;
+    box-shadow: 0 16px 40px rgb(0 0 0 / 0.45);
+  }
+  .chip-callout b { color: var(--blue-deep); }
+  .dot-callout {
+    position: absolute;
+    inline-size: 26px;
+    block-size: 26px;
+    margin: -13px 0 0 -13px;
+    border-radius: 50%;
+    background: var(--blue);
+    box-shadow: 0 0 0 8px rgb(47 107 255 / 0.35);
+  }
+  .swatch { position: absolute; inline-size: 64px; block-size: 64px; border-radius: 50%; border: 3px solid rgb(255 255 255 / 0.25); }
+  .grain {
+    position: absolute;
+    inset: -50%;
+    pointer-events: none;
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='240' height='240' filter='url(%23n)' opacity='1'/></svg>");
+  }
+  .vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 55%, rgb(0 0 0 / 0.55) 100%); }
+  #progress { position: absolute; inset-block-end: 0; inset-inline-start: 0; block-size: 6px; background: var(--blue); }
+  #bug { position: absolute; inset-block-start: 42px; inset-inline-start: 56px; display: flex; align-items: center; gap: 14px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 0.3em; }
+  #bug img { inline-size: 48px; block-size: 48px; border-radius: 8px; }
+  #wipe { position: absolute; inset: 0; background: var(--blue); }
+  .chat {
+    position: absolute;
+    inline-size: 640px;
+    border-radius: 28px;
+    overflow: hidden;
+    background: #0e1512;
+    box-shadow: 0 40px 100px rgb(0 0 0 / 0.55);
+  }
+  .chat header { display: flex; align-items: center; gap: 16px; padding: 22px 28px; background: #1f2c25; font-weight: 700; font-size: 26px; }
+  .chat header img { inline-size: 54px; block-size: 54px; border-radius: 50%; }
+  .chat header small { display: block; color: #9fb8aa; font-weight: 400; font-size: 18px; }
+  .chat .body { padding: 28px; min-block-size: 520px; background: #0b100d; }
+  .bubble {
+    margin-inline-start: auto;
+    inline-size: 88%;
+    padding: 22px 26px 30px;
+    border-radius: 22px 22px 6px 22px;
+    background: #1d5b3f;
+    color: #eef6f1;
+    font-size: 22px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    position: relative;
+  }
+  .bubble .tick { position: absolute; inset-block-end: 8px; inset-inline-end: 16px; font-size: 16px; color: #8fd3ff; }
+  #cursor { position: absolute; inline-size: 52px; block-size: 52px; z-index: 50; filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.5)); }
+  .ripple { position: absolute; inline-size: 120px; block-size: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 5px solid var(--blue); z-index: 49; }
+  .bag { position: absolute; display: grid; place-items: center; inline-size: 120px; block-size: 120px; border-radius: 50%; background: var(--paper); color: var(--ink); box-shadow: 0 20px 60px rgb(0 0 0 / 0.5); }
+  .bag svg { inline-size: 58px; block-size: 58px; }
+  .bag span { position: absolute; inset-block-start: -8px; inset-inline-end: -8px; display: grid; place-items: center; inline-size: 52px; block-size: 52px; border-radius: 50%; background: var(--blue); color: #fff; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 26px; }
+</style>
+</head>
+<body>
+<div id="film">
+
+  <!-- 1. Intro -->
+  <section class="scene" id="s-intro">
+    <div id="intro-art"></div>
+    <img id="intro-logo" class="abs" src="shots/logo.png" alt="" style="inline-size:170px;block-size:170px;left:875px;top:150px;border-radius:24px">
+    <div id="intro-title" class="abs display" style="left:0;right:0;top:350px;text-align:center;font-size:250px"></div>
+    <div id="intro-sub" class="abs syne" style="left:0;right:0;top:600px;text-align:center;font-size:40px;color:var(--muted)">APPAREL</div>
+    <div id="intro-tag" class="abs display accent" style="left:0;right:0;top:700px;text-align:center;font-size:150px">BUILT DIFFERENT.</div>
+    <div id="intro-rule" class="abs" style="left:610px;top:860px;width:700px;height:10px;background:var(--blue);transform-origin:left"></div>
+  </section>
+
+  <!-- 2. Homepage -->
+  <section class="scene" id="s-home">
+    <div class="abs" style="left:110px;top:300px;width:640px">
+      <p class="kicker" id="home-kicker" style="margin:0 0 30px">South African streetwear</p>
+      <div class="display" style="font-size:136px">
+        <span class="line"><span id="home-l1">ORIGINAL ART.</span></span>
+        <span class="line"><span id="home-l2" class="accent">MADE TO</span></span>
+        <span class="line"><span id="home-l3" class="accent">ORDER.</span></span>
+      </div>
+      <p id="home-copy" style="margin-top:34px;font-size:30px;line-height:1.4;color:#d8d3c9">Independent label. Every design is ours.</p>
+    </div>
+    <div class="browser" id="home-browser" style="left:800px;top:170px;width:1040px">
+      <div class="bar"><i></i><i></i><i></i><span class="url">lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE</span></div>
+      <div class="view" style="height:650px"><img id="home-img" src="shots/home-hero.png" alt=""></div>
+    </div>
+  </section>
+
+  <!-- 3. Colours -->
+  <section class="scene" id="s-colour">
+    <div id="colour-disc" class="abs" style="left:900px;top:90px;width:900px;height:900px;border-radius:50%"></div>
+    <div id="colour-stack" class="abs" style="left:960px;top:150px;width:780px;height:780px;border-radius:40px;overflow:hidden"></div>
+    <div class="abs" style="left:110px;top:220px;width:760px">
+      <p class="kicker" style="margin:0 0 28px">Customise</p>
+      <div class="display" style="font-size:170px">
+        <span class="line"><span id="col-l1">YOUR ART.</span></span>
+        <span class="line"><span id="col-l2" class="accent">YOUR COLOUR.</span></span>
+      </div>
+      <div id="colour-name" class="abs display" style="top:470px;font-size:96px;white-space:nowrap"></div>
+      <p id="colour-note" class="abs" style="top:580px;width:700px;font-size:28px;color:#d8d3c9">8 colours · real front &amp; back photos</p>
+    </div>
+    <div id="swatches" class="abs" style="left:110px;top:900px;width:720px;height:80px"></div>
+  </section>
+
+  <!-- 4. Print spots -->
+  <section class="scene" id="s-print">
+    <div class="abs" style="left:0;right:0;top:56px;text-align:center">
+      <p class="kicker" style="margin:0 0 14px">Front · Back · Sleeves</p>
+      <div class="display" style="font-size:110px"><span class="line"><span id="print-title">PRINT IT EVERYWHERE.</span></span></div>
+    </div>
+    <img id="print-front" class="abs card-shadow" src="shots/stage-front.png" alt="" style="left:270px;top:270px;width:600px;height:600px;border-radius:28px">
+    <img id="print-back" class="abs card-shadow" src="shots/stage-back.png" alt="" style="left:1050px;top:270px;width:600px;height:600px;border-radius:28px">
+    <div id="dot-front" class="dot-callout" style="left:570px;top:470px"></div>
+    <div id="dot-sleeve" class="dot-callout" style="left:385px;top:470px"></div>
+    <div id="dot-back" class="dot-callout" style="left:1350px;top:450px"></div>
+    <div id="chip-front" class="chip-callout" style="left:470px;top:196px">Front <b>+R50</b></div>
+    <div id="chip-sleeve" class="chip-callout" style="left:40px;top:420px">Sleeve <b>+R40</b></div>
+    <div id="chip-back" class="chip-callout" style="left:1260px;top:196px">Back <b>+R80</b></div>
+    <div class="abs" style="left:0;right:0;top:900px;text-align:center">
+      <div id="price" class="display" style="font-size:130px">R349</div>
+      <p id="price-note" style="margin:0;font-size:26px;color:#d8d3c9">Tee R349 + front R50 + back R80 + sleeve R40</p>
+    </div>
+    <div id="closeup" class="abs" style="inset:0;background:var(--ink)">
+      <img id="closeup-img" class="abs" src="shots/stage-closeup.png" alt="" style="left:880px;top:60px;width:960px;height:960px;border-radius:40px">
+      <div class="abs" style="left:110px;top:330px;width:720px">
+        <p class="kicker" style="margin:0 0 28px">Close-up</p>
+        <div class="display" style="font-size:150px">
+          <span class="line"><span id="close-l1">PRINTS THAT</span></span>
+          <span class="line"><span id="close-l2" class="accent">SIT IN THE</span></span>
+          <span class="line"><span id="close-l3" class="accent">FABRIC.</span></span>
+        </div>
+        <p id="close-copy" style="margin-top:30px;font-size:28px;color:#d8d3c9">Backgrounds removed. Folds and shadows kept.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 3D -->
+  <section class="scene" id="s-3d" style="background:radial-gradient(circle at 62% 50%, #20232b 0%, var(--ink) 62%)">
+    <div class="abs" style="left:110px;top:330px;width:700px">
+      <p class="kicker" style="margin:0 0 28px">Three.js</p>
+      <div class="display" style="font-size:190px">
+        <span class="line"><span id="d3-l1">SPIN IT</span></span>
+        <span class="line"><span id="d3-l2" class="accent">IN 3D.</span></span>
+      </div>
+      <p id="d3-copy" style="margin-top:30px;font-size:28px;color:#d8d3c9">Drag, turn and zoom your build before you order.</p>
+    </div>
+    <div id="spin-wrap" class="abs" style="left:880px;top:90px;width:900px;height:900px;border-radius:50px;overflow:hidden"></div>
+  </section>
+
+  <!-- 6. Lookbook -->
+  <section class="scene" id="s-look">
+    <div class="browser" id="look-browser" style="left:160px;top:130px;width:1600px">
+      <div class="bar"><i></i><i></i><i></i><span class="url">intersacks · lookbook</span></div>
+      <div class="view" style="height:860px"><img id="look-img" src="shots/home-lookbook.png" alt=""></div>
+    </div>
+    <div id="look-full" class="abs" style="left:0;top:0;width:1920px;height:1080px;overflow:hidden;background:#111">
+      <img id="look-full-img" src="shots/lightbox-lookbook.png" alt="" style="position:absolute;left:-140px;top:-71px;width:2200px;height:1375px">
+    </div>
+    <div id="look-text" class="abs" style="left:110px;top:780px;padding:34px 46px;border-radius:26px;background:rgb(11 11 12 / 0.82)">
+      <div class="display" style="font-size:120px"><span class="line"><span id="look-l1">EVERY ANGLE.</span></span><span class="line"><span id="look-l2" class="accent">EVERY PIECE.</span></span></div>
+    </div>
+  </section>
+
+  <!-- 7. Shop + quick add -->
+  <section class="scene" id="s-shop">
+    <div class="browser" id="shop-browser" style="left:90px;top:150px;width:1130px">
+      <div class="bar"><i></i><i></i><i></i><span class="url">intersacks · shop</span></div>
+      <div class="view" style="height:700px"><img id="shop-img" src="shots/home-grid.png" alt=""></div>
+    </div>
+    <div id="card" class="abs card-shadow" style="left:1330px;top:110px;width:420px;border-radius:24px;overflow:hidden;background:var(--paper)">
+      <img id="card-a" src="shots/card-vest.png" alt="" style="width:100%">
+      <img id="card-b" class="abs" src="shots/card-vest-added.png" alt="" style="left:0;top:0;width:100%">
+    </div>
+    <div class="bag" id="bag" style="left:1740px;top:60px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1 13H5L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+      <span id="bag-count">0</span>
+    </div>
+    <div class="abs" style="left:90px;top:880px;width:1300px">
+      <div class="display" style="font-size:110px"><span class="line"><span id="shop-l1">TAP A SIZE. <span class="accent">ADD TO BAG.</span> DONE.</span></span></div>
+    </div>
+    <div id="shop-full" class="abs" style="inset:0;background:#111;overflow:hidden">
+      <img id="shop-full-img" src="shots/lightbox-shirt.png" alt="" style="position:absolute;left:-140px;top:-71px;width:2200px;height:1375px">
+      <div class="abs" style="left:110px;top:780px;padding:34px 46px;border-radius:26px;background:rgb(11 11 12 / 0.82)">
+        <div class="display" style="font-size:120px"><span class="line"><span id="zoom-l1">ZOOM INTO</span></span><span class="line"><span id="zoom-l2" class="accent">EVERY DETAIL.</span></span></div>
+      </div>
+    </div>
+    <svg id="cursor" viewBox="0 0 24 24"><path d="M3 2l7.5 19 2.7-7.8L21 10.5 3 2z" fill="#fff" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></svg>
+    <div id="ripple" class="ripple"></div>
+  </section>
+
+  <!-- 8. Phones + WhatsApp -->
+  <section class="scene" id="s-phone" style="background:linear-gradient(135deg, #0b0b0c 0%, #101a33 100%)">
+    <div class="phone" id="ph1" style="left:120px;top:200px"><img src="shots/phone-home.png" alt=""></div>
+    <div class="phone" id="ph2" style="left:420px;top:150px"><img src="shots/phone-studio.png" alt=""></div>
+    <div class="phone" id="ph3" style="left:720px;top:200px"><img src="shots/phone-lightbox.png" alt=""></div>
+    <div class="abs" style="left:1150px;top:60px;width:700px">
+      <div class="display" style="font-size:104px">
+        <span class="line"><span id="wa-l1">ORDER IN MINUTES</span></span>
+        <span class="line"><span id="wa-l2" class="accent">ON WHATSAPP.</span></span>
+      </div>
+    </div>
+    <div class="chat" id="chat" style="left:1190px;top:330px">
+      <header><img src="shots/logo.png" alt=""><div>InterSacks Apparel<small>Order desk</small></div></header>
+      <div class="body"><div class="bubble" id="bubble"><span id="bubble-text"></span><span class="tick">✓✓</span></div></div>
+    </div>
+  </section>
+
+  <!-- 9. Outro -->
+  <section class="scene" id="s-outro">
+    <div id="outro-art"></div>
+    <img id="outro-logo" class="abs" src="shots/logo.png" alt="" style="inline-size:150px;block-size:150px;left:885px;top:130px;border-radius:22px">
+    <div class="abs display" style="left:0;right:0;top:320px;text-align:center;font-size:210px">
+      <span class="line"><span id="outro-l1">BUILT</span></span>
+      <span class="line"><span id="outro-l2" class="accent">DIFFERENT.</span></span>
+    </div>
+    <p id="outro-cta" class="abs syne" style="left:0;right:0;top:770px;margin:0;text-align:center;font-size:44px">Design yours today →</p>
+    <p id="outro-url" class="abs" style="left:0;right:0;top:850px;margin:0;text-align:center;font-size:30px;color:#d8d3c9">lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE</p>
+    <p id="outro-ig" class="abs" style="left:0;right:0;top:900px;margin:0;text-align:center;font-size:30px;color:var(--blue)">@intersacks.apparel · Made to order in South Africa</p>
+  </section>
+
+  <div id="bug"><img src="shots/logo.png" alt="">INTERSACKS</div>
+  <div id="wipe"></div>
+  <div class="grain" id="grain"></div>
+  <div class="vignette"></div>
+  <div id="progress"></div>
+  <div id="fade" class="abs" style="inset:0;background:#000;pointer-events:none"></div>
+</div>
+
+<script>
+/* ---------- Timing helpers (all pure functions of t, in seconds) ---------- */
+const FPS = 30
+const DURATION = 60
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v))
+const lerp = (a, b, k) => a + (b - a) * k
+const P = (t, a, b) => clamp((t - a) / (b - a))
+const ease = {
+  out: (k) => 1 - Math.pow(1 - k, 3),
+  outExpo: (k) => (k === 1 ? 1 : 1 - Math.pow(2, -10 * k)),
+  inOut: (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2),
+  back: (k) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2) },
+  in: (k) => k * k * k
+}
+const $ = (id) => document.getElementById(id)
+const style = (el, props) => { for (const k in props) el.style[k] = props[k] }
+
+/* Scene window with fades: returns 0..1 visibility, and hides the scene outside it. */
+function scene(id, t, start, end, fadeIn = 0.35, fadeOut = 0.35) {
+  const el = $(id)
+  const on = t >= start && t < end
+  el.style.display = on ? 'block' : 'none'
+  if (!on) return 0
+  const o = Math.min(fadeIn ? P(t, start, start + fadeIn) : 1, fadeOut ? 1 - P(t, end - fadeOut, end) : 1)
+  el.style.opacity = o
+  return o
+}
+
+/* Slide a masked line of type up into place. */
+function reveal(id, t, at, dur = 0.7, outAt = null) {
+  const k = ease.outExpo(P(t, at, at + dur))
+  const out = outAt == null ? 0 : ease.in(P(t, outAt, outAt + 0.4))
+  $(id).style.transform = `translateY(${(1 - k) * 110 - out * 110}%)`
+}
+
+function fadeUp(id, t, at, dur = 0.6, dist = 30) {
+  const k = ease.out(P(t, at, at + dur))
+  style($(id), { opacity: k, transform: `translateY(${(1 - k) * dist}px)` })
+}
+
+/* ---------- Build repeated elements ---------- */
+const COLOURS = [
+  ['Black', '#141414', 'black'], ['White', '#f5f5f5', 'white'], ['Navy', '#1d2a44', 'navy'], ['Charcoal', '#3a3b3d', 'charcoal'],
+  ['Sand', '#d8c7a6', 'sand'], ['Olive', '#4f5b3a', 'olive'], ['Pink', '#f2b8c8', 'pink'], ['Light blue', '#a9c8e8', 'light-blue']
+]
+const stack = $('colour-stack')
+const swatches = $('swatches')
+COLOURS.forEach(([name, hex, file], i) => {
+  const img = document.createElement('img')
+  img.src = `shots/colour-${file}.png`
+  style(img, { position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'cover' })
+  stack.appendChild(img)
+  const sw = document.createElement('div')
+  sw.className = 'swatch'
+  style(sw, { left: `${i * 88}px`, top: '0', background: hex })
+  swatches.appendChild(sw)
+})
+
+const spin = $('spin-wrap')
+for (let i = 0; i < 36; i++) {
+  const img = document.createElement('img')
+  img.src = `shots/spin-${String(i).padStart(2, '0')}.png`
+  style(img, { position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'cover', display: 'none' })
+  spin.appendChild(img)
+}
+
+const TITLE = 'INTERSACKS'
+$('intro-title').innerHTML = [...TITLE].map((c) => `<span class="line" style="display:inline-block"><span>${c}</span></span>`).join('')
+
+const ART = ['art-panther-claw', 'art-046', 'art-skull-roses', 'art-005', 'art-built-different', 'art-019', 'art-mzansi-skyline', 'art-048']
+function floaters(containerId, seed) {
+  const box = $(containerId)
+  return ART.map((name, i) => {
+    const img = document.createElement('img')
+    img.src = `shots/${name}.webp`
+    const angle = (i / ART.length) * Math.PI * 2 + seed
+    const item = { img, angle, radius: 600 + (i % 3) * 120, size: 220 + (i % 4) * 50, spin: (i % 2 ? 1 : -1) * (6 + i) }
+    style(img, { position: 'absolute', width: `${item.size}px`, height: `${item.size}px`, objectFit: 'contain', filter: 'blur(1px) saturate(1.1)' })
+    box.appendChild(img)
+    return item
+  })
+}
+const introArt = floaters('intro-art', 0.3)
+const outroArt = floaters('outro-art', 1.1)
+function drawFloaters(items, t, local, alpha) {
+  for (const it of items) {
+    const a = it.angle + local * 0.12
+    const r = it.radius + Math.sin(local * 0.8 + it.angle) * 30
+    const x = 960 + Math.cos(a) * r * 1.25 - it.size / 2
+    const y = 540 + Math.sin(a) * r * 0.62 - it.size / 2
+    style(it.img, { left: `${x}px`, top: `${y}px`, opacity: alpha * 0.42, transform: `rotate(${it.spin * local}deg)` })
+  }
+}
+
+const ORDER = `Hi InterSacks Apparel 👋
+
+I would like to place an order (ref IS-261121-7KQ2):
+
+1 × Classic Tee
+Colour: Navy · Size: L
+Prints (3):
+• Front Centre: Panther Claw
+• Back: Built Different
+• Right Sleeve: IS Crest
+Price: R519
+
+TOTAL: R519`
+
+/* ---------- The timeline ---------- */
+function renderAt(t) {
+  // 1. Intro 0–5.2
+  let o = scene('s-intro', t, 0, 5.2, 0.4, 0.5)
+  if (o) {
+    drawFloaters(introArt, t, t, ease.out(P(t, 0.2, 1.6)))
+    const lk = ease.back(P(t, 0.35, 1.1))
+    style($('intro-logo'), { opacity: P(t, 0.35, 0.7), transform: `scale(${lerp(0.4, 1, lk)}) rotate(${(1 - lk) * -12}deg)` })
+    ;[...$('intro-title').querySelectorAll('.line > span')].forEach((span, i) => {
+      const k = ease.outExpo(P(t, 0.9 + i * 0.06, 1.7 + i * 0.06))
+      span.style.transform = `translateY(${(1 - k) * 110}%)`
+    })
+    const sk = ease.out(P(t, 1.8, 2.8))
+    style($('intro-sub'), { opacity: sk, letterSpacing: `${lerp(0.1, 0.9, sk)}em` })
+    const tk = ease.outExpo(P(t, 2.9, 3.6))
+    style($('intro-tag'), { clipPath: `inset(0 ${(1 - tk) * 100}% 0 0)` })
+    style($('intro-rule'), { transform: `scaleX(${ease.inOut(P(t, 3.3, 4.1))})` })
+    $('s-intro').style.transform = `scale(${1 + ease.in(P(t, 4.6, 5.2)) * 0.12})`
+  }
+
+  // 2. Homepage 5.0–10.6
+  o = scene('s-home', t, 5.0, 10.6, 0.4, 0.4)
+  if (o) {
+    fadeUp('home-kicker', t, 5.3)
+    reveal('home-l1', t, 5.5); reveal('home-l2', t, 5.75); reveal('home-l3', t, 6.0)
+    fadeUp('home-copy', t, 6.5)
+    const bk = ease.outExpo(P(t, 5.1, 6.4))
+    const drift = P(t, 5.1, 10.6)
+    style($('home-browser'), { transform: `perspective(2200px) translateX(${(1 - bk) * 500}px) rotateY(${lerp(-24, -8, bk) + drift * 4}deg) rotateX(${lerp(8, 3, bk)}deg)`, opacity: bk })
+    $('home-img').style.transform = `scale(${1 + drift * 0.08}) translateY(${-drift * 30}px)`
+  }
+
+  // 3. Colours 10.4–17.2
+  o = scene('s-colour', t, 10.4, 17.2, 0.4, 0.4)
+  if (o) {
+    reveal('col-l1', t, 10.6); reveal('col-l2', t, 10.85)
+    fadeUp('colour-note', t, 11.6)
+    const slot = 0.72
+    const local = Math.max(0, t - 11.0)
+    const idx = Math.min(COLOURS.length - 1, Math.floor(local / slot))
+    const within = local - idx * slot
+    const imgs = stack.children
+    for (let i = 0; i < imgs.length; i++) {
+      let op = 0
+      if (i === idx) op = 1
+      if (i === idx + 1 && idx < COLOURS.length - 1) op = ease.inOut(P(within, slot - 0.2, slot))
+      imgs[i].style.opacity = i === idx && idx < COLOURS.length - 1 ? 1 : op
+      imgs[i].style.zIndex = i === idx + 1 ? 2 : 1
+    }
+    const sk = ease.back(P(t, 10.7, 11.5))
+    style(stack, { transform: `scale(${lerp(0.7, 1, sk)}) rotate(${(1 - sk) * 6}deg)`, opacity: P(t, 10.7, 11.0), boxShadow: '0 40px 120px rgb(0 0 0 / 0.5)' })
+    const [name, hex] = COLOURS[idx]
+    const next = COLOURS[Math.min(COLOURS.length - 1, idx + 1)]
+    const blend = idx < COLOURS.length - 1 ? ease.inOut(P(within, slot - 0.2, slot)) : 0
+    $('colour-disc').style.background = blend > 0.5 ? next[1] : hex
+    $('colour-disc').style.opacity = 0.35
+    $('colour-disc').style.transform = `scale(${lerp(0.6, 1, ease.out(P(t, 10.6, 11.6))) * (1 + Math.sin(t * 2) * 0.01)})`
+    const nameEl = $('colour-name')
+    nameEl.textContent = name.toUpperCase()
+    const nk = ease.outExpo(P(within, 0, 0.3))
+    style(nameEl, { opacity: t > 11.0 ? nk : 0, transform: `translateY(${(1 - nk) * 40}px)` })
+    ;[...swatches.children].forEach((sw, i) => {
+      const appear = ease.back(P(t, 11.2 + i * 0.05, 11.6 + i * 0.05))
+      const active = i === idx && t > 11.0
+      style(sw, { transform: `scale(${appear * (active ? 1.25 : 1)})`, borderColor: active ? '#fff' : 'rgb(255 255 255 / 0.25)', boxShadow: active ? '0 0 0 6px rgb(47 107 255 / 0.6)' : 'none' })
+    })
+  }
+
+  // 4. Print spots 17.0–25.4
+  o = scene('s-print', t, 17.0, 25.4, 0.4, 0.4)
+  if (o) {
+    reveal('print-title', t, 17.2)
+    const fk = ease.outExpo(P(t, 17.3, 18.3))
+    const bk = ease.outExpo(P(t, 17.6, 18.6))
+    style($('print-front'), { opacity: fk, transform: `perspective(1800px) rotateY(${(1 - fk) * 70}deg) translateY(${(1 - fk) * 60}px)` })
+    style($('print-back'), { opacity: bk, transform: `perspective(1800px) rotateY(${(1 - bk) * -70}deg) translateY(${(1 - bk) * 60}px)` })
+    const steps = [[18.8, 'front', 399], [19.6, 'sleeve', 439], [20.4, 'back', 519]]
+    let price = 349
+    for (const [at, key, value] of steps) {
+      const ck = ease.back(P(t, at, at + 0.45))
+      style($(`chip-${key}`), { opacity: P(t, at, at + 0.2), transform: `scale(${ck})` })
+      const dk = P(t, at - 0.15, at + 0.3)
+      style($(`dot-${key}`), { opacity: dk, transform: `scale(${ease.back(dk)})`, boxShadow: `0 0 0 ${8 + Math.sin(t * 6) * 6}px rgb(47 107 255 / 0.35)` })
+      const pk = ease.out(P(t, at, at + 0.6))
+      if (t >= at) price = Math.round(lerp(price, value, pk))
+    }
+    $('price').textContent = `R${price}`
+    const pop = t > 20.4 ? 1 + Math.sin(P(t, 20.4, 21.0) * Math.PI) * 0.12 : 1
+    style($('price'), { transform: `scale(${pop})`, color: t > 20.9 ? 'var(--blue)' : 'var(--paper)' })
+    fadeUp('price-note', t, 21.0)
+    // Close-up overlay 21.8–25.4
+    const co = P(t, 21.8, 22.3)
+    style($('closeup'), { display: t > 21.8 ? 'block' : 'none', opacity: co, clipPath: `circle(${ease.inOut(P(t, 21.8, 22.6)) * 150}% at 70% 50%)` })
+    const zk = P(t, 21.8, 25.4)
+    style($('closeup-img'), { transform: `scale(${1.15 - zk * 0.15})` })
+    reveal('close-l1', t, 22.3); reveal('close-l2', t, 22.5); reveal('close-l3', t, 22.7)
+    fadeUp('close-copy', t, 23.2)
+  }
+
+  // 5. 3D 25.2–31.4
+  o = scene('s-3d', t, 25.2, 31.4, 0.4, 0.4)
+  if (o) {
+    reveal('d3-l1', t, 25.4); reveal('d3-l2', t, 25.65)
+    fadeUp('d3-copy', t, 26.2)
+    const frames = spin.children
+    const f = Math.floor(Math.max(0, t - 25.3) * 12) % 36
+    for (let i = 0; i < frames.length; i++) frames[i].style.display = i === f ? 'block' : 'none'
+    const sk = ease.back(P(t, 25.3, 26.2))
+    style(spin, { opacity: P(t, 25.3, 25.6), transform: `scale(${lerp(0.75, 1, sk)})`, boxShadow: '0 40px 140px rgb(0 0 0 / 0.6)' })
+  }
+
+  // 6. Lookbook 31.2–38.4
+  o = scene('s-look', t, 31.2, 38.4, 0.4, 0.4)
+  if (o) {
+    const bk = ease.outExpo(P(t, 31.3, 32.4))
+    style($('look-browser'), { opacity: bk, transform: `perspective(2400px) translateY(${(1 - bk) * 200}px) rotateX(${(1 - bk) * 18}deg) scale(${1 + P(t, 31.3, 34.6) * 0.05})` })
+    $('look-img').style.transform = `translateY(${-ease.inOut(P(t, 32.2, 34.4)) * 40}px)`
+    const fk = ease.inOut(P(t, 34.3, 35.1))
+    style($('look-full'), { display: t > 34.3 ? 'block' : 'none', clipPath: `inset(${(1 - fk) * 30}% ${(1 - fk) * 30}% ${(1 - fk) * 30}% ${(1 - fk) * 30}% round ${(1 - fk) * 40}px)` })
+    const zk = ease.inOut(P(t, 35.1, 38.4))
+    $('look-full-img').style.transform = `scale(${1 + zk * 0.35})`
+    $('look-full-img').style.transformOrigin = '42% 40%'
+    const tk = P(t, 35.0, 35.3)
+    $('look-text').style.opacity = tk
+    reveal('look-l1', t, 35.0); reveal('look-l2', t, 35.2)
+  }
+
+  // 7. Shop and quick add 38.2–46.4
+  o = scene('s-shop', t, 38.2, 46.4, 0.4, 0.4)
+  if (o) {
+    const bk = ease.outExpo(P(t, 38.3, 39.3))
+    style($('shop-browser'), { opacity: bk, transform: `perspective(2200px) translateX(${(1 - bk) * -300}px) rotateY(${lerp(18, 6, bk)}deg)` })
+    $('shop-img').style.transform = `translateY(${-ease.inOut(P(t, 38.6, 41.5)) * 60}px)`
+    const ck = ease.back(P(t, 38.9, 39.8))
+    style($('card'), { opacity: P(t, 38.9, 39.2), transform: `translateY(${(1 - ck) * 120}px) rotate(${(1 - ck) * 6}deg)` })
+    // Cursor: in from bottom right, click size L, then Add to bag.
+    const card = { x: 1330, y: 110, w: 420 }
+    const cardH = card.w * ($('card-a').naturalHeight / ($('card-a').naturalWidth || 1))
+    const sizeL = { x: card.x + card.w * 0.4, y: card.y + cardH * 0.797 }
+    const addBtn = { x: card.x + card.w * 0.5, y: card.y + cardH * 0.879 }
+    const m1 = ease.inOut(P(t, 39.6, 40.4))
+    const m2 = ease.inOut(P(t, 40.7, 41.3))
+    let cx = lerp(1880, sizeL.x, m1)
+    let cy = lerp(1040, sizeL.y, m1)
+    if (t > 40.7) { cx = lerp(sizeL.x, addBtn.x, m2); cy = lerp(sizeL.y, addBtn.y, m2) }
+    if (t > 42.4) { const m3 = ease.inOut(P(t, 42.4, 43.2)); cx = lerp(addBtn.x, 1800, m3); cy = lerp(addBtn.y, 120, m3) }
+    const press = (at) => (t > at && t < at + 0.18 ? 0.85 : 1)
+    style($('cursor'), { left: `${cx - 8}px`, top: `${cy - 4}px`, opacity: P(t, 39.5, 39.8) * (1 - P(t, 43.2, 43.5)), transform: `scale(${press(40.45) * press(41.35)})` })
+    const rip = (at) => P(t, at, at + 0.55)
+    const r = t < 41.3 ? rip(40.45) : rip(41.35)
+    const rp = t < 41.3 ? sizeL : addBtn
+    style($('ripple'), { left: `${rp.x}px`, top: `${rp.y}px`, opacity: r > 0 && r < 1 ? 1 - r : 0, transform: `scale(${0.2 + r})` })
+    // The L pill and Added state come from the real "after" screenshot.
+    $('card-b').style.opacity = ease.out(P(t, 41.4, 41.7))
+    const bag = ease.back(P(t, 41.6, 42.1))
+    $('bag-count').textContent = t > 41.6 ? '1' : '0'
+    style($('bag'), { opacity: P(t, 38.8, 39.2), transform: `scale(${1 + Math.sin(P(t, 41.6, 42.2) * Math.PI) * 0.25})` })
+    $('bag-count').style.transform = `scale(${t > 41.6 ? bag : 0.001})`
+    reveal('shop-l1', t, 41.8)
+    // Fullscreen viewer 43.6–46.4
+    const fk = ease.inOut(P(t, 43.6, 44.4))
+    style($('shop-full'), { display: t > 43.6 ? 'block' : 'none', clipPath: `circle(${fk * 140}% at 50% 40%)` })
+    $('shop-full-img').style.transform = `scale(${1 + ease.inOut(P(t, 44.0, 46.4)) * 0.45})`
+    $('shop-full-img').style.transformOrigin = '50% 38%'
+    reveal('zoom-l1', t, 44.3); reveal('zoom-l2', t, 44.5)
+  }
+
+  // 8. Phones + WhatsApp 46.2–53.4
+  o = scene('s-phone', t, 46.2, 53.4, 0.4, 0.4)
+  if (o) {
+    ;['ph1', 'ph2', 'ph3'].forEach((id, i) => {
+      const k = ease.outExpo(P(t, 46.3 + i * 0.2, 47.4 + i * 0.2))
+      const float = Math.sin((t + i) * 1.6) * 10
+      style($(id), { opacity: k, transform: `translateY(${(1 - k) * 500 + float}px) rotate(${(i - 1) * 5 * k}deg)` })
+    })
+    reveal('wa-l1', t, 46.8); reveal('wa-l2', t, 47.05)
+    const ck = ease.back(P(t, 47.4, 48.2))
+    style($('chat'), { opacity: P(t, 47.4, 47.7), transform: `translateY(${(1 - ck) * 80}px) scale(${lerp(0.9, 1, ck)})` })
+    const chars = Math.floor(P(t, 48.0, 51.8) * ORDER.length)
+    $('bubble-text').textContent = ORDER.slice(0, chars)
+    $('bubble').querySelector('.tick').style.opacity = P(t, 51.9, 52.2)
+  }
+
+  // 9. Outro 53.2–60
+  o = scene('s-outro', t, 53.2, 60, 0.5, 0)
+  if (o) {
+    drawFloaters(outroArt, t, t - 53, ease.out(P(t, 53.3, 54.6)))
+    const lk = ease.back(P(t, 53.5, 54.2))
+    style($('outro-logo'), { opacity: P(t, 53.5, 53.8), transform: `scale(${lerp(0.4, 1, lk)})` })
+    reveal('outro-l1', t, 53.8); reveal('outro-l2', t, 54.05)
+    fadeUp('outro-cta', t, 54.8); fadeUp('outro-url', t, 55.2); fadeUp('outro-ig', t, 55.5)
+  }
+
+  // Global layers.
+  const wipeIn = ease.inOut(P(t, 4.75, 5.05))
+  const wipeOut = ease.inOut(P(t, 5.05, 5.4))
+  style($('wipe'), { transform: `translateX(${t < 5.05 ? (1 - wipeIn) * 100 : -wipeOut * 100}%)`, display: t > 4.7 && t < 5.45 ? 'block' : 'none' })
+  style($('bug'), { opacity: t > 5.4 && t < 53.2 ? Math.min(P(t, 5.4, 5.9), 1 - P(t, 52.8, 53.2)) * 0.85 : 0 })
+  $('progress').style.width = `${(t / DURATION) * 100}%`
+  $('grain').style.transform = `translate(${(Math.floor(t * FPS) * 37) % 120 - 60}px, ${(Math.floor(t * FPS) * 53) % 120 - 60}px)`
+  $('fade').style.opacity = Math.max(1 - P(t, 0, 0.4), P(t, 59.3, 60))
+}
+
+window.renderAt = renderAt
+window.DURATION = DURATION
+window.FPS = FPS
+window.ready = Promise.all([
+  document.fonts.ready,
+  ...[...document.images].map((img) => (img.complete ? Promise.resolve() : new Promise((r) => { img.onload = img.onerror = r })))
+])
+
+/* Scrub or preview in a normal browser: #t=12.5, or Space to play. */
+let playing = false
+let startWall = 0
+let startT = 0
+function frame() {
+  if (!playing) return
+  const t = Math.min(DURATION - 0.001, startT + (performance.now() - startWall) / 1000)
+  renderAt(t)
+  if (t < DURATION - 0.01) requestAnimationFrame(frame); else playing = false
+}
+addEventListener('keydown', (e) => {
+  if (e.code !== 'Space') return
+  playing = !playing
+  startWall = performance.now()
+  startT = parseFloat(location.hash.replace('#t=', '')) || 0
+  if (playing) requestAnimationFrame(frame)
+})
+window.ready.then(() => renderAt(parseFloat(location.hash.replace('#t=', '')) || 0))
+</script>
+</body>
+</html>

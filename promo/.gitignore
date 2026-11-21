@@ -1,0 +1,4 @@
+# Rendered outputs (rebuild with render.cjs / beat.py)
+*.mp4
+*.wav
+still-*.jpg
