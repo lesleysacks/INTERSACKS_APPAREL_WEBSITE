@@ -101,12 +101,12 @@
   background: var(--paper-2);
 }
 
-.product-link picture,
+.product-card .photo-open picture,
 .collection-tile picture {
   display: block;
   overflow: clip;
 }
-.product-link img,
+.product-card .photo-open img,
 .collection-tile img {
   transition: scale 500ms var(--ease-out);
 }
@@ -126,7 +126,7 @@
   .product-card:is(:hover, :focus-within) {
     translate: 0 -4px;
   }
-  .product-card:is(:hover, :focus-within) .product-link img,
+  .product-card:is(:hover, :focus-within) .photo-open img,
   .collection-tile:is(:hover, :focus-visible) img {
     scale: 1.06;
   }
@@ -518,7 +518,7 @@ html.vt-preview::view-transition-new(root) {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .lookbook-card a:is(:hover, :focus-visible) img {
+  .lookbook-card:is(:hover, :focus-within) img {
     scale: 1.05;
   }
   .lookbook-cta {

@@ -10,6 +10,8 @@ import {
   getPriceBreakdown,
   filterGarments,
   formatPrice,
+  garmentViews,
+  getGarmentById,
   getDesigns,
   getGarments,
   getPlannedGarments,
@@ -397,4 +399,26 @@ test('Search suggestions rank prefixes first and skip hidden designs', async () 
   assert.ok(getSearchSuggestions('faith').some((item) => item.type === 'collection'))
   assert.ok(getSearchSuggestions('t-sh').some((item) => item.type === 'category' && item.category === 'T-Shirts'))
   assert.ok(getSearchSuggestions('a', 5).length <= 5)
+})
+
+test('Fullscreen views: Classic Tee shows front and back, ready-made pieces show the photos they have', () => {
+  const tee = getGarmentById('classic-tee')
+  assert.deepEqual(garmentViews(tee, tee.colours[2]).map((view) => view.label), ['Front', 'Back'])
+  assert.match(garmentViews(tee, tee.colours[2])[1].src, /navy-back/)
+  assert.deepEqual(garmentViews(getGarmentById('panther-vest')).map((view) => view.label), ['Front and back'])
+  assert.deepEqual(garmentViews(getGarmentById('hip-hop-tee')).map((view) => view.label), ['Front'])
+})
+
+test('Quick add from the shop: same piece and size merges, and the order has no print lines', () => {
+  const cart = new Cart(createMemoryStorage())
+  const vest = { garmentId: 'panther-vest', garmentName: 'Panther Vest', colour: 'Blue / Black', size: 'L', prints: [], designName: 'None', unitPrice: 399, quantity: 1 }
+  cart.addItem({ ...vest })
+  cart.addItem({ ...vest })
+  cart.addItem({ ...vest, size: 'M' })
+  assert.equal(cart.items.length, 2)
+  assert.equal(cart.items[0].quantity, 2)
+  const message = generateWhatsAppMessage(cart)
+  assert.ok(message.includes('2 × Panther Vest'))
+  assert.ok(!message.includes('Print'))
+  assert.ok(message.includes('TOTAL: R1197'))
 })

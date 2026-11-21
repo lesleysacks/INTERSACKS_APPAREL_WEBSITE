@@ -1,10 +1,13 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { Lightbox } from './Lightbox.jsx'
 import { Photo } from './Photo.jsx'
 import { lookbook, lookbookHref } from '../data/lookbook.js'
 
 /* Swipeable lookbook row: native scroll with snap points, plus previous/next buttons. */
 export function Lookbook() {
   const trackRef = useRef(null)
+  const [openId, setOpenId] = useState(null)
+  const openEntry = lookbook.find((entry) => entry.id === openId)
 
   function scrollByCard(direction) {
     const track = trackRef.current
@@ -22,7 +25,7 @@ export function Lookbook() {
           <div className="section-head">
             <p className="kicker">Lookbook</p>
             <h2 id="lookbook-title">Every angle, every piece</h2>
-            <p>Front, back and close-up views. Tap a look to put that artwork on your own Classic Tee.</p>
+            <p>Front, back and close-up views. Tap a sheet to see it fullscreen, or put that artwork on your own Classic Tee.</p>
           </div>
           <div className="lookbook-nav">
             <button type="button" className="btn btn-ghost" onClick={() => scrollByCard(-1)} aria-label="Previous looks">←</button>
@@ -32,8 +35,11 @@ export function Lookbook() {
         <ul className="lookbook-track" ref={trackRef}>
           {lookbook.map((entry) => (
             <li key={entry.id} className="lookbook-card">
-              <a href={lookbookHref(entry)}>
+              <button type="button" className="photo-open lookbook-open" onClick={() => setOpenId(entry.id)} aria-label={`View ${entry.name} sheet fullscreen`}>
                 <Photo layout="lookbook" framed={false} src={entry.image} alt={entry.alt} />
+                <span className="photo-open-hint" aria-hidden="true">⤢</span>
+              </button>
+              <a href={lookbookHref(entry)}>
                 <span className="lookbook-meta">
                   <strong>{entry.name}</strong>
                   <span>{entry.tagline}</span>
@@ -44,6 +50,14 @@ export function Lookbook() {
           ))}
         </ul>
       </div>
+      <Lightbox
+        open={Boolean(openEntry)}
+        onClose={() => setOpenId(null)}
+        title={openEntry ? `${openEntry.name} · ${openEntry.tagline}` : 'Lookbook'}
+        views={openEntry ? [{ label: 'Lookbook sheet', src: openEntry.image, alt: openEntry.alt }] : []}
+      >
+        {openEntry ? <a className="btn" href={lookbookHref(openEntry)}>Put it on a tee →</a> : null}
+      </Lightbox>
     </section>
   )
 }
