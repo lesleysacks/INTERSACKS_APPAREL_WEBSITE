@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Layout } from '../components/Chrome.jsx'
 import { Photo } from '../components/Photo.jsx'
-import { getPurchasableGarments } from '../data/catalogue.js'
+import { getPurchasableGarments, STORE_CONFIG } from '../data/catalogue.js'
 import { createOrderReference, CUSTOM_OCCASIONS, customEnquiryUrl } from '../services/orders.js'
+import { buildEnquiryPayload, sendOrderLog } from '../services/orderLog.js'
 
 function initialOccasion() {
   const requested = new URLSearchParams(window.location.search).get('occasion')
@@ -24,7 +25,9 @@ export function CustomPage() {
 
   function send(event) {
     event.preventDefault()
-    window.open(customEnquiryUrl({ ...details, reference: createOrderReference() }), '_blank', 'noopener,noreferrer')
+    const reference = createOrderReference()
+    sendOrderLog(buildEnquiryPayload({ ...details, reference }))
+    window.open(customEnquiryUrl({ ...details, reference }), '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -96,6 +99,7 @@ export function CustomPage() {
               </div>
               <button type="submit" className="btn">Send on WhatsApp</button>
               <p className="fine-print">This opens WhatsApp with your request written out. You can attach photos or a logo there.</p>
+              {STORE_CONFIG.orderLogUrl ? <p className="fine-print">We keep a copy of your request so we can follow up on your quote.</p> : null}
             </form>
 
             <aside className="custom-aside" aria-labelledby="custom-how-title">

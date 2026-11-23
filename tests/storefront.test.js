@@ -21,6 +21,7 @@ import {
 import { Cart, createMemoryStorage } from '../src/services/cart.js'
 import { Customizer } from '../src/services/customizer.js'
 import { createOrderReference, generateCustomEnquiryMessage, generateWhatsAppMessage } from '../src/services/orders.js'
+import { buildEnquiryPayload, buildOrderPayload, sendOrderLog } from '../src/services/orderLog.js'
 
 test('Baseline: Store configuration matches expected InterSacks brand settings', () => {
   assert.equal(STORE_CONFIG.brandName, 'InterSacks Apparel')
@@ -421,4 +422,33 @@ test('Quick add from the shop: same piece and size merges, and the order has no 
   assert.ok(message.includes('2 × Panther Vest'))
   assert.ok(!message.includes('Print'))
   assert.ok(message.includes('TOTAL: R1197'))
+})
+
+test('Order log: the Sheet copy carries the same ref, every line, its prints and the total', () => {
+  const customizer = new Customizer()
+  customizer.setGarment('classic-tee')
+  customizer.setColour('#1d2a44', 'Navy')
+  customizer.setSize('L')
+  customizer.setZoneDesign('front', 'design-051')
+  customizer.setZoneDesign('back', 'design-054')
+  const cart = new Cart(createMemoryStorage())
+  cart.addItem(customizer.createCartItem())
+  cart.addItem({ garmentId: 'panther-vest', garmentName: 'Panther Vest', colour: 'Blue / Black', size: 'M', prints: [], designName: 'None', unitPrice: 399, quantity: 2 })
+  const ref = 'IS-261123-AB12'
+  const payload = buildOrderPayload(cart, { ref, name: ' Ayanda ', area: 'Durban ' })
+  assert.equal(payload.type, 'order')
+  assert.equal(payload.ref, ref)
+  assert.equal(payload.name, 'Ayanda')
+  assert.equal(payload.area, 'Durban')
+  assert.equal(payload.total, 479 + 798)
+  assert.deepEqual(payload.lines[0], { garment: 'Classic Tee', colour: 'Navy', size: 'L', prints: 'Front Centre: Panther Claw; Back: Built Different', qty: 1, unitPrice: 479 })
+  assert.deepEqual(payload.lines[1], { garment: 'Panther Vest', colour: 'Blue / Black', size: 'M', prints: '', qty: 2, unitPrice: 399 })
+  assert.ok(generateWhatsAppMessage(cart, { reference: ref }).includes(`(ref ${ref})`))
+})
+
+test('Order log: quote requests carry the occasion name, and logging stays off without a URL', () => {
+  const payload = buildEnquiryPayload({ occasion: 'matric', garment: 'Classic Tee', quantity: 40, date: '2027-09-01', printText: ' Class of 2027 ', notes: '', name: 'Ayanda', reference: 'IS-270101-AAAA' })
+  assert.deepEqual(payload, { type: 'enquiry', ref: 'IS-270101-AAAA', name: 'Ayanda', occasion: 'Matric & graduation', garment: 'Classic Tee', quantity: '40', date: '2027-09-01', printText: 'Class of 2027', notes: '' })
+  assert.equal(sendOrderLog(payload, ''), false)
+  assert.equal(sendOrderLog(payload), false)
 })

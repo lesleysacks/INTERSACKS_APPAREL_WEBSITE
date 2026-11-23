@@ -6,7 +6,7 @@
     "dev": "node scripts/run.mjs dev",
     "build": "node scripts/run.mjs build",
     "preview": "vite preview",
-    "test": "node --test tests/storefront.test.js"
+    "test": "node --test tests/storefront.test.js tests/apps-script.test.js"
   },
   "dependencies": {
     "@oddbird/popover-polyfill": "^0.7.3",
