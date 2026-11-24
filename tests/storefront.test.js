@@ -27,6 +27,7 @@ import { initCustomizerFromUrl } from '../src/services/customizer.js'
 import { getDesignByCode, getGarmentByCode, SEASON_COLLECTION } from '../src/data/catalogue.js'
 import { dropDateLabel, isPreorder, SEASON_DROP } from '../src/data/seasonal.js'
 import { familyDiscounts, familyGroups } from '../src/services/family.js'
+import { lookbook, heroShowcase } from '../src/data/lookbook.js'
 import { paymentSplit } from '../src/services/payment.js'
 
 test('Baseline: Store configuration matches expected InterSacks brand settings', () => {
@@ -36,13 +37,13 @@ test('Baseline: Store configuration matches expected InterSacks brand settings',
   assert.equal(STORE_CONFIG.whatsappNumber, '27843252262')
 })
 
-test('Garment catalogue integrity (10 active real products, 19 planned)', () => {
+test('Garment catalogue integrity (2 active real products, 19 planned)', () => {
   const allGarments = getGarments()
   const realGarments = allGarments.filter((garment) => garment.available !== false)
   const plannedGarments = allGarments.filter((garment) => garment.available === false)
 
-  assert.equal(allGarments.length, 29, 'Total active garments should be 29 (10 real + 19 planned)')
-  assert.equal(realGarments.length, 10, 'Real active garments should be 10')
+  assert.equal(allGarments.length, 21, 'Total active garments should be 21 (2 real + 19 planned)')
+  assert.equal(realGarments.length, 2, 'Real active garments should be 2 (Classic Tee, Kids Classic Tee)')
   assert.ok(realGarments.every((garment) => !RIGHTS_HOLD[garment.id]))
   assert.equal(plannedGarments.length, 19, 'Planned garments should be 19')
 
@@ -76,7 +77,9 @@ test('Design catalogue integrity (70 in manifest, rights-held designs hidden)', 
 test('Baseline: Price calculations for base garments and customized designs', () => {
   assert.equal(calculatePrice('classic-tee'), 349)
   assert.equal(formatPrice(349), 'R349')
-  assert.equal(calculatePrice('classic-tee', 'design-001'), 399)
+  assert.equal(calculatePrice('classic-tee', 'design-005'), 399)
+  // Held (downloaded) artwork adds nothing and cannot be printed.
+  assert.equal(calculatePrice('classic-tee', 'design-001'), 349)
   assert.equal(calculatePrice('panther-long-sleeve'), 499)
   assert.equal(calculatePrice('skull-tracksuit'), 899)
 })
@@ -196,7 +199,9 @@ test('Baseline: Customizer state management and price updates', () => {
   assert.equal(customizer.selectedColourName, 'White')
 
   customizer.setDesign('design-001')
-  assert.equal(customizer.selectedDesignId, 'design-001')
+  assert.equal(customizer.selectedDesignId, null, 'downloaded artwork cannot be chosen')
+  customizer.setDesign('design-005')
+  assert.equal(customizer.selectedDesignId, 'design-005')
   assert.equal(customizer.selectedPlacement, 'front-center')
   assert.equal(customizer.getPrice(), 399)
 
@@ -204,7 +209,7 @@ test('Baseline: Customizer state management and price updates', () => {
   assert.equal(cartItem.garmentName, 'Classic Tee')
   assert.equal(cartItem.colour, 'White')
   assert.equal(cartItem.size, 'XL')
-  assert.equal(cartItem.designName, 'Midnight Snake')
+  assert.equal(cartItem.designName, 'Street Motion')
   assert.equal(cartItem.unitPrice, 399)
   assert.equal(cartItem.quantity, 1)
 })
@@ -271,13 +276,13 @@ test('Order message carries the customer name, area and reference', () => {
 })
 
 test('Print position sets the artwork price', () => {
-  assert.equal(calculatePrice('classic-tee', 'design-001', 'front-small'), 399)
-  assert.equal(calculatePrice('classic-tee', 'design-001', 'back-center'), 429)
-  assert.equal(calculatePrice('classic-tee', 'design-001', 'left-sleeve'), 389)
-  assert.equal(getPriceBreakdown('classic-tee', 'design-001', 'back-center').artwork, 80)
+  assert.equal(calculatePrice('classic-tee', 'design-005', 'front-small'), 399)
+  assert.equal(calculatePrice('classic-tee', 'design-005', 'back-center'), 429)
+  assert.equal(calculatePrice('classic-tee', 'design-005', 'left-sleeve'), 389)
+  assert.equal(getPriceBreakdown('classic-tee', 'design-005', 'back-center').artwork, 80)
   const customizer = new Customizer()
   customizer.setGarment('classic-tee')
-  customizer.setZoneDesign('back', 'design-001')
+  customizer.setZoneDesign('back', 'design-005')
   const item = customizer.createCartItem()
   assert.equal(item.unitPrice, 429)
   assert.deepEqual(item.prints.map((print) => print.placement), ['back-center'])
@@ -352,18 +357,18 @@ test('Every Classic Tee colour has a front and back photo, and cut-outs are used
     assert.match(colour.frontImage, /classic-tee\/.+-front\.webp$/)
     assert.match(colour.backImage, /classic-tee\/.+-back\.webp$/)
   }
-  const panther = getDesigns().find((design) => design.id === 'design-034')
-  assert.equal(panther.transparentImage, 'assets/Designs/cutouts/design-034.webp')
-  assert.ok(panther.hasUsableTransparency)
+  const street = getDesigns().find((design) => design.id === 'design-005')
+  assert.equal(street.transparentImage, 'assets/Designs/cutouts/design-005.webp')
+  assert.ok(street.hasUsableTransparency)
 })
 
 test('Designs can be filtered by collection', () => {
   const collections = getDesignCollections()
-  assert.ok(collections.includes('Faith'))
+  assert.ok(collections.includes('Festive'))
   assert.ok(collections.includes('Panther'))
-  const faith = filterDesigns(getDesigns(), { collection: 'Faith' })
-  assert.ok(faith.length >= 5)
-  assert.ok(faith.every((design) => design.collection === 'Faith'))
+  const festive = filterDesigns(getDesigns(), { collection: 'Festive' })
+  assert.equal(festive.length, 6)
+  assert.ok(festive.every((design) => design.collection === 'Festive'))
   assert.ok(getDesigns().every((design) => design.collection))
 })
 
@@ -395,7 +400,8 @@ test('Search suggestions rank prefixes first and skip hidden designs', async () 
   const pan = getSearchSuggestions('pan')
   assert.ok(pan.length > 0)
   assert.ok(pan[0].label.toLowerCase().startsWith('pan'), 'a prefix match comes first')
-  assert.ok(pan.some((item) => item.type === 'garment' && item.id === 'panther-vest'))
+  assert.ok(!pan.some((item) => item.id === 'panther-vest'), 'held pieces stay out of search')
+  assert.ok(!getSearchSuggestions('midnight snake').length)
   assert.ok(pan.some((item) => item.type === 'collection' && item.label === 'Panther'))
   assert.equal(pan[0].match.start, 0)
   // Rights-held designs never show up.
@@ -404,7 +410,7 @@ test('Search suggestions rank prefixes first and skip hidden designs', async () 
   // Word-start beats a match in the middle of a word.
   assert.ok(matchText('No Pain No Gain', 'pain').rank === 1)
   assert.ok(matchText('Champain', 'pain').rank === 2)
-  assert.ok(getSearchSuggestions('faith').some((item) => item.type === 'collection'))
+  assert.ok(getSearchSuggestions('festive').some((item) => item.type === 'collection'))
   assert.ok(getSearchSuggestions('t-sh').some((item) => item.type === 'category' && item.category === 'T-Shirts'))
   assert.ok(getSearchSuggestions('a', 5).length <= 5)
 })
@@ -476,8 +482,10 @@ test('Every design and ready-made piece has a unique permanent code', () => {
   assert.equal(getDesignByCode('IS-D051').name, 'Panther Claw')
   assert.equal(getDesignByCode('d51').name, 'Panther Claw')
   const liveCodes = getPurchasableGarments().map((garment) => garment.code)
-  assert.deepEqual(liveCodes, ['IS-P01', 'IS-P02', 'IS-P03', 'IS-P04', 'IS-P05', 'IS-P06', 'IS-P07', 'IS-P08', 'IS-P09', 'IS-P10'])
+  assert.deepEqual(liveCodes, ['IS-P01', 'IS-P10'])
+  // Held pieces keep their codes (never reused) but are not for sale.
   assert.equal(getGarmentByCode('P03').name, 'Panther Vest')
+  assert.equal(getGarmentByCode('P03').active, false)
   assert.equal(filterDesigns(getDesigns(), { query: 'D059' })[0].name, 'Braai Master Cub')
 })
 
@@ -600,4 +608,23 @@ test('50% deposit or pay in full: amounts, WhatsApp block and Sheet copy', () =>
   assert.ok(!generateWhatsAppMessage(cart).includes('Payment:'))
   const payload = buildOrderPayload(cart, { ref: 'IS-261124-7KQ2', payment: 'deposit' })
   assert.deepEqual([payload.payment, payload.total, payload.dueNow, payload.balance], ['deposit', 1256, 628, 628])
+})
+
+test('Downloaded artwork is never for sale: no Pinterest-style files, held pieces hidden everywhere', () => {
+  const downloaded = /[0-9a-f]{32}\.(jpg|jpeg|png|webp)$/
+  for (const design of getDesigns()) assert.ok(!downloaded.test(design.image), `${design.code} uses a downloaded file`)
+  for (const garment of getPurchasableGarments()) {
+    for (const colour of garment.colours) assert.ok(!downloaded.test(colour.frontImage || ''), garment.id)
+  }
+  for (const id of ['design-001', 'design-034', 'design-046', 'panther-vest', 'birthday-queen-tee']) assert.ok(RIGHTS_HOLD[id], id)
+  assert.ok(lookbook.every((entry) => getDesigns().some((design) => design.id === entry.designId)))
+  assert.deepEqual(lookbook.map((entry) => entry.id), ['street-moves', 'urban-motion'])
+  assert.ok(heroShowcase.length >= 1 && heroShowcase.every(Boolean))
+  const cart = new Cart(createMemoryStorage())
+  cart.addItem({ garmentId: 'panther-vest', garmentName: 'Panther Vest', colour: 'Blue / Black', size: 'M', prints: [], designName: 'None', unitPrice: 399, quantity: 1 })
+  cart.addItem({ garmentId: 'classic-tee', garmentName: 'Classic Tee', colour: 'Black', size: 'M', prints: [{ placement: 'front-center', designId: 'design-001', designName: 'Midnight Snake' }], designName: 'Midnight Snake', unitPrice: 399, quantity: 1 })
+  cart.addItem({ garmentId: 'classic-tee', garmentName: 'Classic Tee', colour: 'Black', size: 'M', prints: [{ placement: 'front-center', designId: 'design-051', designName: 'Panther Claw' }], designName: 'Panther Claw', unitPrice: 399, quantity: 1 })
+  const stillOrderable = (item) => getPurchasableGarments().some((g) => g.id === item.garmentId) && (item.prints || []).every((p) => getDesigns().some((d) => d.id === p.designId))
+  cart.prune(stillOrderable)
+  assert.deepEqual(cart.items.map((item) => item.designName), ['Panther Claw'])
 })

@@ -97,6 +97,7 @@ export function HomePage() {
         </div>
       </section>
 
+      {featured.length ? (
       <section className="band" aria-labelledby="featured-title">
         <div className="wrap">
           <div className="section-head">
@@ -108,6 +109,7 @@ export function HomePage() {
           </div>
         </div>
       </section>
+      ) : null}
 
       <section id="shop" className="band" aria-labelledby="shop-title">
         <div className="wrap">
