@@ -3,6 +3,10 @@ import assert from 'node:assert/strict'
 import {
   STORE_CONFIG,
   RIGHTS_HOLD,
+  SHOWCASE_ONLY,
+  getShowcaseDesigns,
+  getShowcaseGarments,
+  getCompatibleDesigns,
   designs as allDesigns,
   calculatePrice,
   filterDesigns,
@@ -617,9 +621,9 @@ test('Downloaded artwork is never for sale: no Pinterest-style files, held piece
     for (const colour of garment.colours) assert.ok(!downloaded.test(colour.frontImage || ''), garment.id)
   }
   for (const id of ['design-001', 'design-034', 'design-046', 'panther-vest', 'birthday-queen-tee']) assert.ok(RIGHTS_HOLD[id], id)
-  assert.ok(lookbook.every((entry) => getDesigns().some((design) => design.id === entry.designId)))
-  assert.deepEqual(lookbook.map((entry) => entry.id), ['street-moves', 'urban-motion'])
-  assert.ok(heroShowcase.length >= 1 && heroShowcase.every(Boolean))
+  assert.ok(lookbook.filter((entry) => entry.forSale).every((entry) => getDesigns().some((design) => design.id === entry.designId)))
+  assert.deepEqual(lookbook.filter((entry) => entry.forSale).map((entry) => entry.id), ['street-moves', 'urban-motion'])
+  assert.ok(heroShowcase.length >= 1 && heroShowcase.every((entry) => entry.forSale))
   const cart = new Cart(createMemoryStorage())
   cart.addItem({ garmentId: 'panther-vest', garmentName: 'Panther Vest', colour: 'Blue / Black', size: 'M', prints: [], designName: 'None', unitPrice: 399, quantity: 1 })
   cart.addItem({ garmentId: 'classic-tee', garmentName: 'Classic Tee', colour: 'Black', size: 'M', prints: [{ placement: 'front-center', designId: 'design-001', designName: 'Midnight Snake' }], designName: 'Midnight Snake', unitPrice: 399, quantity: 1 })
@@ -627,4 +631,26 @@ test('Downloaded artwork is never for sale: no Pinterest-style files, held piece
   const stillOrderable = (item) => getPurchasableGarments().some((g) => g.id === item.garmentId) && (item.prints || []).every((p) => getDesigns().some((d) => d.id === p.designId))
   cart.prune(stillOrderable)
   assert.deepEqual(cart.items.map((item) => item.designName), ['Panther Claw'])
+})
+
+test('Past work is shown but never sold: downloaded pieces in the gallery, not in the shop, customiser or bag', () => {
+  assert.equal(getShowcaseDesigns().length, 19)
+  assert.equal(getShowcaseGarments().length, 8)
+  assert.equal(lookbook.length, 10)
+  assert.equal(lookbook.filter((entry) => !entry.forSale).length, 8)
+  for (const item of [...getShowcaseDesigns(), ...getShowcaseGarments()]) {
+    assert.equal(item.active, false, item.id)
+    assert.ok(RIGHTS_HOLD[item.id] && SHOWCASE_ONLY.has(item.id), item.id)
+  }
+  for (const id of ['design-002', 'design-006', 'design-023', 'cocomelon-sweatshirt', 'rose-tracksuit']) {
+    assert.ok(!SHOWCASE_ONLY.has(id), `${id} is a trademark or likeness hold and must stay hidden`)
+  }
+  const showcaseIds = new Set([...getShowcaseDesigns(), ...getShowcaseGarments()].map((item) => item.id))
+  assert.ok(getDesigns().every((design) => !showcaseIds.has(design.id)))
+  assert.ok(getCompatibleDesigns('classic-tee').every((design) => !showcaseIds.has(design.id)))
+  assert.ok(getPurchasableGarments().every((garment) => !showcaseIds.has(garment.id)))
+  assert.ok(filterDesigns(getDesigns(), { query: 'snake' }).every((design) => !showcaseIds.has(design.id)))
+  const customizer = new Customizer()
+  initCustomizerFromUrl(customizer, { garment: 'classic-tee', design: 'design-001', front: 'IS-D001' })
+  assert.ok(customizer.getPrints().every((print) => !showcaseIds.has(print.designId)))
 })

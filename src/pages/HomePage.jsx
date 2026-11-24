@@ -4,6 +4,7 @@ import { HeroShowcase } from '../components/HeroShowcase.jsx'
 import { Lookbook } from '../components/Lookbook.jsx'
 import { SeasonDrop } from '../components/SeasonDrop.jsx'
 import { PopularBuilds } from '../components/PopularBuilds.jsx'
+import { PastWork } from '../components/PastWork.jsx'
 import { SearchCombobox } from '../components/SearchCombobox.jsx'
 import { Photo } from '../components/Photo.jsx'
 import { ExternalLink, Layout, visibleWhatsAppNumber, WHATSAPP_DESK_URL } from '../components/Chrome.jsx'
@@ -143,6 +144,8 @@ export function HomePage() {
           <PopularBuilds />
         </div>
       </section>
+
+      <PastWork />
 
       <section className="band band-quiet" aria-labelledby="planned-title">
         <div className="wrap">
