@@ -14,13 +14,15 @@ export const SEASON_DROP = {
       label: 'Summer',
       intro: 'Braai days, beach days and long December evenings. Tees in summer colours now, matching tee + shorts sets on the way.',
       available: [
+        { designId: 'design-069', colour: 'Sand' },
+        { designId: 'design-070', colour: 'White' },
         { designId: 'design-059', colour: 'Sand' },
         { designId: 'design-057', colour: 'Light blue' },
         { designId: 'design-058', colour: 'White' },
         { designId: 'design-056', colour: 'Pink' }
       ],
       comingSoon: [
-        { id: 'summer-set', name: 'Summer Set: Tee + Shorts', blurb: 'One print across a matching tee and shorts.', garmentId: 'summer-set' },
+        { id: 'summer-set', name: 'Summer Set: Tee + Shorts', blurb: 'Mzansi Summer (IS-D069) on a matching tee and shorts.', garmentId: 'summer-set' },
         { id: 'shorts', name: 'Shorts', blurb: 'Casual shorts with a leg print to pair with any tee.', garmentId: 'shorts' }
       ]
     },
@@ -28,11 +30,16 @@ export const SEASON_DROP = {
       id: 'festive',
       label: 'Festive',
       intro: 'Original Christmas and Dezemba designs in red, green and gold. Order matching tees for the whole family.',
-      available: [],
+      available: [
+        { designId: 'design-063', colour: 'Black' },
+        { designId: 'design-065', colour: 'Sand' },
+        { designId: 'design-066', colour: 'White' },
+        { designId: 'design-068', colour: 'Black' },
+        { designId: 'design-064', colour: 'White' },
+        { designId: 'design-067', colour: 'White' }
+      ],
       comingSoon: [
-        { id: 'festive-tees', name: 'Festive tees', blurb: 'New original Christmas designs for December.' },
-        { id: 'family-matching', name: 'Family matching', blurb: 'The same festive design in kids and adult sizes.' },
-        { id: 'dezemba-vibes', name: 'Dezemba vibes', blurb: 'Celebration designs for the festive season.' }
+        { id: 'family-matching', name: 'Family matching in kids sizes', blurb: 'Festive Squad and the rest of the drop in kids sizes, so the whole family can match.' }
       ]
     }
   ]

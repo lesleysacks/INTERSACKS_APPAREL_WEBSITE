@@ -264,6 +264,7 @@ export function ProductPage() {
                       <p>
                         <strong>{activeZone.name}:</strong> {activeDesign ? <>{activeDesign.name} <span className="code-tag">{activeDesign.code}</span></> : 'pick a design below'}
                       </p>
+                      {activeDesign?.note ? <p className="design-note">{activeDesign.note}</p> : null}
                       {activeDesign && activeZone.placements.length > 1 ? (
                         <div className="zone-sizes" role="group" aria-label={`${activeZone.name} print size`}>
                           {activeZone.placements.map((id) => (

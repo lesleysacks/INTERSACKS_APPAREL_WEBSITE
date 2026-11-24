@@ -57,10 +57,10 @@ test('Garment catalogue integrity (9 active real products, 19 planned)', () => {
   })
 })
 
-test('Design catalogue integrity (50 in manifest, rights-held designs hidden)', () => {
+test('Design catalogue integrity (70 in manifest, rights-held designs hidden)', () => {
   const designs = getDesigns()
-  assert.equal(allDesigns.length, 62, 'There should be 62 designs in the manifest')
-  assert.equal(designs.length, 62 - Object.keys(RIGHTS_HOLD).filter((id) => id.startsWith('design-')).length)
+  assert.equal(allDesigns.length, 70, 'There should be 70 designs in the manifest')
+  assert.equal(designs.length, 70 - Object.keys(RIGHTS_HOLD).filter((id) => id.startsWith('design-')).length)
   assert.ok(designs.every((design) => !RIGHTS_HOLD[design.id]))
   designs.forEach((design) => {
     assert.ok(design.id, 'Design must have id')
@@ -509,7 +509,11 @@ test('WhatsApp order lists codes and a preview link for each piece', () => {
 
 test('Festive Summer: filters, drop tabs and Notify me message', () => {
   const seasonal = filterDesigns(getDesigns(), { collection: SEASON_COLLECTION })
-  assert.deepEqual(seasonal.map((design) => design.code), ['IS-D056', 'IS-D057', 'IS-D058', 'IS-D059'])
+  assert.deepEqual(seasonal.map((design) => design.code), ['IS-D056', 'IS-D057', 'IS-D058', 'IS-D059', 'IS-D063', 'IS-D064', 'IS-D065', 'IS-D066', 'IS-D067', 'IS-D068', 'IS-D069', 'IS-D070'])
+  assert.deepEqual(seasonal.filter((design) => design.season === 'festive').map((design) => design.name), ['Dezemba Vibes', 'Festive Season Loading', 'Mzansi Christmas', 'Braai Before Presents', 'Festive Squad', 'Panther Holiday'])
+  assert.ok(seasonal.every((design) => design.active && design.hasUsableTransparency))
+  assert.equal(getDesignByCode('D066').note, 'Black lettering: best on light tees.')
+  assert.equal(SEASON_DROP.tabs.find((tab) => tab.id === 'festive').available.length, 6)
   assert.ok(getDesignCollections()[0] === SEASON_COLLECTION)
   assert.deepEqual(filterGarments(getPurchasableGarments(), { category: SEASON_COLLECTION }).map((g) => g.id), ['classic-tee'])
   assert.deepEqual(SEASON_DROP.tabs.map((tab) => tab.label), ['Summer', 'Festive'])

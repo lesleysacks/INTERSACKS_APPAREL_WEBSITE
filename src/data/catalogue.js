@@ -56,7 +56,19 @@ const PRODUCT_CODES = {
 
 /* Festive Summer drop: which pieces and designs belong to it. */
 const GARMENT_SEASON = { "classic-tee":"summer", "shorts":"summer", "summer-set":"summer" };
-const DESIGN_SEASON = { "design-056":"summer", "design-057":"summer", "design-058":"summer", "design-059":"summer" };
+const DESIGN_SEASON = {
+  "design-056":"summer", "design-057":"summer", "design-058":"summer", "design-059":"summer",
+  "design-063":"festive", "design-064":"festive", "design-065":"festive", "design-066":"festive", "design-067":"festive", "design-068":"festive",
+  "design-069":"summer", "design-070":"summer"
+};
+
+/* Print advice shown in the customiser, e.g. black ink that disappears on dark tees. */
+const DESIGN_NOTES = {
+  "design-013":"Black ink: best on light tees.",
+  "design-038":"White ink: best on dark tees.",
+  "design-066":"Black lettering: best on light tees.",
+  "design-067":"Sized to read clearly on kids' and adult tees, for matching family orders."
+};
 
 for (const garment of garments) {
   garment.code = PRODUCT_CODES[garment.id] || null;
@@ -127,7 +139,15 @@ const designManifest = [
   ["design-059","Braai Master Cub","assets/Designs/InterSacks_2026/mascot-braai.png","Character",true,true],
   ["design-060","Graduate Cub","assets/Designs/InterSacks_2026/mascot-graduate.png","Character",false,true],
   ["design-061","Skull & Roses","assets/Designs/InterSacks_2026/skull-roses.png","Graphic",true,true],
-  ["design-062","Rose Vine","assets/Designs/InterSacks_2026/rose-vine.png","Graphic",false,true]
+  ["design-062","Rose Vine","assets/Designs/InterSacks_2026/rose-vine.png","Graphic",false,true],
+  ["design-063","Dezemba Vibes","assets/Designs/Festive_Summer_2026/dezemba-vibes.webp","Typography",true,true],
+  ["design-064","Festive Season Loading","assets/Designs/Festive_Summer_2026/festive-season-loading.webp","Typography",true,true],
+  ["design-065","Mzansi Christmas","assets/Designs/Festive_Summer_2026/mzansi-christmas.webp","Graphic",true,true],
+  ["design-066","Braai Before Presents","assets/Designs/Festive_Summer_2026/braai-before-presents.webp","Character",true,true],
+  ["design-067","Festive Squad","assets/Designs/Festive_Summer_2026/festive-squad.webp","Typography",true,true],
+  ["design-068","Panther Holiday","assets/Designs/Festive_Summer_2026/panther-holiday.webp","Animal",true,true],
+  ["design-069","Mzansi Summer","assets/Designs/Festive_Summer_2026/mzansi-summer.webp","Graphic",true,true],
+  ["design-070","Summer in Mzansi","assets/Designs/Festive_Summer_2026/summer-in-mzansi.webp","Graphic",true,true]
 ];
 
 /* Artwork and garments hidden from the shop because they show other people's
@@ -213,13 +233,14 @@ const COLLECTION_BY_DESIGN = {
   "design-005":"Street","design-008":"Street","design-010":"Street","design-019":"Street","design-021":"Street","design-042":"Street","design-048":"Street",
   "design-001":"Wild","design-007":"Wild","design-046":"Wild",
   "design-003":"Pups","design-014":"Pups","design-037":"Pups","design-039":"Pups",
-  "design-051":"Panther","design-052":"Panther","design-053":"Panther","design-054":"Built Different","design-055":"Built Different","design-056":"Mzansi","design-057":"Mzansi","design-058":"Mzansi","design-059":"Mascot","design-060":"Mascot","design-061":"Skull & Rose","design-062":"Skull & Rose"
+  "design-051":"Panther","design-052":"Panther","design-053":"Panther","design-054":"Built Different","design-055":"Built Different","design-056":"Mzansi","design-057":"Mzansi","design-058":"Mzansi","design-059":"Mascot","design-063":"Festive","design-064":"Festive","design-065":"Festive","design-066":"Festive","design-067":"Festive","design-068":"Festive","design-069":"Mzansi","design-070":"Mzansi","design-060":"Mascot","design-061":"Skull & Rose","design-062":"Skull & Rose"
 };
-export const COLLECTION_ORDER = ["Panther","Built Different","Mzansi","Mascot","Skull & Rose","Faith","Grind","Street","Wild","Pups"];
+export const COLLECTION_ORDER = ["Festive","Panther","Built Different","Mzansi","Mascot","Skull & Rose","Faith","Grind","Street","Wild","Pups"];
 for (const design of designs) design.collection = design.collection || COLLECTION_BY_DESIGN[design.id] || design.category;
 for (const design of designs) {
   design.code = designCode(design);
   design.season = DESIGN_SEASON[design.id] || null;
+  design.note = DESIGN_NOTES[design.id] || null;
 }
 
 export const SEASON_COLLECTION = "Festive Summer";
