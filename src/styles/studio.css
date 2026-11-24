@@ -1321,3 +1321,96 @@ p.code-tag {
   flex: 1;
   text-align: start;
 }
+
+/* ---------- Collections as artwork tiles ---------- */
+.design-collections {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+}
+.design-collections .collection-tile {
+  grid-template-columns: 4.5rem 1fr;
+  padding: 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+}
+.collection-art {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 0.6rem;
+  background: #1b1a18;
+  overflow: hidden;
+}
+.collection-art img {
+  inline-size: 88%;
+  block-size: 88%;
+  object-fit: contain;
+}
+
+/* ---------- Popular builds in the shop ---------- */
+.popular-builds {
+  margin-block-start: 2.5rem;
+}
+.builds-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.8rem;
+  margin: 0 0 1rem;
+}
+.builds-title span {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+.builds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(46%, 14rem), 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.build-card > a {
+  display: grid;
+  gap: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+.build-card .tee-mock {
+  border-radius: 0.8rem;
+  overflow: hidden;
+  --tee-bg: #ece7dd;
+}
+.build-meta {
+  display: grid;
+  gap: 0.1rem;
+}
+.build-meta > span {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+.build-price {
+  color: var(--ink) !important;
+  font-weight: 700;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .build-card .tee-mock {
+    transition: scale 400ms var(--ease-out, ease-out);
+  }
+  .build-card > a:is(:hover, :focus-visible) .tee-mock {
+    scale: 1.03;
+  }
+}
+
+/* ---------- Lookbook with only a few sheets ---------- */
+.lookbook-band.is-few .lookbook-track {
+  overflow: visible;
+  flex-wrap: wrap;
+}
+.lookbook-band.is-few .lookbook-card {
+  flex: 1 1 18rem;
+  max-inline-size: 30rem;
+}
+.lookbook-band.is-few .lookbook-nav {
+  display: none;
+}

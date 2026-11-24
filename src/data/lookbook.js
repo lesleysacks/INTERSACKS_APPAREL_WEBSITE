@@ -1,7 +1,9 @@
 /* Lookbook sheets made in Canva (front, back and detail views of each tee).
    Each links to the customiser with the matching archive design.
    Sheets whose artwork is on RIGHTS_HOLD are deliberately not included. */
-export const lookbook = [
+import { getDesignById } from './catalogue.js'
+
+const allLooks = [
   { id: 'street-moves', name: 'Street Moves', tagline: 'Urban. Bold. Unstoppable.', designId: 'design-005', image: 'assets/lookbook/street-moves.jpg', alt: 'Street Moves oversized black tee with a graffiti breakdancer print, front and back views' },
   { id: 'urban-motion', name: 'Urban Motion', tagline: 'Wear the movement.', designId: 'design-008', image: 'assets/lookbook/urban-motion.jpg', alt: 'Urban Motion all-over print tee with a street dancer, shown in black, white, sand and navy' },
   { id: 'no-pain-no-gain', name: 'No Pain No Gain', tagline: 'Front, side and back.', designId: 'design-004', image: 'assets/lookbook/no-pain-no-gain.jpg', alt: 'No Pain No Gain black tee in red and silver type, worn from the front, side and back' },
@@ -14,8 +16,12 @@ export const lookbook = [
   { id: 'cute-pup-peek', name: 'Cute Pup Peek', tagline: 'Peekaboo print.', designId: 'design-003', image: 'assets/lookbook/cute-pup-peek.jpg', alt: 'Black tee with a Yorkshire terrier peeking around the edge of the print' }
 ]
 
+/* Only sheets whose artwork is still for sale. */
+export const lookbook = allLooks.filter((entry) => getDesignById(entry.designId)?.active)
+
 export const heroShowcase = ['street-moves', 'urban-motion', 'no-pain-no-gain', 'let-god-handle-it']
   .map((id) => lookbook.find((entry) => entry.id === id))
+  .filter(Boolean)
 
 export function lookbookHref(entry) {
   return `product.html?garment=classic-tee&design=${encodeURIComponent(entry.designId)}`
