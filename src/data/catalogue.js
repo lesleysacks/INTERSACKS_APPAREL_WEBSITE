@@ -5,7 +5,7 @@ import { TEE_COLOURS } from "./teeColours.js";
 
 /* orderLogUrl: the Google Apps Script web-app (/exec) URL from apps-script/README.md.
    Leave empty to switch order logging off; WhatsApp ordering works either way. */
-export const STORE_CONFIG = { whatsappNumber: "27843252262", brandName: "InterSacks Apparel", tagline: "Built Different.", currency: "R", orderLogUrl: "" };
+export const STORE_CONFIG = { whatsappNumber: "27843252262", brandName: "InterSacks Apparel", tagline: "Built Different.", currency: "R", orderLogUrl: "", siteUrl: "https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/" };
 
 export const garments = [
   { id:"classic-tee", name:"Classic Tee", category:"T-Shirts", description:"A clean short-sleeve base for custom InterSacks artwork.", basePrice:349, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:true, image:"assets/garments/classic-tee/black-front.webp" },
@@ -29,6 +29,7 @@ const plannedProducts = [
   ["tank-top", "Tank Top", "Vests", "Sleeveless warm-weather apparel with a centre-front print area."],
   ["joggers", "Joggers", "Bottoms", "Streetwear joggers for leg prints and small logo placements."],
   ["shorts", "Shorts", "Bottoms", "Casual shorts with compact logo or leg artwork placement."],
+  ["summer-set", "Summer Set: Tee + Shorts", "Sets", "Matching tee and shorts in one print, made for December heat."],
   ["bomber-jacket", "Bomber Jacket", "Jackets", "Outerwear concept for embroidered or patch-based decoration."],
   ["denim-jacket", "Denim Jacket", "Jackets", "Structured jacket concept for back artwork and patches."],
   ["baseball-cap", "Baseball Cap", "Headwear", "Six-panel cap concept for front embroidery."],
@@ -46,6 +47,21 @@ const plannedProducts = [
 }));
 
 garments.push(...plannedProducts);
+
+/* Permanent product codes. Never reuse a code; new pieces continue from P10. */
+const PRODUCT_CODES = {
+  "classic-tee":"IS-P01","panther-long-sleeve":"IS-P02","panther-vest":"IS-P03","skull-tracksuit":"IS-P04","graphic-long-sleeve":"IS-P05",
+  "rose-shirt":"IS-P06","hip-hop-tee":"IS-P07","pop-art-skirt":"IS-P08","birthday-queen-tee":"IS-P09"
+};
+
+/* Festive Summer drop: which pieces and designs belong to it. */
+const GARMENT_SEASON = { "classic-tee":"summer", "shorts":"summer", "summer-set":"summer" };
+const DESIGN_SEASON = { "design-056":"summer", "design-057":"summer", "design-058":"summer", "design-059":"summer" };
+
+for (const garment of garments) {
+  garment.code = PRODUCT_CODES[garment.id] || null;
+  garment.season = GARMENT_SEASON[garment.id] || null;
+}
 
 const designDefaults = { additionalPrice:50, compatibleGarments:["classic-tee"], placements:["front-center","front-small","back-center","left-sleeve","right-sleeve"], active:true, printable:true };
 const designManifest = [
@@ -201,6 +217,19 @@ const COLLECTION_BY_DESIGN = {
 };
 export const COLLECTION_ORDER = ["Panther","Built Different","Mzansi","Mascot","Skull & Rose","Faith","Grind","Street","Wild","Pups"];
 for (const design of designs) design.collection = design.collection || COLLECTION_BY_DESIGN[design.id] || design.category;
+for (const design of designs) {
+  design.code = designCode(design);
+  design.season = DESIGN_SEASON[design.id] || null;
+}
+
+export const SEASON_COLLECTION = "Festive Summer";
+
+/* design-051 → IS-D051. Numbers are permanent: retired numbers are never reused, new designs continue from D063. */
+export function designCode(design){return design ? `IS-D${String(design.id).replace("design-","")}` : ""}
+const normaliseCode=(code,letter)=>{const m=String(code||"").trim().toUpperCase().match(new RegExp(`^(?:IS-)?${letter}?0*(\\d{1,3})$`));return m?m[1].padStart(letter==="D"?3:2,"0"):null}
+export function getDesignByCode(code){const n=normaliseCode(code,"D");return n?designs.find(d=>d.id===`design-${n}`):undefined}
+export function getGarmentByCode(code){const n=normaliseCode(code,"P");return n?garments.find(g=>g.code===`IS-P${n}`):undefined}
+export function inCollection(design, collection){return collection==="All" || design.collection===collection || (collection===SEASON_COLLECTION && Boolean(design.season))}
 
 export function getGarments(){return garments.filter(g=>g.active)}
 export function getGarmentById(id){return garments.find(g=>g.id===id)}
@@ -229,7 +258,8 @@ export function getMinArtworkPrice() {
 }
 export function getDesignCollections() {
   const present = new Set(getDesigns().map((d) => d.collection))
-  return [...COLLECTION_ORDER.filter((c) => present.has(c)), ...[...present].filter((c) => !COLLECTION_ORDER.includes(c)).sort()]
+  const seasonal = getDesigns().some((d) => d.season) ? [SEASON_COLLECTION] : []
+  return [...seasonal, ...COLLECTION_ORDER.filter((c) => present.has(c)), ...[...present].filter((c) => !COLLECTION_ORDER.includes(c)).sort()]
 }
 export function formatPrice(amount){return `${STORE_CONFIG.currency}${amount}`}
 
@@ -336,10 +366,10 @@ export function sortGarments(list, mode = 'featured') {
 export function filterGarments(list, { category = 'All', query = '' } = {}) {
   const needle = query.trim().toLowerCase()
   return list.filter((garment) => {
-    const categoryMatch = category === 'All' || garment.category === category
+    const categoryMatch = category === 'All' || garment.category === category || (category === SEASON_COLLECTION && Boolean(garment.season))
     if (!categoryMatch) return false
     if (!needle) return true
-    return [garment.name, garment.category, garment.description]
+    return [garment.name, garment.category, garment.description, garment.code]
       .filter(Boolean)
       .some((value) => value.toLowerCase().includes(needle))
   })
@@ -350,8 +380,8 @@ export function filterDesigns(list, { category = 'All', collection = 'All', quer
   return list.filter((design) => {
     const categoryMatch = category === 'All' || design.category === category
     if (!categoryMatch) return false
-    if (collection !== 'All' && design.collection !== collection) return false
+    if (!inCollection(design, collection)) return false
     if (!needle) return true
-    return [design.name, design.category, design.collection].filter(Boolean).some((value) => value.toLowerCase().includes(needle))
+    return [design.name, design.category, design.collection, design.code].filter(Boolean).some((value) => value.toLowerCase().includes(needle))
   })
 }

@@ -16,6 +16,8 @@ function fakeSheet(name) {
     setFrozenRows() {},
     setColumnWidth() {},
     appendRow: (row) => rows.push([...row]),
+    heights: [],
+    setRowHeights(start, count, px) { sheet.heights.push([start, count, px]) },
     getRange(row, col, numRows = 1, numCols = 1) {
       return {
         setValues(values) {
@@ -57,8 +59,11 @@ function loadScript() {
 const order = {
   type: 'order', ref: 'IS-261123-AB12', name: 'Ayanda', area: 'Durban',
   lines: [
-    { garment: 'Classic Tee', colour: 'Navy', size: 'L', prints: 'Front Centre: Panther Claw; Back: Built Different', qty: 1, unitPrice: 479 },
-    { garment: 'Panther Vest', colour: 'Blue / Black', size: 'M', prints: '', qty: 2, unitPrice: 399 }
+    { garment: 'Classic Tee', code: 'IS-P01', colour: 'Navy', size: 'L', prints: 'Front Centre: Panther Claw; Back: Built Different', designCodes: 'IS-D051, IS-D054', qty: 1, unitPrice: 479,
+      previewUrl: 'https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/product.html?garment=classic-tee&colour=Navy&size=L&front=D051c&back=D054',
+      imageUrl: 'https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/assets/Designs/InterSacks_2026/panther-claw.png' },
+    { garment: 'Panther Vest', code: 'IS-P03', colour: 'Blue / Black', size: 'M', prints: '', designCodes: '', qty: 2, unitPrice: 399,
+      previewUrl: 'https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/product.html?garment=panther-vest&size=M', imageUrl: '' }
   ],
   total: 1277
 }
@@ -79,25 +84,35 @@ test('Apps Script saves an order: one Orders row, one row per line, duplicates i
   assert.equal(orders.length, 2)
   const [, ref, name, area, items, pieces, total, status] = orders[1]
   assert.deepEqual([ref, name, area, pieces, total, status], ['IS-261123-AB12', 'Ayanda', 'Durban', 3, 1277, 'New'])
-  assert.equal(items, '1 × Classic Tee (Navy, L) — Front Centre: Panther Claw; Back: Built Different\n2 × Panther Vest (Blue / Black, M)')
+  assert.equal(items, '1 × Classic Tee IS-P01 (Navy, L) — Front Centre: Panther Claw; Back: Built Different [IS-D051, IS-D054]\n2 × Panther Vest IS-P03 (Blue / Black, M)')
   const lines = sheets.get('Order lines').rows
-  assert.deepEqual(lines[2], ['IS-261123-AB12', 'Panther Vest', 'Blue / Black', 'M', '', 2, 399, 798])
+  assert.deepEqual(lines[1].slice(0, 10), ['IS-261123-AB12', 'Classic Tee', 'IS-P01', 'Navy', 'L', 'Front Centre: Panther Claw; Back: Built Different', 'IS-D051, IS-D054', 1, 479, 479])
+  assert.equal(lines[1][10], '=HYPERLINK("https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/product.html?garment=classic-tee&colour=Navy&size=L&front=D051c&back=D054","Open build")')
+  assert.equal(lines[1][11], '=IMAGE("https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/assets/Designs/InterSacks_2026/panther-claw.png")')
+  assert.deepEqual(lines[2], ['IS-261123-AB12', 'Panther Vest', 'IS-P03', 'Blue / Black', 'M', '', '', 2, 399, 798, '=HYPERLINK("https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/product.html?garment=panther-vest&size=M","Open build")', ''])
+  assert.deepEqual(sheets.get('Order lines').heights, [[2, 2, 90]])
   assert.deepEqual(post(order), { ok: true, duplicate: true })
   assert.equal(sheets.get('Orders').rows.length, 2)
 })
 
-test('Apps Script blocks spreadsheet formulas, bad input and oversized posts', () => {
+test('Apps Script blocks spreadsheet formulas, spoofed links, bad input and oversized posts', () => {
   const { sheets, post } = loadScript()
   post({ ...order, ref: 'IS-261123-ZZ99', name: '=HYPERLINK("http://x")', lines: [{ ...order.lines[0], qty: 999, unitPrice: -5 }] })
   const row = sheets.get('Orders').rows[1]
   assert.equal(row[2], '\'=HYPERLINK("http://x")')
   const line = sheets.get('Order lines').rows[1]
-  assert.equal(line[5], 10)
-  assert.equal(line[6], 0)
+  assert.equal(line[7], 10)
+  assert.equal(line[8], 0)
+  // Links and pictures only for the shop's own site, and nothing that can break out of the formula.
+  post({ ...order, ref: 'IS-261123-ZZ97', lines: [{ ...order.lines[0], code: '=1+1', designCodes: 'IS-D051, evil', previewUrl: 'https://evil.example/x', imageUrl: 'https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/a"),HYPERLINK("x' }] })
+  const spoof = sheets.get('Order lines').rows[2]
+  assert.deepEqual(spoof.slice(2, 3), [''])
+  assert.equal(spoof[6], 'IS-D051')
+  assert.deepEqual(spoof.slice(10), ['', ''])
   assert.equal(post({ ...order, ref: 'not-a-ref' }).ok, false)
   assert.equal(post({ ...order, ref: 'IS-261123-ZZ98', lines: [] }).ok, false)
   assert.equal(post({ type: 'other' }).ok, false)
-  assert.equal(post('x'.repeat(20001)).ok, false)
+  assert.equal(post('x'.repeat(30001)).ok, false)
   assert.equal(post('{not json').ok, false)
 })
 

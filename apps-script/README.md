@@ -5,11 +5,13 @@ Customers still send their order and pay on WhatsApp, exactly as before. At the 
 | Tab | One row per | Columns |
 |---|---|---|
 | **Orders** | order | Received, Ref, Name, Delivery area, Items, Pieces, Total shown (R), **Status**, Notes |
-| **Order lines** | garment in an order | Ref, Garment, Colour, Size, Prints, Qty, Unit price, Line total |
+| **Order lines** | garment in an order | Ref, Garment, Product code, Colour, Size, Prints, Design codes, Qty, Unit price, Line total, **Preview**, **Image** |
 | **Custom enquiries** | quote request | Received, Ref, Name, Occasion, Garment, Quantity, Needed by, Text to print, Notes, **Status** |
 
 - **Status for orders:** New → Paid → In production → Ready → Delivered (or Cancelled).
 - **Status for quote requests:** New → Quoted → Accepted / Declined.
+- **Codes:** every design has a permanent code like `IS-D051` and every ready-made piece one like `IS-P03`. Customers see the same codes on the website, in the bag and in their WhatsApp message.
+- **Preview** is an "Open build" link that opens the customer's exact tee on the website: colour, size and every print. **Image** shows the main artwork, or the product photo, right in the row. Only links to the InterSacks website are turned into links or pictures.
 - The **Ref** (e.g. `IS-261123-7KQ2`) is the same reference the customer sends you on WhatsApp, so you can match the chat to the row.
 
 ## Set it up (about 5 minutes)

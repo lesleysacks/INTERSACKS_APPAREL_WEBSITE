@@ -22,6 +22,10 @@ import { Cart, createMemoryStorage } from '../src/services/cart.js'
 import { Customizer } from '../src/services/customizer.js'
 import { createOrderReference, generateCustomEnquiryMessage, generateWhatsAppMessage } from '../src/services/orders.js'
 import { buildEnquiryPayload, buildOrderPayload, sendOrderLog } from '../src/services/orderLog.js'
+import { buildPreviewUrl, seasonNotifyUrl } from '../src/services/orders.js'
+import { initCustomizerFromUrl } from '../src/services/customizer.js'
+import { getDesignByCode, getGarmentByCode, SEASON_COLLECTION } from '../src/data/catalogue.js'
+import { dropDateLabel, SEASON_DROP } from '../src/data/seasonal.js'
 
 test('Baseline: Store configuration matches expected InterSacks brand settings', () => {
   assert.equal(STORE_CONFIG.brandName, 'InterSacks Apparel')
@@ -30,15 +34,15 @@ test('Baseline: Store configuration matches expected InterSacks brand settings',
   assert.equal(STORE_CONFIG.whatsappNumber, '27843252262')
 })
 
-test('Garment catalogue integrity (9 active real products, 18 planned)', () => {
+test('Garment catalogue integrity (9 active real products, 19 planned)', () => {
   const allGarments = getGarments()
   const realGarments = allGarments.filter((garment) => garment.available !== false)
   const plannedGarments = allGarments.filter((garment) => garment.available === false)
 
-  assert.equal(allGarments.length, 27, 'Total active garments should be 27 (9 real + 18 planned)')
+  assert.equal(allGarments.length, 28, 'Total active garments should be 28 (9 real + 19 planned)')
   assert.equal(realGarments.length, 9, 'Real active garments should be 9')
   assert.ok(realGarments.every((garment) => !RIGHTS_HOLD[garment.id]))
-  assert.equal(plannedGarments.length, 18, 'Planned garments should be 18')
+  assert.equal(plannedGarments.length, 19, 'Planned garments should be 19')
 
   realGarments.forEach((garment) => {
     assert.ok(garment.basePrice > 0, `${garment.id} should have basePrice > 0`)
@@ -206,7 +210,7 @@ test('Planned garments cannot be selected or purchased', () => {
   const customizer = new Customizer()
   customizer.setGarment('oversized-tee')
   assert.equal(customizer.selectedGarmentId, null)
-  assert.equal(getPlannedGarments().length, 18)
+  assert.equal(getPlannedGarments().length, 19)
   assert.throws(() => customizer.createCartItem(), /not available to order/)
 })
 
@@ -441,8 +445,17 @@ test('Order log: the Sheet copy carries the same ref, every line, its prints and
   assert.equal(payload.name, 'Ayanda')
   assert.equal(payload.area, 'Durban')
   assert.equal(payload.total, 479 + 798)
-  assert.deepEqual(payload.lines[0], { garment: 'Classic Tee', colour: 'Navy', size: 'L', prints: 'Front Centre: Panther Claw; Back: Built Different', qty: 1, unitPrice: 479 })
-  assert.deepEqual(payload.lines[1], { garment: 'Panther Vest', colour: 'Blue / Black', size: 'M', prints: '', qty: 2, unitPrice: 399 })
+  const site = 'https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/'
+  assert.deepEqual(payload.lines[0], {
+    garment: 'Classic Tee', code: 'IS-P01', colour: 'Navy', size: 'L', prints: 'Front Centre: Panther Claw; Back: Built Different',
+    designCodes: 'IS-D051, IS-D054', qty: 1, unitPrice: 479,
+    previewUrl: `${site}product.html?garment=classic-tee&colour=Navy&size=L&front=D051c&back=D054`,
+    imageUrl: `${site}assets/Designs/InterSacks_2026/panther-claw.png`
+  })
+  assert.equal(payload.lines[1].code, 'IS-P03')
+  assert.equal(payload.lines[1].designCodes, '')
+  assert.equal(payload.lines[1].previewUrl, `${site}product.html?garment=panther-vest&size=M`)
+  assert.match(payload.lines[1].imageUrl, /^https:\/\/lesleysacks\.github\.io\/INTERSACKS_APPAREL_WEBSITE\/assets\/products\/pantherPJ_Vest\(blue&black\)%20\(1\)\.png$/)
   assert.ok(generateWhatsAppMessage(cart, { reference: ref }).includes(`(ref ${ref})`))
 })
 
@@ -451,4 +464,60 @@ test('Order log: quote requests carry the occasion name, and logging stays off w
   assert.deepEqual(payload, { type: 'enquiry', ref: 'IS-270101-AAAA', name: 'Ayanda', occasion: 'Matric & graduation', garment: 'Classic Tee', quantity: '40', date: '2027-09-01', printText: 'Class of 2027', notes: '' })
   assert.equal(sendOrderLog(payload, ''), false)
   assert.equal(sendOrderLog(payload), false)
+})
+
+test('Every design and ready-made piece has a unique permanent code', () => {
+  const designCodes = allDesigns.map((design) => design.code)
+  assert.equal(new Set(designCodes).size, allDesigns.length)
+  assert.ok(designCodes.every((code) => /^IS-D\d{3}$/.test(code)))
+  assert.equal(getDesignByCode('IS-D051').name, 'Panther Claw')
+  assert.equal(getDesignByCode('d51').name, 'Panther Claw')
+  const liveCodes = getPurchasableGarments().map((garment) => garment.code)
+  assert.deepEqual(liveCodes, ['IS-P01', 'IS-P02', 'IS-P03', 'IS-P04', 'IS-P05', 'IS-P06', 'IS-P07', 'IS-P08', 'IS-P09'])
+  assert.equal(getGarmentByCode('P03').name, 'Panther Vest')
+  assert.equal(filterDesigns(getDesigns(), { query: 'D059' })[0].name, 'Braai Master Cub')
+})
+
+test('A preview link rebuilds the exact tee: colour, size, every print and the price', () => {
+  const original = new Customizer()
+  original.setGarment('classic-tee')
+  original.setColour('#a9c8e8', 'Light blue')
+  original.setSize('XL')
+  original.setZoneDesign('front', 'design-051')
+  original.setZonePlacement('front', 'front-small')
+  original.setZoneDesign('back', 'design-054')
+  original.setZoneDesign('right-sleeve', 'design-055')
+  const item = original.createCartItem()
+  const url = buildPreviewUrl(item, '')
+  assert.equal(url, 'product.html?garment=classic-tee&colour=Light+blue&size=XL&front=D051s&back=D054&rs=D055')
+  const copy = new Customizer()
+  initCustomizerFromUrl(copy, Object.fromEntries(new URL(url, 'https://example.test/').searchParams))
+  assert.deepEqual(copy.createCartItem(), item)
+})
+
+test('WhatsApp order lists codes and a preview link for each piece', () => {
+  const customizer = new Customizer()
+  customizer.setGarment('classic-tee')
+  customizer.setZoneDesign('front', 'design-051')
+  const cart = new Cart(createMemoryStorage())
+  cart.addItem(customizer.createCartItem())
+  const message = generateWhatsAppMessage(cart)
+  assert.ok(message.includes('1 × Classic Tee (IS-P01)'))
+  assert.ok(message.includes('• Front Centre: Panther Claw (IS-D051)'))
+  assert.ok(message.includes('Preview: https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/product.html?garment=classic-tee&colour=Black&size=S&front=D051c'))
+})
+
+test('Festive Summer: filters, drop tabs and Notify me message', () => {
+  const seasonal = filterDesigns(getDesigns(), { collection: SEASON_COLLECTION })
+  assert.deepEqual(seasonal.map((design) => design.code), ['IS-D056', 'IS-D057', 'IS-D058', 'IS-D059'])
+  assert.ok(getDesignCollections()[0] === SEASON_COLLECTION)
+  assert.deepEqual(filterGarments(getPurchasableGarments(), { category: SEASON_COLLECTION }).map((g) => g.id), ['classic-tee'])
+  assert.deepEqual(SEASON_DROP.tabs.map((tab) => tab.label), ['Summer', 'Festive'])
+  for (const tab of SEASON_DROP.tabs) for (const entry of tab.available) assert.ok(getDesigns().some((design) => design.id === entry.designId))
+  assert.equal(getPlannedGarments().find((g) => g.id === 'summer-set').season, 'summer')
+  assert.equal(dropDateLabel(null), 'Dropping this December')
+  assert.equal(dropDateLabel('2026-12-01'), 'Drops 1 December')
+  const notify = decodeURIComponent(seasonNotifyUrl('Summer Set: Tee + Shorts', 'Summer'))
+  assert.ok(notify.startsWith('https://wa.me/27843252262?text='))
+  assert.ok(notify.includes('Please let me know when the Festive Summer drop lands, especially: Summer Set: Tee + Shorts (Summer).'))
 })

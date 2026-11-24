@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Layout } from '../components/Chrome.jsx'
 import { Photo } from '../components/Photo.jsx'
 import { useCart } from '../context/CartContext.jsx'
-import { formatPrice, getGarmentById, placementLabel, STORE_CONFIG } from '../data/catalogue.js'
+import { formatPrice, getDesignById, getGarmentById, placementLabel, STORE_CONFIG } from '../data/catalogue.js'
 import { TeeMock } from '../components/TeeMock.jsx'
-import { createOrderReference, whatsAppOrderUrl } from '../services/orders.js'
+import { buildPreviewUrl, createOrderReference, whatsAppOrderUrl } from '../services/orders.js'
 import { buildOrderPayload, sendOrderLog } from '../services/orderLog.js'
 
 export function CartPage() {
@@ -52,15 +52,17 @@ export function CartPage() {
                     <CartThumb item={item} />
                     <div>
                       <h2>{item.garmentName}</h2>
+                      {getGarmentById(item.garmentId)?.code ? <p className="code-tag">{getGarmentById(item.garmentId).code}</p> : null}
                       <p>Colour: {item.colour}</p>
                       <p>Size: {item.size}</p>
                       {item.prints?.length ? (
                         <ul className="cart-prints">
                           {item.prints.map((print) => (
-                            <li key={print.placement}>{placementLabel(print.placement)}: {print.designName}</li>
+                            <li key={print.placement}>{placementLabel(print.placement)}: {print.designName} <span className="code-tag">{getDesignById(print.designId)?.code}</span></li>
                           ))}
                         </ul>
                       ) : null}
+                      <p><a className="preview-link" href={buildPreviewUrl(item, '')}>View preview</a></p>
                       <p>Each {formatPrice(item.unitPrice)}</p>
                       <div className="field qty-field">
                         <label htmlFor={`qty-${index}`}>Quantity for {item.garmentName}</label>
