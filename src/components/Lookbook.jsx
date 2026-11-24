@@ -19,7 +19,7 @@ export function Lookbook() {
   }
 
   return (
-    <section id="lookbook" className="band lookbook-band" aria-labelledby="lookbook-title">
+    <section id="lookbook" className={`band lookbook-band${lookbook.length <= 3 ? ' is-few' : ''}`} aria-labelledby="lookbook-title">
       <div className="wrap">
         <div className="lookbook-head">
           <div className="section-head">

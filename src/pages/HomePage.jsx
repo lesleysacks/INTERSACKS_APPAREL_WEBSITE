@@ -3,6 +3,7 @@ import { ProductCard } from '../components/ProductCard.jsx'
 import { HeroShowcase } from '../components/HeroShowcase.jsx'
 import { Lookbook } from '../components/Lookbook.jsx'
 import { SeasonDrop } from '../components/SeasonDrop.jsx'
+import { PopularBuilds } from '../components/PopularBuilds.jsx'
 import { SearchCombobox } from '../components/SearchCombobox.jsx'
 import { Photo } from '../components/Photo.jsx'
 import { ExternalLink, Layout, visibleWhatsAppNumber, WHATSAPP_DESK_URL } from '../components/Chrome.jsx'
@@ -38,11 +39,13 @@ const ARCHIVE_ORDER = [...getDesigns()].sort((a, b) => Number(b.featured) - Numb
 export function HomePage() {
   const purchasable = getPurchasableGarments()
   const categories = getPurchasableCategories()
-  const featured = purchasable.filter((garment) => garment.featured)
-  const collections = categories.map((category) => {
-    const items = purchasable.filter((garment) => garment.category === category)
-    return { category, count: items.length, lead: items.find((item) => item.featured) || items[0] }
-  })
+  const designCollections = getDesignCollections()
+    .filter((name) => name !== SEASON_COLLECTION)
+    .map((name) => {
+      const items = getDesigns().filter((design) => design.collection === name)
+      return { name, count: items.length, lead: items.find((design) => design.hasUsableTransparency) || items[0] }
+    })
+    .filter((collection) => collection.count)
   const [category, setCategory] = useState(initialCategory)
   const [sort, setSort] = useState('featured')
   const [query, setQuery] = useState('')
@@ -81,15 +84,16 @@ export function HomePage() {
         <div className="wrap">
           <div className="section-head">
             <p className="kicker">01 — Collections</p>
-            <h2 id="collections-title">Shop by silhouette</h2>
+            <h2 id="collections-title">Shop by collection</h2>
+            <p>Original InterSacks artwork, printed on the Classic Tee or the Kids Classic Tee.</p>
           </div>
-          <div className="collection-grid">
-            {collections.map((collection) => (
-              <a key={collection.category} className="collection-tile" href={`index.html?category=${encodeURIComponent(collection.category)}#shop`}>
-                <Photo src={collection.lead.image} alt="" />
+          <div className="collection-grid design-collections">
+            {designCollections.map((collection) => (
+              <a key={collection.name} className="collection-tile" href={`product.html?garment=classic-tee&collection=${encodeURIComponent(collection.name)}`}>
+                <span className="collection-art"><Photo layout="thumb" framed={false} src={collection.lead.transparentImage || collection.lead.image} alt="" /></span>
                 <span>
-                  <strong>{collection.category}</strong>
-                  <span>{collection.count} {collection.count === 1 ? 'piece' : 'pieces'}</span>
+                  <strong>{collection.name}</strong>
+                  <span>{collection.count} {collection.count === 1 ? 'design' : 'designs'}</span>
                 </span>
               </a>
             ))}
@@ -97,24 +101,10 @@ export function HomePage() {
         </div>
       </section>
 
-      {featured.length ? (
-      <section className="band" aria-labelledby="featured-title">
-        <div className="wrap">
-          <div className="section-head">
-            <p className="kicker">02 — Featured</p>
-            <h2 id="featured-title">Featured pieces</h2>
-          </div>
-          <div className="product-grid">
-            {featured.map((garment) => <ProductCard key={garment.id} garment={garment} />)}
-          </div>
-        </div>
-      </section>
-      ) : null}
-
       <section id="shop" className="band" aria-labelledby="shop-title">
         <div className="wrap">
           <div className="section-head">
-            <p className="kicker">03 — Shop</p>
+            <p className="kicker">02 — Shop</p>
             <h2 id="shop-title">Available to order</h2>
           </div>
           <search aria-labelledby="shop-title" className="shop-search">
@@ -150,6 +140,7 @@ export function HomePage() {
               {shopItems.map((garment) => <ProductCard key={garment.id} garment={garment} />)}
             </div>
           ) : <p>No pieces match that search.</p>}
+          <PopularBuilds />
         </div>
       </section>
 
