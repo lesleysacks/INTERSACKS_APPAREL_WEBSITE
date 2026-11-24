@@ -2,6 +2,7 @@ import {
   calculatePrintsPrice,
   describePrints,
   getCompatibleDesigns,
+  getDesignByCode,
   getDesignById,
   getGarmentById,
   getPlacementConfig,
@@ -176,6 +177,9 @@ export class Customizer {
   }
 }
 
+/* Preview-link spot parameters: front=D051c (c = centre, s = small), back=D054, ls=D055, rs=D055. */
+export const SPOT_PARAMS = { front: 'front', back: 'back', ls: 'left-sleeve', rs: 'right-sleeve' }
+
 export function initCustomizerFromUrl(customizer, params = {}) {
   const requestedDesign = params.design ? getDesignById(params.design) : null
 
@@ -192,5 +196,20 @@ export function initCustomizerFromUrl(customizer, params = {}) {
 
   if (params.design && customizer.selectedGarmentId) {
     customizer.setZoneDesign('front', params.design)
+  }
+
+  // A shared build: colour, size and every print spot.
+  const garment = getGarmentById(customizer.selectedGarmentId)
+  const colour = garment?.colours.find((entry) => entry.name.toLowerCase() === String(params.colour || '').toLowerCase())
+  if (colour) customizer.setColour(colour.value, colour.name)
+  if (garment?.sizes.includes(params.size)) customizer.setSize(params.size)
+  for (const [key, zone] of Object.entries(SPOT_PARAMS)) {
+    const raw = String(params[key] || '').trim()
+    if (!raw) continue
+    const match = raw.match(/^(.*?)([cs])?$/i)
+    const design = getDesignByCode(match[1])
+    if (!design) continue
+    customizer.setZoneDesign(zone, design.id)
+    if (zone === 'front' && match[2]) customizer.setZonePlacement('front', match[2].toLowerCase() === 's' ? 'front-small' : 'front-center')
   }
 }

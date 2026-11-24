@@ -12,12 +12,14 @@ import {
   getGarmentById,
   getPlacementConfig,
   getPurchasableGarments,
+  filterDesigns,
   PRINT_ZONES
 } from '../data/catalogue.js'
 import { Customizer, initCustomizerFromUrl } from '../services/customizer.js'
 import { withPreviewTransition } from '../lib/pageTransitions.js'
 import { ZoomStage } from '../components/ZoomStage.jsx'
 import { Tee3D } from '../components/Tee3D.jsx'
+import { FamilyKit } from '../components/FamilyKit.jsx'
 
 export function ProductPage() {
   const customizerRef = useRef(null)
@@ -39,7 +41,7 @@ export function ProductPage() {
   if (!customizerRef.current) {
     const customizer = new Customizer()
     const params = new URLSearchParams(window.location.search)
-    initCustomizerFromUrl(customizer, { garment: params.get('garment'), design: params.get('design') })
+    initCustomizerFromUrl(customizer, Object.fromEntries(params))
     customizerRef.current = customizer
   }
 
@@ -57,12 +59,12 @@ export function ProductPage() {
   const [focus, setFocus] = useState(null)
   const designs = getCompatibleDesigns(customizer.selectedGarmentId)
   const [designQuery, setDesignQuery] = useState('')
-  const [designCollection, setDesignCollection] = useState('All')
+  const [designCollection, setDesignCollection] = useState(() => {
+    const requested = new URLSearchParams(window.location.search).get('collection')
+    return getDesignCollections().includes(requested) ? requested : 'All'
+  })
   const [mode, setMode] = useState('2d')
-  const visibleDesigns = designs.filter((entry) =>
-    (designCollection === 'All' || entry.collection === designCollection) &&
-    [entry.name, entry.collection].some((value) => value.toLowerCase().includes(designQuery.trim().toLowerCase()))
-  )
+  const visibleDesigns = filterDesigns(designs, { collection: designCollection, query: designQuery })
   const onThisView = printDetails.filter((print) => print.view === view)
 
   function showView(next) {
@@ -194,6 +196,7 @@ export function ProductPage() {
             <header className="studio-head">
               <p className="kicker">{designs.length ? 'Customise' : garment?.category}</p>
               <h1 id="product-title">{garment ? garment.name : 'Choose a piece'}</h1>
+              {garment?.code ? <p className="code-tag">{garment.code}</p> : null}
               <p className="studio-price">{formatPrice(total)} <span>each</span></p>
               <p className="studio-desc">{garment?.description}</p>
             </header>
@@ -252,7 +255,7 @@ export function ProductPage() {
                             </span>
                             <span className="zone-text">
                               <span className="zone-name">{zone.name}</span>
-                              <small>{zoneDesign ? `✓ ${zoneDesign.name}` : `+${formatPrice(price)}`}</small>
+                              <small>{zoneDesign ? `✓ ${zoneDesign.name} · ${zoneDesign.code}` : `+${formatPrice(price)}`}</small>
                             </span>
                           </label>
                         )
@@ -260,8 +263,9 @@ export function ProductPage() {
                     </div>
                     <div className="zone-active">
                       <p>
-                        <strong>{activeZone.name}:</strong> {activeDesign ? activeDesign.name : 'pick a design below'}
+                        <strong>{activeZone.name}:</strong> {activeDesign ? <>{activeDesign.name} <span className="code-tag">{activeDesign.code}</span></> : 'pick a design below'}
                       </p>
+                      {activeDesign?.note ? <p className="design-note">{activeDesign.note}</p> : null}
                       {activeDesign && activeZone.placements.length > 1 ? (
                         <div className="zone-sizes" role="group" aria-label={`${activeZone.name} print size`}>
                           {activeZone.placements.map((id) => (
@@ -310,11 +314,13 @@ export function ProductPage() {
                           />
                           <Photo layout="thumb" framed={false} src={entry.image} alt="" />
                           <span className="artwork-name">{entry.name}</span>
+                          <span className="artwork-code">{entry.code}</span>
                         </label>
                       ))}
                     </div>
                     {(designQuery || designCollection !== 'All') && !visibleDesigns.length ? <p>No artwork matches that search.</p> : null}
                   </fieldset>
+                  <FamilyKit customizer={customizer} />
                 </>
               ) : <p className="fine-print">Sold as shown. Pick your colour and size.</p>}
               <p className="fine-print">Made to order. We confirm sizing and delivery with you on WhatsApp before anything is made.</p>

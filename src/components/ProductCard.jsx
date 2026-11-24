@@ -21,6 +21,7 @@ export function ProductCard({ garment }) {
       <a className="product-link" href={href} data-vt="garment">
         <p className="kicker">{garment.category}</p>
         <h3>{garment.name}</h3>
+        {garment.code ? <span className="code-tag">{garment.code}</span> : null}
       </a>
       <p className="price">{formatPrice(garment.basePrice)}</p>
       {readyMade ? (
@@ -32,7 +33,7 @@ export function ProductCard({ garment }) {
           <a className="btn card-customise" href={href}>Customise</a>
         </>
       )}
-      <Lightbox open={open} onClose={() => setOpen(false)} title={`${garment.name} · ${formatPrice(garment.basePrice)}`} views={views}>
+      <Lightbox open={open} onClose={() => setOpen(false)} title={`${garment.name}${garment.code ? ` (${garment.code})` : ''} · ${formatPrice(garment.basePrice)}`} views={views}>
         {readyMade ? (
           <QuickAdd garment={garment} colourName={colourName} onColour={setColourName} />
         ) : (

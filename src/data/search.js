@@ -41,13 +41,13 @@ export function getSearchSuggestions(query, limit = 8) {
   const results = []
 
   for (const garment of getPurchasableGarments()) {
-    const hit = score([garment.name, garment.category, garment.description], needle)
+    const hit = score([garment.name, garment.category, garment.description, garment.code], needle)
     if (hit) {
       results.push({
         type: 'garment',
         id: garment.id,
         label: garment.name,
-        sublabel: `${garment.category} · ${formatPrice(garment.basePrice)}`,
+        sublabel: `${garment.code ? `${garment.code} · ` : ''}${garment.category} · ${formatPrice(garment.basePrice)}`,
         image: garment.image,
         href: `product.html?garment=${encodeURIComponent(garment.id)}`,
         match: hit.labelMatch,
@@ -57,13 +57,13 @@ export function getSearchSuggestions(query, limit = 8) {
   }
 
   for (const design of getDesigns()) {
-    const hit = score([design.name, design.collection, design.category], needle)
+    const hit = score([design.name, design.collection, design.category, design.code], needle)
     if (hit) {
       results.push({
         type: 'design',
         id: design.id,
         label: design.name,
-        sublabel: `Design · ${design.collection}`,
+        sublabel: `${design.code} · ${design.collection}`,
         image: design.image,
         href: `product.html?garment=classic-tee&design=${encodeURIComponent(design.id)}`,
         match: hit.labelMatch,

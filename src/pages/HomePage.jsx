@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { ProductCard } from '../components/ProductCard.jsx'
 import { HeroShowcase } from '../components/HeroShowcase.jsx'
 import { Lookbook } from '../components/Lookbook.jsx'
+import { SeasonDrop } from '../components/SeasonDrop.jsx'
 import { SearchCombobox } from '../components/SearchCombobox.jsx'
 import { Photo } from '../components/Photo.jsx'
 import { ExternalLink, Layout, visibleWhatsAppNumber, WHATSAPP_DESK_URL } from '../components/Chrome.jsx'
@@ -16,6 +17,7 @@ import {
   getDesignCollections,
   getPurchasableCategories,
   getPurchasableGarments,
+  SEASON_COLLECTION,
   sortGarments
 } from '../data/catalogue.js'
 
@@ -26,7 +28,7 @@ function initialCollection() {
 
 function initialCategory() {
   const requested = new URLSearchParams(window.location.search).get('category')
-  return getPurchasableCategories().includes(requested) ? requested : 'All'
+  return requested === SEASON_COLLECTION || getPurchasableCategories().includes(requested) ? requested : 'All'
 }
 
 const DESIGN_PREVIEW = 12
@@ -73,6 +75,8 @@ export function HomePage() {
 
       <Lookbook />
 
+      <SeasonDrop />
+
       <section id="collections" className="band" aria-labelledby="collections-title">
         <div className="wrap">
           <div className="section-head">
@@ -115,11 +119,11 @@ export function HomePage() {
             <SearchCombobox value={query} onSearch={setQuery} onCategory={setCategory} />
             <div className="shop-toolbar">
               <div className="collection-chips" role="group" aria-label="Shop categories">
-                {['All', ...categories].map((entry) => (
+                {['All', SEASON_COLLECTION, ...categories].map((entry) => (
                   <button
                     key={entry}
                     type="button"
-                    className="chip"
+                    className={`chip${entry === SEASON_COLLECTION ? ' chip-season' : ''}`}
                     aria-pressed={category === entry}
                     onClick={() => setCategory(entry)}
                   >

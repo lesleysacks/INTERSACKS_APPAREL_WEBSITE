@@ -1,4 +1,5 @@
 import { printsForItem, printsKey } from '../data/catalogue.js'
+import { familyDiscounts, familyDiscountTotal } from './family.js'
 
 export const CART_STORAGE_KEY = 'intersacks-cart'
 export const MAX_QUANTITY = 10
@@ -110,6 +111,19 @@ export class Cart {
 
   getSubtotal() {
     return this.items.reduce((total, item) => total + (item.unitPrice * item.quantity), 0)
+  }
+
+  /* Family Kit discount on matching tees (see family.js). */
+  getDiscounts() {
+    return familyDiscounts(this.items)
+  }
+
+  getDiscount() {
+    return familyDiscountTotal(this.items)
+  }
+
+  getTotal() {
+    return this.getSubtotal() - this.getDiscount()
   }
 
   getItemCount() {

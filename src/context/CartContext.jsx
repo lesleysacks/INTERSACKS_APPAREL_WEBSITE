@@ -1,5 +1,5 @@
 import { createContext, useContext, useRef, useState } from 'react'
-import { Cart } from '../services/cart.js'
+import { Cart, createMemoryStorage } from '../services/cart.js'
 import { getDesignById, getGarmentById, isPurchasable, printsForItem } from '../data/catalogue.js'
 
 function stillOrderable(item) {
@@ -23,9 +23,20 @@ export function CartProvider({ children }) {
     items: cart.items,
     count: cart.getItemCount(),
     subtotal: cart.getSubtotal(),
+    discount: cart.getDiscount(),
+    discounts: cart.getDiscounts(),
+    total: cart.getTotal(),
     empty: cart.isEmpty(),
     addItem(item) {
       cart.addItem(item)
+      refresh()
+    },
+    /* Several lines at once (a Family Kit). All are checked before any is added. */
+    addItems(items) {
+      const trial = new Cart(createMemoryStorage())
+      trial.items = cart.items.map((entry) => ({ ...entry }))
+      for (const item of items) trial.addItem(item)
+      for (const item of items) cart.addItem(item)
       refresh()
     },
     updateQuantity(index, quantity) {

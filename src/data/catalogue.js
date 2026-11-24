@@ -5,7 +5,7 @@ import { TEE_COLOURS } from "./teeColours.js";
 
 /* orderLogUrl: the Google Apps Script web-app (/exec) URL from apps-script/README.md.
    Leave empty to switch order logging off; WhatsApp ordering works either way. */
-export const STORE_CONFIG = { whatsappNumber: "27843252262", brandName: "InterSacks Apparel", tagline: "Built Different.", currency: "R", orderLogUrl: "" };
+export const STORE_CONFIG = { whatsappNumber: "27843252262", brandName: "InterSacks Apparel", tagline: "Built Different.", currency: "R", orderLogUrl: "", siteUrl: "https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/" };
 
 export const garments = [
   { id:"classic-tee", name:"Classic Tee", category:"T-Shirts", description:"A clean short-sleeve base for custom InterSacks artwork.", basePrice:349, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:true, image:"assets/garments/classic-tee/black-front.webp" },
@@ -18,8 +18,12 @@ export const garments = [
   { id:"hip-hop-tee", name:"Hip-Hop Graphic Tee", category:"T-Shirts", description:"White tee with monochrome hip-hop artwork.", basePrice:399, colours:[{name:"White",value:"#f5f5f5",frontImage:"assets/products/product-5.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/product-5.png" },
   { id:"pop-art-skirt", name:"Pop Art Skirt", category:"Skirts", description:"Pink maxi skirt with colourful pop-art portrait.", basePrice:499, colours:[{name:"Pink",value:"#ed388c",frontImage:"assets/products/product-6.png",backImage:null}], sizes:["S","M","L","XL"], featured:false, active:true, customizable:false, image:"assets/products/product-6.png" },
   { id:"birthday-queen-tee", name:"Birthday Queen Tee", category:"T-Shirts", description:"Black tee with a bright Birthday Queen graphic.", basePrice:399, colours:[{name:"Black",value:"#111111",frontImage:"assets/products/product-7.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:false, active:true, customizable:false, image:"assets/products/product-7.png" },
+  { id:"kids-classic-tee", name:"Kids Classic Tee", category:"T-Shirts", description:"The Classic Tee in kids sizes. Pair it with an adult tee for a matching Family Kit.", basePrice:249, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["2-3","4-5","6-7","8-9","10-11","12-13"], featured:false, active:true, customizable:true, image:"assets/garments/classic-tee/white-front.webp" },
   { id:"rose-tracksuit", name:"Rose Sleeve Tracksuit", category:"Sets", description:"Black hoodie-and-jogger set with rose sleeve artwork.", basePrice:899, colours:[{name:"Black / Pink",value:"#1a151a",frontImage:"assets/products/product-8.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/product-8.png" }
 ];
+
+/* Announced prices for pieces that are not on sale yet (shown on "Coming soon" cards). */
+const PLANNED_PRICES = { "shorts": 349, "summer-set": 699 };
 
 const plannedProducts = [
   ["oversized-tee", "Oversized Tee", "T-Shirts", "Relaxed streetwear tee with a larger print area."],
@@ -29,6 +33,7 @@ const plannedProducts = [
   ["tank-top", "Tank Top", "Vests", "Sleeveless warm-weather apparel with a centre-front print area."],
   ["joggers", "Joggers", "Bottoms", "Streetwear joggers for leg prints and small logo placements."],
   ["shorts", "Shorts", "Bottoms", "Casual shorts with compact logo or leg artwork placement."],
+  ["summer-set", "Summer Set: Tee + Shorts", "Sets", "Matching tee and shorts in one print, made for December heat."],
   ["bomber-jacket", "Bomber Jacket", "Jackets", "Outerwear concept for embroidered or patch-based decoration."],
   ["denim-jacket", "Denim Jacket", "Jackets", "Structured jacket concept for back artwork and patches."],
   ["baseball-cap", "Baseball Cap", "Headwear", "Six-panel cap concept for front embroidery."],
@@ -41,13 +46,40 @@ const plannedProducts = [
   ["apron", "Apron", "Accessories", "Custom apron concept for centre-front artwork."],
   ["socks", "Graphic Socks", "Accessories", "All-over patterned sock concept."]
 ].map(([id, name, category, description]) => ({
-  id, name, category, description, basePrice: 0, colours: [], sizes: [],
+  id, name, category, description, basePrice: PLANNED_PRICES[id] || 0, colours: [], sizes: [],
   featured: false, active: true, available: false, customizable: false, image: null
 }));
 
 garments.push(...plannedProducts);
 
-const designDefaults = { additionalPrice:50, compatibleGarments:["classic-tee"], placements:["front-center","front-small","back-center","left-sleeve","right-sleeve"], active:true, printable:true };
+/* Permanent product codes. Never reuse a code; new pieces continue from P10. */
+const PRODUCT_CODES = {
+  "classic-tee":"IS-P01","panther-long-sleeve":"IS-P02","panther-vest":"IS-P03","skull-tracksuit":"IS-P04","graphic-long-sleeve":"IS-P05",
+  "rose-shirt":"IS-P06","hip-hop-tee":"IS-P07","pop-art-skirt":"IS-P08","birthday-queen-tee":"IS-P09","kids-classic-tee":"IS-P10"
+};
+
+/* Festive Summer drop: which pieces and designs belong to it. */
+const GARMENT_SEASON = { "classic-tee":"summer", "kids-classic-tee":"festive", "shorts":"summer", "summer-set":"summer" };
+const DESIGN_SEASON = {
+  "design-056":"summer", "design-057":"summer", "design-058":"summer", "design-059":"summer",
+  "design-063":"festive", "design-064":"festive", "design-065":"festive", "design-066":"festive", "design-067":"festive", "design-068":"festive",
+  "design-069":"summer", "design-070":"summer"
+};
+
+/* Print advice shown in the customiser, e.g. black ink that disappears on dark tees. */
+const DESIGN_NOTES = {
+  "design-013":"Black ink: best on light tees.",
+  "design-038":"White ink: best on dark tees.",
+  "design-066":"Black lettering: best on light tees.",
+  "design-067":"Sized to read clearly on kids' and adult tees, for matching family orders."
+};
+
+for (const garment of garments) {
+  garment.code = PRODUCT_CODES[garment.id] || null;
+  garment.season = GARMENT_SEASON[garment.id] || null;
+}
+
+const designDefaults = { additionalPrice:50, compatibleGarments:["classic-tee","kids-classic-tee"], placements:["front-center","front-small","back-center","left-sleeve","right-sleeve"], active:true, printable:true };
 const designManifest = [
   ["design-001","Midnight Snake","assets/Designs/0ceea4478c03705b4283b673023e1450.jpg","Graphic",true],
   ["design-002","Crowned Icon","assets/Designs/104e5a912c34fd6898133b672a492a89.jpg","Character",true],
@@ -111,7 +143,15 @@ const designManifest = [
   ["design-059","Braai Master Cub","assets/Designs/InterSacks_2026/mascot-braai.png","Character",true,true],
   ["design-060","Graduate Cub","assets/Designs/InterSacks_2026/mascot-graduate.png","Character",false,true],
   ["design-061","Skull & Roses","assets/Designs/InterSacks_2026/skull-roses.png","Graphic",true,true],
-  ["design-062","Rose Vine","assets/Designs/InterSacks_2026/rose-vine.png","Graphic",false,true]
+  ["design-062","Rose Vine","assets/Designs/InterSacks_2026/rose-vine.png","Graphic",false,true],
+  ["design-063","Dezemba Vibes","assets/Designs/Festive_Summer_2026/dezemba-vibes.webp","Typography",true,true],
+  ["design-064","Festive Season Loading","assets/Designs/Festive_Summer_2026/festive-season-loading.webp","Typography",true,true],
+  ["design-065","Mzansi Christmas","assets/Designs/Festive_Summer_2026/mzansi-christmas.webp","Graphic",true,true],
+  ["design-066","Braai Before Presents","assets/Designs/Festive_Summer_2026/braai-before-presents.webp","Character",true,true],
+  ["design-067","Festive Squad","assets/Designs/Festive_Summer_2026/festive-squad.webp","Typography",true,true],
+  ["design-068","Panther Holiday","assets/Designs/Festive_Summer_2026/panther-holiday.webp","Animal",true,true],
+  ["design-069","Mzansi Summer","assets/Designs/Festive_Summer_2026/mzansi-summer.webp","Graphic",true,true],
+  ["design-070","Summer in Mzansi","assets/Designs/Festive_Summer_2026/summer-in-mzansi.webp","Graphic",true,true]
 ];
 
 /* Artwork and garments hidden from the shop because they show other people's
@@ -197,10 +237,24 @@ const COLLECTION_BY_DESIGN = {
   "design-005":"Street","design-008":"Street","design-010":"Street","design-019":"Street","design-021":"Street","design-042":"Street","design-048":"Street",
   "design-001":"Wild","design-007":"Wild","design-046":"Wild",
   "design-003":"Pups","design-014":"Pups","design-037":"Pups","design-039":"Pups",
-  "design-051":"Panther","design-052":"Panther","design-053":"Panther","design-054":"Built Different","design-055":"Built Different","design-056":"Mzansi","design-057":"Mzansi","design-058":"Mzansi","design-059":"Mascot","design-060":"Mascot","design-061":"Skull & Rose","design-062":"Skull & Rose"
+  "design-051":"Panther","design-052":"Panther","design-053":"Panther","design-054":"Built Different","design-055":"Built Different","design-056":"Mzansi","design-057":"Mzansi","design-058":"Mzansi","design-059":"Mascot","design-063":"Festive","design-064":"Festive","design-065":"Festive","design-066":"Festive","design-067":"Festive","design-068":"Festive","design-069":"Mzansi","design-070":"Mzansi","design-060":"Mascot","design-061":"Skull & Rose","design-062":"Skull & Rose"
 };
-export const COLLECTION_ORDER = ["Panther","Built Different","Mzansi","Mascot","Skull & Rose","Faith","Grind","Street","Wild","Pups"];
+export const COLLECTION_ORDER = ["Festive","Panther","Built Different","Mzansi","Mascot","Skull & Rose","Faith","Grind","Street","Wild","Pups"];
 for (const design of designs) design.collection = design.collection || COLLECTION_BY_DESIGN[design.id] || design.category;
+for (const design of designs) {
+  design.code = designCode(design);
+  design.season = DESIGN_SEASON[design.id] || null;
+  design.note = DESIGN_NOTES[design.id] || null;
+}
+
+export const SEASON_COLLECTION = "Festive Summer";
+
+/* design-051 → IS-D051. Numbers are permanent: retired numbers are never reused, new designs continue from D063. */
+export function designCode(design){return design ? `IS-D${String(design.id).replace("design-","")}` : ""}
+const normaliseCode=(code,letter)=>{const m=String(code||"").trim().toUpperCase().match(new RegExp(`^(?:IS-)?${letter}?0*(\\d{1,3})$`));return m?m[1].padStart(letter==="D"?3:2,"0"):null}
+export function getDesignByCode(code){const n=normaliseCode(code,"D");return n?designs.find(d=>d.id===`design-${n}`):undefined}
+export function getGarmentByCode(code){const n=normaliseCode(code,"P");return n?garments.find(g=>g.code===`IS-P${n}`):undefined}
+export function inCollection(design, collection){return collection==="All" || design.collection===collection || (collection===SEASON_COLLECTION && Boolean(design.season))}
 
 export function getGarments(){return garments.filter(g=>g.active)}
 export function getGarmentById(id){return garments.find(g=>g.id===id)}
@@ -229,7 +283,8 @@ export function getMinArtworkPrice() {
 }
 export function getDesignCollections() {
   const present = new Set(getDesigns().map((d) => d.collection))
-  return [...COLLECTION_ORDER.filter((c) => present.has(c)), ...[...present].filter((c) => !COLLECTION_ORDER.includes(c)).sort()]
+  const seasonal = getDesigns().some((d) => d.season) ? [SEASON_COLLECTION] : []
+  return [...seasonal, ...COLLECTION_ORDER.filter((c) => present.has(c)), ...[...present].filter((c) => !COLLECTION_ORDER.includes(c)).sort()]
 }
 export function formatPrice(amount){return `${STORE_CONFIG.currency}${amount}`}
 
@@ -336,10 +391,10 @@ export function sortGarments(list, mode = 'featured') {
 export function filterGarments(list, { category = 'All', query = '' } = {}) {
   const needle = query.trim().toLowerCase()
   return list.filter((garment) => {
-    const categoryMatch = category === 'All' || garment.category === category
+    const categoryMatch = category === 'All' || garment.category === category || (category === SEASON_COLLECTION && Boolean(garment.season))
     if (!categoryMatch) return false
     if (!needle) return true
-    return [garment.name, garment.category, garment.description]
+    return [garment.name, garment.category, garment.description, garment.code]
       .filter(Boolean)
       .some((value) => value.toLowerCase().includes(needle))
   })
@@ -350,8 +405,8 @@ export function filterDesigns(list, { category = 'All', collection = 'All', quer
   return list.filter((design) => {
     const categoryMatch = category === 'All' || design.category === category
     if (!categoryMatch) return false
-    if (collection !== 'All' && design.collection !== collection) return false
+    if (!inCollection(design, collection)) return false
     if (!needle) return true
-    return [design.name, design.category, design.collection].filter(Boolean).some((value) => value.toLowerCase().includes(needle))
+    return [design.name, design.category, design.collection, design.code].filter(Boolean).some((value) => value.toLowerCase().includes(needle))
   })
 }

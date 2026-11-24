@@ -99,6 +99,7 @@ export function CustomPage() {
               </div>
               <button type="submit" className="btn">Send on WhatsApp</button>
               <p className="fine-print">This opens WhatsApp with your request written out. You can attach photos or a logo there.</p>
+              <p className="fine-print">Once you accept the quote, you can pay a 50% deposit to start printing or pay in full. Deposits can't be refunded once printing starts.</p>
               {STORE_CONFIG.orderLogUrl ? <p className="fine-print">We keep a copy of your request so we can follow up on your quote.</p> : null}
             </form>
 
