@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext.jsx'
 import { formatPrice, getDesignById, getGarmentById, placementLabel, STORE_CONFIG } from '../data/catalogue.js'
 import { TeeMock } from '../components/TeeMock.jsx'
 import { familyGroups, percent } from '../services/family.js'
+import { PAYMENT_OPTIONS, PAYMENT_TERMS, paymentSplit } from '../services/payment.js'
 import { buildPreviewUrl, createOrderReference, whatsAppOrderUrl } from '../services/orders.js'
 import { buildOrderPayload, sendOrderLog } from '../services/orderLog.js'
 
@@ -15,6 +16,7 @@ export function CartPage() {
   const [error, setError] = useState('')
   const [name, setName] = useState('')
   const [area, setArea] = useState('')
+  const [payment, setPayment] = useState('')
 
   function changeQuantity(index, value) {
     try {
@@ -28,9 +30,9 @@ export function CartPage() {
   function proceed(event) {
     event.preventDefault()
     const reference = createOrderReference()
-    const url = whatsAppOrderUrl(cart, { name, area, reference })
+    const url = whatsAppOrderUrl(cart, { name, area, reference, payment })
     if (!url) return
-    sendOrderLog(buildOrderPayload(cart, { ref: reference, name, area }))
+    sendOrderLog(buildOrderPayload(cart, { ref: reference, name, area, payment }))
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
@@ -115,6 +117,22 @@ export function CartPage() {
                     <label htmlFor="order-area">Delivery area</label>
                     <input id="order-area" name="area" autoComplete="address-level2" placeholder="e.g. Soweto, Johannesburg" required value={area} onChange={(event) => setArea(event.target.value)} />
                   </div>
+                  <fieldset className="payment-choice">
+                    <legend>How would you like to pay?</legend>
+                    {PAYMENT_OPTIONS.map((option) => {
+                      const split = paymentSplit(total, option.id)
+                      return (
+                        <label key={option.id} className="payment-option">
+                          <input type="radio" name="payment" value={option.id} required checked={payment === option.id} onChange={() => setPayment(option.id)} />
+                          <span>
+                            <strong>{option.label}</strong>
+                            <span>{option.id === 'deposit' ? `${formatPrice(split.dueNow)} now, ${formatPrice(split.balance)} before dispatch` : `${formatPrice(split.dueNow)} now`}</span>
+                          </span>
+                        </label>
+                      )
+                    })}
+                    <p className="fine-print">{PAYMENT_TERMS} You pay by EFT or a secure payment link we send on WhatsApp.</p>
+                  </fieldset>
                   <button type="submit" className="btn">Send order on WhatsApp</button>
                 </form>
                 <p className="fine-print">This opens WhatsApp with your order written out. We confirm delivery and payment with you there. Nothing is charged on this website.</p>

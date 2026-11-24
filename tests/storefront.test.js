@@ -27,6 +27,7 @@ import { initCustomizerFromUrl } from '../src/services/customizer.js'
 import { getDesignByCode, getGarmentByCode, SEASON_COLLECTION } from '../src/data/catalogue.js'
 import { dropDateLabel, isPreorder, SEASON_DROP } from '../src/data/seasonal.js'
 import { familyDiscounts, familyGroups } from '../src/services/family.js'
+import { paymentSplit } from '../src/services/payment.js'
 
 test('Baseline: Store configuration matches expected InterSacks brand settings', () => {
   assert.equal(STORE_CONFIG.brandName, 'InterSacks Apparel')
@@ -581,4 +582,22 @@ test('Festive Summer drops 1 December: pre-order before, Family Kit card, summer
   assert.deepEqual(festive.kit, { designId: 'design-067', colour: 'White' })
   assert.equal(getPlannedGarments().find((g) => g.id === 'shorts').basePrice, 349)
   assert.equal(getPlannedGarments().find((g) => g.id === 'summer-set').basePrice, 699)
+})
+
+test('50% deposit or pay in full: amounts, WhatsApp block and Sheet copy', () => {
+  assert.deepEqual(paymentSplit(1256, 'deposit'), { option: 'deposit', label: '50% deposit', dueNow: 628, balance: 628 })
+  assert.deepEqual(paymentSplit(399, 'deposit'), { option: 'deposit', label: '50% deposit', dueNow: 200, balance: 199 })
+  assert.deepEqual(paymentSplit(399, 'full'), { option: 'full', label: 'Pay in full', dueNow: 399, balance: 0 })
+  assert.equal(paymentSplit(399, 'nope'), null)
+  const cart = new Cart(createMemoryStorage())
+  cart.addItem(familyLine('classic-tee', 'L', 2))
+  cart.addItem(familyLine('kids-classic-tee', '4-5', 2))
+  const deposit = generateWhatsAppMessage(cart, { reference: 'IS-261124-7KQ2', payment: 'deposit' })
+  assert.ok(deposit.includes('TOTAL: R1256'))
+  assert.ok(deposit.includes('Payment: 50% deposit (R628 now, R628 before dispatch)'))
+  assert.ok(deposit.includes("Please send EFT details or a payment link. I'll use IS-261124-7KQ2 as the reference."))
+  assert.ok(generateWhatsAppMessage(cart, { payment: 'full' }).includes('Payment: Pay in full (R1256 now)'))
+  assert.ok(!generateWhatsAppMessage(cart).includes('Payment:'))
+  const payload = buildOrderPayload(cart, { ref: 'IS-261124-7KQ2', payment: 'deposit' })
+  assert.deepEqual([payload.payment, payload.total, payload.dueNow, payload.balance], ['deposit', 1256, 628, 628])
 })

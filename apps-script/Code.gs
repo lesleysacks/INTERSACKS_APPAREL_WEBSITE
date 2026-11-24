@@ -14,8 +14,8 @@
 var SHEETS = {
   orders: {
     name: 'Orders',
-    headers: ['Received', 'Ref', 'Name', 'Delivery area', 'Items', 'Pieces', 'Discount (R)', 'Total shown (R)', 'Status', 'Notes'],
-    widths: [150, 140, 160, 170, 420, 70, 110, 120, 130, 240]
+    headers: ['Received', 'Ref', 'Name', 'Delivery area', 'Items', 'Pieces', 'Discount (R)', 'Total shown (R)', 'Payment', 'Due now (R)', 'Balance (R)', 'Status', 'Notes'],
+    widths: [150, 140, 160, 170, 420, 70, 110, 120, 120, 110, 110, 130, 240]
   },
   lines: {
     name: 'Order lines',
@@ -29,7 +29,8 @@ var SHEETS = {
   }
 };
 
-var ORDER_STATUSES = ['New', 'Paid', 'In production', 'Ready', 'Delivered', 'Cancelled'];
+var ORDER_STATUSES = ['New', 'Deposit paid', 'Paid in full', 'In production', 'Ready', 'Delivered', 'Cancelled'];
+var PAYMENT_LABELS = { deposit: '50% deposit', full: 'Pay in full' };
 var ENQUIRY_STATUSES = ['New', 'Quoted', 'Accepted', 'Declined'];
 var MAX_BODY = 30000;
 /* Only links to the shop's own website become clickable links or pictures in the sheet. */
@@ -46,7 +47,7 @@ function setup() {
     sheet.setFrozenRows(1);
     spec.widths.forEach(function (width, i) { sheet.setColumnWidth(i + 1, width); });
   });
-  addStatusDropdown_(book.getSheetByName(SHEETS.orders.name), 9, ORDER_STATUSES);
+  addStatusDropdown_(book.getSheetByName(SHEETS.orders.name), 12, ORDER_STATUSES);
   addStatusDropdown_(book.getSheetByName(SHEETS.enquiries.name), 10, ENQUIRY_STATUSES);
   var blank = book.getSheetByName('Sheet1');
   if (blank && book.getSheets().length > 3 && blank.getLastRow() === 0) book.deleteSheet(blank);
@@ -107,7 +108,11 @@ function saveOrder_(data) {
     return c[7] + ' × ' + c[1] + (c[2] ? ' ' + c[2] : '') + ' (' + c[3] + ', ' + c[4] + ')' + (c[5] ? ' — ' + c[5] : '') + (c[6] ? ' [' + c[6] + ']' : '');
   }).join('\n');
 
-  orders.appendRow(safe_([new Date(), ref, text_(data.name, 80), text_(data.area, 120), summary, pieces, money_(data.discount), money_(data.total), 'New', '']));
+  var total = money_(data.total);
+  var payment = PAYMENT_LABELS[data.payment] || '';
+  var dueNow = payment ? Math.min(money_(data.dueNow), total) : total;
+  orders.appendRow(safe_([new Date(), ref, text_(data.name, 80), text_(data.area, 120), summary, pieces, money_(data.discount), total,
+    payment, dueNow, Math.max(0, Math.round((total - dueNow) * 100) / 100), 'New', '']));
   var linesSheet = sheet_(book, 'lines');
   var start = linesSheet.getLastRow() + 1;
   // Formulas are built here from checked site URLs only; customer text always goes through safe_().

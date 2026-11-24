@@ -1,3 +1,4 @@
+import { paymentSplit } from './payment.js'
 import { formatPrice, getDesignById, getGarmentById, placementLabel, printsForItem, STORE_CONFIG } from '../data/catalogue.js'
 
 export function createOrderReference(date = new Date(), random = Math.random) {
@@ -26,7 +27,7 @@ export function buildPreviewUrl(item, base = STORE_CONFIG.siteUrl) {
   return `${base}product.html?${params.toString()}`
 }
 
-export function generateWhatsAppMessage(cart, { name = '', area = '', reference = '' } = {}) {
+export function generateWhatsAppMessage(cart, { name = '', area = '', reference = '', payment = null } = {}) {
   if (!cart || cart.isEmpty()) return null
 
   let message = `Hi ${STORE_CONFIG.brandName} 👋\n\n`
@@ -61,7 +62,15 @@ export function generateWhatsAppMessage(cart, { name = '', area = '', reference 
       message += `Family Kit discount (${group.designName} ${group.code} × ${group.tees}, ${Math.round(group.rate * 100)}% off): -${formatPrice(group.amount)}\n`
     }
   }
-  message += `TOTAL: ${formatPrice(cart.getTotal ? cart.getTotal() : cart.getSubtotal())}\n\n`
+  const grandTotal = cart.getTotal ? cart.getTotal() : cart.getSubtotal()
+  message += `TOTAL: ${formatPrice(grandTotal)}\n\n`
+  const split = payment ? paymentSplit(grandTotal, payment) : null
+  if (split) {
+    message += split.option === 'deposit'
+      ? `Payment: 50% deposit (${formatPrice(split.dueNow)} now, ${formatPrice(split.balance)} before dispatch)\n`
+      : `Payment: Pay in full (${formatPrice(split.dueNow)} now)\n`
+    message += `Please send EFT details or a payment link.${reference ? ` I'll use ${reference} as the reference.` : ''}\n\n`
+  }
   message += `Name: ${name.trim()}\nDelivery Area: ${area.trim()}\n`
   message += `\n${STORE_CONFIG.tagline}`
 

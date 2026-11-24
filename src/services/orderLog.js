@@ -2,9 +2,10 @@
    at the moment the customer is sent to WhatsApp. Payment is still arranged on WhatsApp.
    Fire-and-forget: if logging is switched off or fails, the WhatsApp order goes ahead unchanged. */
 import { buildPreviewUrl, CUSTOM_OCCASIONS } from './orders.js'
+import { paymentSplit } from './payment.js'
 import { getDesignById, getGarmentById, placementLabel, printsForItem, STORE_CONFIG } from '../data/catalogue.js'
 
-export function buildOrderPayload(cart, { ref, name = '', area = '' }) {
+export function buildOrderPayload(cart, { ref, name = '', area = '', payment = null }) {
   const lines = cart.items.map((item) => {
     const saved = item.prints || []
     const prints = printsForItem(item)
@@ -28,7 +29,13 @@ export function buildOrderPayload(cart, { ref, name = '', area = '' }) {
       imageUrl: image ? siteAssetUrl(image) : ''
     }
   })
-  return { type: 'order', ref, name: name.trim(), area: area.trim(), lines, subtotal: cart.getSubtotal(), discount: cart.getDiscount(), total: cart.getTotal() }
+  const total = cart.getTotal()
+  const split = paymentSplit(total, payment)
+  return {
+    type: 'order', ref, name: name.trim(), area: area.trim(), lines,
+    subtotal: cart.getSubtotal(), discount: cart.getDiscount(), total,
+    payment: split?.option || '', dueNow: split?.dueNow ?? total, balance: split?.balance ?? 0
+  }
 }
 
 /* Public address of a site asset, e.g. for =IMAGE() in the owner's Sheet. */

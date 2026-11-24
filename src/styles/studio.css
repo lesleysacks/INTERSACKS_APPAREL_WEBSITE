@@ -1271,3 +1271,41 @@ p.code-tag {
 .season-card.is-kit {
   box-shadow: 0 0 0 2px var(--season-accent);
 }
+
+/* ---------- Deposit or pay in full ---------- */
+.payment-choice {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.4rem 0 0.2rem;
+  padding: 0;
+  border: 0;
+}
+.payment-choice legend {
+  margin-block-end: 0.35rem;
+  font-weight: 700;
+}
+.payment-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  cursor: pointer;
+}
+.payment-option:has(input:checked) {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+.payment-option input {
+  margin-block-start: 0.25rem;
+  accent-color: var(--ink);
+}
+.payment-option > span {
+  display: grid;
+  gap: 0.1rem;
+}
+.payment-option > span > span {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
