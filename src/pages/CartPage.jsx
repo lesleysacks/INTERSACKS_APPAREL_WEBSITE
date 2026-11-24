@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { Layout } from '../components/Chrome.jsx'
 import { Photo } from '../components/Photo.jsx'
 import { useCart } from '../context/CartContext.jsx'
-import { formatPrice, getGarmentById, placementLabel } from '../data/catalogue.js'
+import { formatPrice, getGarmentById, placementLabel, STORE_CONFIG } from '../data/catalogue.js'
 import { TeeMock } from '../components/TeeMock.jsx'
 import { createOrderReference, whatsAppOrderUrl } from '../services/orders.js'
+import { buildOrderPayload, sendOrderLog } from '../services/orderLog.js'
 
 export function CartPage() {
   const { items, subtotal, empty, updateQuantity, removeItem, clear, cart } = useCart()
@@ -24,8 +25,10 @@ export function CartPage() {
 
   function proceed(event) {
     event.preventDefault()
-    const url = whatsAppOrderUrl(cart, { name, area, reference: createOrderReference() })
+    const reference = createOrderReference()
+    const url = whatsAppOrderUrl(cart, { name, area, reference })
     if (!url) return
+    sendOrderLog(buildOrderPayload(cart, { ref: reference, name, area }))
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
@@ -100,6 +103,7 @@ export function CartPage() {
                   <button type="submit" className="btn">Send order on WhatsApp</button>
                 </form>
                 <p className="fine-print">This opens WhatsApp with your order written out. We confirm delivery and payment with you there. Nothing is charged on this website.</p>
+                {STORE_CONFIG.orderLogUrl ? <p className="fine-print">We keep a copy of your order (name, area and items) so we can track it.</p> : null}
                 <a className="btn btn-ghost" href="index.html#shop">Continue shopping</a>
                 {confirmEmpty ? (
                   <div>

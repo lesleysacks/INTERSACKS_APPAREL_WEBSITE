@@ -3,7 +3,9 @@
 
 import { TEE_COLOURS } from "./teeColours.js";
 
-export const STORE_CONFIG = { whatsappNumber: "27843252262", brandName: "InterSacks Apparel", tagline: "Built Different.", currency: "R" };
+/* orderLogUrl: the Google Apps Script web-app (/exec) URL from apps-script/README.md.
+   Leave empty to switch order logging off; WhatsApp ordering works either way. */
+export const STORE_CONFIG = { whatsappNumber: "27843252262", brandName: "InterSacks Apparel", tagline: "Built Different.", currency: "R", orderLogUrl: "" };
 
 export const garments = [
   { id:"classic-tee", name:"Classic Tee", category:"T-Shirts", description:"A clean short-sleeve base for custom InterSacks artwork.", basePrice:349, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:true, image:"assets/garments/classic-tee/black-front.webp" },
