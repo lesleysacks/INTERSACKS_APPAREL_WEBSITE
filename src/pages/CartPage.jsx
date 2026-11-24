@@ -4,11 +4,13 @@ import { Photo } from '../components/Photo.jsx'
 import { useCart } from '../context/CartContext.jsx'
 import { formatPrice, getDesignById, getGarmentById, placementLabel, STORE_CONFIG } from '../data/catalogue.js'
 import { TeeMock } from '../components/TeeMock.jsx'
+import { familyGroups, percent } from '../services/family.js'
 import { buildPreviewUrl, createOrderReference, whatsAppOrderUrl } from '../services/orders.js'
 import { buildOrderPayload, sendOrderLog } from '../services/orderLog.js'
 
 export function CartPage() {
-  const { items, subtotal, empty, updateQuantity, removeItem, clear, cart } = useCart()
+  const { items, subtotal, discounts, total, empty, updateQuantity, removeItem, clear, cart } = useCart()
+  const nudges = familyGroups(items).filter((group) => group.toNext && group.toNext.more <= 2)
   const [confirmEmpty, setConfirmEmpty] = useState(false)
   const [error, setError] = useState('')
   const [name, setName] = useState('')
@@ -89,9 +91,20 @@ export function CartPage() {
                 <h2 id="summary-title">Order</h2>
                 <dl className="price-list">
                   <div><dt>Subtotal</dt><dd>{formatPrice(subtotal)}</dd></div>
+                  {discounts.map((group) => (
+                    <div key={group.designId} className="discount-row">
+                      <dt>Family Kit · {group.designName} × {group.tees} ({percent(group.rate)} off)</dt>
+                      <dd>−{formatPrice(group.amount)}</dd>
+                    </div>
+                  ))}
                   <div><dt>Delivery</dt><dd>Confirmed on WhatsApp</dd></div>
-                  <div><dt>Total</dt><dd>{formatPrice(subtotal)}</dd></div>
+                  <div><dt>Total</dt><dd>{formatPrice(total)}</dd></div>
                 </dl>
+                {nudges.map((group) => (
+                  <p key={group.designId} className="family-nudge">
+                    Add {group.toNext.more} more {group.designName} {group.toNext.more === 1 ? 'tee' : 'tees'} (adult or kids) for {percent(group.toNext.rate)} off all of them.
+                  </p>
+                ))}
                 {error ? <p role="alert">{error}</p> : null}
                 <form className="checkout-fields" onSubmit={proceed}>
                   <div className="field">

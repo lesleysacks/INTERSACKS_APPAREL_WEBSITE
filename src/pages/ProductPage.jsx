@@ -19,6 +19,7 @@ import { Customizer, initCustomizerFromUrl } from '../services/customizer.js'
 import { withPreviewTransition } from '../lib/pageTransitions.js'
 import { ZoomStage } from '../components/ZoomStage.jsx'
 import { Tee3D } from '../components/Tee3D.jsx'
+import { FamilyKit } from '../components/FamilyKit.jsx'
 
 export function ProductPage() {
   const customizerRef = useRef(null)
@@ -319,6 +320,7 @@ export function ProductPage() {
                     </div>
                     {(designQuery || designCollection !== 'All') && !visibleDesigns.length ? <p>No artwork matches that search.</p> : null}
                   </fieldset>
+                  <FamilyKit customizer={customizer} />
                 </>
               ) : <p className="fine-print">Sold as shown. Pick your colour and size.</p>}
               <p className="fine-print">Made to order. We confirm sizing and delivery with you on WhatsApp before anything is made.</p>

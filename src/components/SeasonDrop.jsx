@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { calculatePrintsPrice, formatPrice, getDesignById, getGarmentById } from '../data/catalogue.js'
-import { dropDateLabel, SEASON_DROP } from '../data/seasonal.js'
+import { dropDateLabel, isPreorder, SEASON_DROP } from '../data/seasonal.js'
+import { FAMILY_TIERS, percent } from '../services/family.js'
 import { seasonNotifyUrl } from '../services/orders.js'
 import { TeeMock } from './TeeMock.jsx'
 
@@ -13,6 +14,7 @@ export function SeasonDrop() {
   const available = tab.available
     .map((entry) => ({ ...entry, design: getDesignById(entry.designId), colour: tee?.colours.find((c) => c.name === entry.colour) }))
     .filter((entry) => entry.design?.active && entry.colour)
+  const kit = tab.kit ? { design: getDesignById(tab.kit.designId), colour: tee?.colours.find((c) => c.name === tab.kit.colour) } : null
 
   return (
     <section id="festive-summer" className="band season-band" data-tab={tab.id} aria-labelledby="season-title">
@@ -46,7 +48,7 @@ export function SeasonDrop() {
 
           {available.length ? (
             <>
-              <h3 className="season-sub">Available now</h3>
+              <h3 className="season-sub">{tab.id === 'festive' && isPreorder() ? `Pre-order now · ships from ${when.replace('Drops ', '')}` : 'Available now'}</h3>
               <ul className="season-grid" role="list">
                 {available.map(({ design, colour }) => {
                   const prints = [{ placement: 'front-center', designId: design.id }]
@@ -65,17 +67,33 @@ export function SeasonDrop() {
                     </li>
                   )
                 })}
+                {kit ? (
+                  <li className="season-card is-kit">
+                    <a href={`product.html?garment=classic-tee&colour=${encodeURIComponent(kit.colour.name)}&front=${kit.design.code.replace('IS-', '')}c&kit=1`}>
+                      <div className="kit-teaser" aria-hidden="true">
+                        <TeeMock colour={kit.colour} view="front" prints={[{ placement: 'front-center', designId: kit.design.id }]} layout="card" size={480} alt="" />
+                        <TeeMock colour={kit.colour} view="front" prints={[{ placement: 'front-center', designId: kit.design.id }]} layout="card" size={480} alt="" />
+                      </div>
+                      <span className="season-meta">
+                        <strong>Family Kit</strong>
+                        <span>Adult and kids tees in the same design. Kids from {formatPrice(calculatePrintsPrice('kids-classic-tee', [{ placement: 'front-center', designId: kit.design.id }]))}.</span>
+                        <span className="season-price">4+ matching tees {percent(FAMILY_TIERS[1].rate)} off · 6+ {percent(FAMILY_TIERS[0].rate)} off</span>
+                        <span className="season-cta">Build your kit →</span>
+                      </span>
+                    </a>
+                  </li>
+                ) : null}
               </ul>
             </>
           ) : null}
 
-          <h3 className="season-sub">Coming soon</h3>
+          {tab.comingSoon.length ? <h3 className="season-sub">Coming soon</h3> : null}
           <ul className="season-grid" role="list">
             {tab.comingSoon.map((entry) => (
               <li key={entry.id} className="season-card is-soon">
                 <div className="season-teaser" aria-hidden="true"><span>{tab.label}</span></div>
                 <span className="season-meta">
-                  <strong>{entry.name}</strong>
+                  <strong>{entry.name}{getGarmentById(entry.garmentId)?.basePrice ? <> · {formatPrice(getGarmentById(entry.garmentId).basePrice)}</> : null}</strong>
                   <span>{entry.blurb}</span>
                   <span className="season-when">{when}</span>
                   <a className="btn btn-ghost season-notify" href={seasonNotifyUrl(entry.name, tab.label)} target="_blank" rel="noopener noreferrer">

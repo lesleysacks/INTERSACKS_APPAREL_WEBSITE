@@ -54,7 +54,14 @@ export function generateWhatsAppMessage(cart, { name = '', area = '', reference 
     message += `\n`
   })
 
-  message += `TOTAL: ${formatPrice(cart.getSubtotal())}\n\n`
+  const discounts = cart.getDiscounts?.() || []
+  if (discounts.length) {
+    message += `Subtotal: ${formatPrice(cart.getSubtotal())}\n`
+    for (const group of discounts) {
+      message += `Family Kit discount (${group.designName} ${group.code} × ${group.tees}, ${Math.round(group.rate * 100)}% off): -${formatPrice(group.amount)}\n`
+    }
+  }
+  message += `TOTAL: ${formatPrice(cart.getTotal ? cart.getTotal() : cart.getSubtotal())}\n\n`
   message += `Name: ${name.trim()}\nDelivery Area: ${area.trim()}\n`
   message += `\n${STORE_CONFIG.tagline}`
 

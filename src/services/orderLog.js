@@ -28,7 +28,7 @@ export function buildOrderPayload(cart, { ref, name = '', area = '' }) {
       imageUrl: image ? siteAssetUrl(image) : ''
     }
   })
-  return { type: 'order', ref, name: name.trim(), area: area.trim(), lines, total: cart.getSubtotal() }
+  return { type: 'order', ref, name: name.trim(), area: area.trim(), lines, subtotal: cart.getSubtotal(), discount: cart.getDiscount(), total: cart.getTotal() }
 }
 
 /* Public address of a site asset, e.g. for =IMAGE() in the owner's Sheet. */

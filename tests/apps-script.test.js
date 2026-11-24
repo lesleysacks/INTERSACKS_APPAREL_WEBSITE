@@ -72,9 +72,11 @@ test('Apps Script setup() makes the three tabs with headers and Status dropdowns
   const { context, sheets } = loadScript()
   assert.equal(context.setup(), 'Order log is ready.')
   assert.deepEqual([...sheets.keys()], ['Orders', 'Order lines', 'Custom enquiries'])
-  assert.equal(sheets.get('Orders').rows[0][7], 'Status')
+  assert.equal(sheets.get('Orders').rows[0][8], 'Status')
+  assert.equal(sheets.get('Orders').rows[0][6], 'Discount (R)')
   assert.deepEqual([...sheets.get('Orders').validation.rule.list], ['New', 'Paid', 'In production', 'Ready', 'Delivered', 'Cancelled'])
   assert.equal(sheets.get('Custom enquiries').validation.col, 10)
+  assert.equal(sheets.get('Orders').validation.col, 9)
 })
 
 test('Apps Script saves an order: one Orders row, one row per line, duplicates ignored', () => {
@@ -82,8 +84,8 @@ test('Apps Script saves an order: one Orders row, one row per line, duplicates i
   assert.deepEqual(post(order), { ok: true })
   const orders = sheets.get('Orders').rows
   assert.equal(orders.length, 2)
-  const [, ref, name, area, items, pieces, total, status] = orders[1]
-  assert.deepEqual([ref, name, area, pieces, total, status], ['IS-261123-AB12', 'Ayanda', 'Durban', 3, 1277, 'New'])
+  const [, ref, name, area, items, pieces, discount, total, status] = orders[1]
+  assert.deepEqual([ref, name, area, pieces, discount, total, status], ['IS-261123-AB12', 'Ayanda', 'Durban', 3, 0, 1277, 'New'])
   assert.equal(items, '1 × Classic Tee IS-P01 (Navy, L) — Front Centre: Panther Claw; Back: Built Different [IS-D051, IS-D054]\n2 × Panther Vest IS-P03 (Blue / Black, M)')
   const lines = sheets.get('Order lines').rows
   assert.deepEqual(lines[1].slice(0, 10), ['IS-261123-AB12', 'Classic Tee', 'IS-P01', 'Navy', 'L', 'Front Centre: Panther Claw; Back: Built Different', 'IS-D051, IS-D054', 1, 479, 479])
@@ -121,4 +123,11 @@ test('Apps Script saves a custom enquiry', () => {
   assert.deepEqual(post({ type: 'enquiry', ref: 'IS-270101-AAAA', name: 'Ayanda', occasion: 'Matric & graduation', garment: 'Classic Tee', quantity: '40', date: '2027-09-01', printText: 'Class of 2027', notes: '' }), { ok: true })
   const row = sheets.get('Custom enquiries').rows[1]
   assert.deepEqual(row.slice(1), ['IS-270101-AAAA', 'Ayanda', 'Matric & graduation', 'Classic Tee', '40', '2027-09-01', 'Class of 2027', '', 'New'])
+})
+
+test('Apps Script records the Family Kit discount next to the total', () => {
+  const { sheets, post } = loadScript()
+  post({ ...order, ref: 'IS-261124-FAM1', subtotal: 1396, discount: 140, total: 1256 })
+  const row = sheets.get('Orders').rows[1]
+  assert.deepEqual([row[6], row[7]], [140, 1256])
 })

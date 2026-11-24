@@ -18,8 +18,12 @@ export const garments = [
   { id:"hip-hop-tee", name:"Hip-Hop Graphic Tee", category:"T-Shirts", description:"White tee with monochrome hip-hop artwork.", basePrice:399, colours:[{name:"White",value:"#f5f5f5",frontImage:"assets/products/product-5.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/product-5.png" },
   { id:"pop-art-skirt", name:"Pop Art Skirt", category:"Skirts", description:"Pink maxi skirt with colourful pop-art portrait.", basePrice:499, colours:[{name:"Pink",value:"#ed388c",frontImage:"assets/products/product-6.png",backImage:null}], sizes:["S","M","L","XL"], featured:false, active:true, customizable:false, image:"assets/products/product-6.png" },
   { id:"birthday-queen-tee", name:"Birthday Queen Tee", category:"T-Shirts", description:"Black tee with a bright Birthday Queen graphic.", basePrice:399, colours:[{name:"Black",value:"#111111",frontImage:"assets/products/product-7.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:false, active:true, customizable:false, image:"assets/products/product-7.png" },
+  { id:"kids-classic-tee", name:"Kids Classic Tee", category:"T-Shirts", description:"The Classic Tee in kids sizes. Pair it with an adult tee for a matching Family Kit.", basePrice:249, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["2-3","4-5","6-7","8-9","10-11","12-13"], featured:false, active:true, customizable:true, image:"assets/garments/classic-tee/white-front.webp" },
   { id:"rose-tracksuit", name:"Rose Sleeve Tracksuit", category:"Sets", description:"Black hoodie-and-jogger set with rose sleeve artwork.", basePrice:899, colours:[{name:"Black / Pink",value:"#1a151a",frontImage:"assets/products/product-8.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/product-8.png" }
 ];
+
+/* Announced prices for pieces that are not on sale yet (shown on "Coming soon" cards). */
+const PLANNED_PRICES = { "shorts": 349, "summer-set": 699 };
 
 const plannedProducts = [
   ["oversized-tee", "Oversized Tee", "T-Shirts", "Relaxed streetwear tee with a larger print area."],
@@ -42,7 +46,7 @@ const plannedProducts = [
   ["apron", "Apron", "Accessories", "Custom apron concept for centre-front artwork."],
   ["socks", "Graphic Socks", "Accessories", "All-over patterned sock concept."]
 ].map(([id, name, category, description]) => ({
-  id, name, category, description, basePrice: 0, colours: [], sizes: [],
+  id, name, category, description, basePrice: PLANNED_PRICES[id] || 0, colours: [], sizes: [],
   featured: false, active: true, available: false, customizable: false, image: null
 }));
 
@@ -51,11 +55,11 @@ garments.push(...plannedProducts);
 /* Permanent product codes. Never reuse a code; new pieces continue from P10. */
 const PRODUCT_CODES = {
   "classic-tee":"IS-P01","panther-long-sleeve":"IS-P02","panther-vest":"IS-P03","skull-tracksuit":"IS-P04","graphic-long-sleeve":"IS-P05",
-  "rose-shirt":"IS-P06","hip-hop-tee":"IS-P07","pop-art-skirt":"IS-P08","birthday-queen-tee":"IS-P09"
+  "rose-shirt":"IS-P06","hip-hop-tee":"IS-P07","pop-art-skirt":"IS-P08","birthday-queen-tee":"IS-P09","kids-classic-tee":"IS-P10"
 };
 
 /* Festive Summer drop: which pieces and designs belong to it. */
-const GARMENT_SEASON = { "classic-tee":"summer", "shorts":"summer", "summer-set":"summer" };
+const GARMENT_SEASON = { "classic-tee":"summer", "kids-classic-tee":"festive", "shorts":"summer", "summer-set":"summer" };
 const DESIGN_SEASON = {
   "design-056":"summer", "design-057":"summer", "design-058":"summer", "design-059":"summer",
   "design-063":"festive", "design-064":"festive", "design-065":"festive", "design-066":"festive", "design-067":"festive", "design-068":"festive",
@@ -75,7 +79,7 @@ for (const garment of garments) {
   garment.season = GARMENT_SEASON[garment.id] || null;
 }
 
-const designDefaults = { additionalPrice:50, compatibleGarments:["classic-tee"], placements:["front-center","front-small","back-center","left-sleeve","right-sleeve"], active:true, printable:true };
+const designDefaults = { additionalPrice:50, compatibleGarments:["classic-tee","kids-classic-tee"], placements:["front-center","front-small","back-center","left-sleeve","right-sleeve"], active:true, printable:true };
 const designManifest = [
   ["design-001","Midnight Snake","assets/Designs/0ceea4478c03705b4283b673023e1450.jpg","Graphic",true],
   ["design-002","Crowned Icon","assets/Designs/104e5a912c34fd6898133b672a492a89.jpg","Character",true],

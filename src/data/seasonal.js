@@ -7,7 +7,7 @@ export const SEASON_DROP = {
   title: 'Festive Summer',
   kicker: 'December drop',
   blurb: 'Matching summer sets for the heat and festive tees for the family. Christmas and summer in one drop, the Mzansi way.',
-  dropDate: null,
+  dropDate: '2026-12-01',
   tabs: [
     {
       id: 'summer',
@@ -22,7 +22,7 @@ export const SEASON_DROP = {
         { designId: 'design-056', colour: 'Pink' }
       ],
       comingSoon: [
-        { id: 'summer-set', name: 'Summer Set: Tee + Shorts', blurb: 'Mzansi Summer (IS-D069) on a matching tee and shorts.', garmentId: 'summer-set' },
+        { id: 'summer-set', name: 'Summer Set: Tee + Shorts', blurb: 'Mzansi Summer (IS-D069) on a matching tee and shorts. Save R49 on buying both.', garmentId: 'summer-set' },
         { id: 'shorts', name: 'Shorts', blurb: 'Casual shorts with a leg print to pair with any tee.', garmentId: 'shorts' }
       ]
     },
@@ -38,11 +38,17 @@ export const SEASON_DROP = {
         { designId: 'design-064', colour: 'White' },
         { designId: 'design-067', colour: 'White' }
       ],
-      comingSoon: [
-        { id: 'family-matching', name: 'Family matching in kids sizes', blurb: 'Festive Squad and the rest of the drop in kids sizes, so the whole family can match.' }
-      ]
+      // Family Kit card: the design and colour it opens in the customiser.
+      kit: { designId: 'design-067', colour: 'White' },
+      comingSoon: []
     }
   ]
+}
+
+/* Before the drop date, ready designs are sold as pre-orders. */
+export function isPreorder(today = new Date(), date = SEASON_DROP.dropDate) {
+  if (!date) return false
+  return today < new Date(`${date}T00:00:00`)
 }
 
 export function dropDateLabel(date = SEASON_DROP.dropDate) {

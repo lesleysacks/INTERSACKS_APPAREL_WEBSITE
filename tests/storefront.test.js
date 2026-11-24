@@ -25,7 +25,8 @@ import { buildEnquiryPayload, buildOrderPayload, sendOrderLog } from '../src/ser
 import { buildPreviewUrl, seasonNotifyUrl } from '../src/services/orders.js'
 import { initCustomizerFromUrl } from '../src/services/customizer.js'
 import { getDesignByCode, getGarmentByCode, SEASON_COLLECTION } from '../src/data/catalogue.js'
-import { dropDateLabel, SEASON_DROP } from '../src/data/seasonal.js'
+import { dropDateLabel, isPreorder, SEASON_DROP } from '../src/data/seasonal.js'
+import { familyDiscounts, familyGroups } from '../src/services/family.js'
 
 test('Baseline: Store configuration matches expected InterSacks brand settings', () => {
   assert.equal(STORE_CONFIG.brandName, 'InterSacks Apparel')
@@ -34,13 +35,13 @@ test('Baseline: Store configuration matches expected InterSacks brand settings',
   assert.equal(STORE_CONFIG.whatsappNumber, '27843252262')
 })
 
-test('Garment catalogue integrity (9 active real products, 19 planned)', () => {
+test('Garment catalogue integrity (10 active real products, 19 planned)', () => {
   const allGarments = getGarments()
   const realGarments = allGarments.filter((garment) => garment.available !== false)
   const plannedGarments = allGarments.filter((garment) => garment.available === false)
 
-  assert.equal(allGarments.length, 28, 'Total active garments should be 28 (9 real + 19 planned)')
-  assert.equal(realGarments.length, 9, 'Real active garments should be 9')
+  assert.equal(allGarments.length, 29, 'Total active garments should be 29 (10 real + 19 planned)')
+  assert.equal(realGarments.length, 10, 'Real active garments should be 10')
   assert.ok(realGarments.every((garment) => !RIGHTS_HOLD[garment.id]))
   assert.equal(plannedGarments.length, 19, 'Planned garments should be 19')
 
@@ -53,7 +54,8 @@ test('Garment catalogue integrity (9 active real products, 19 planned)', () => {
 
   plannedGarments.forEach((garment) => {
     assert.equal(garment.available, false, `${garment.id} should be available: false`)
-    assert.equal(garment.basePrice, 0, `${garment.id} basePrice should be 0`)
+    const announced = { shorts: 349, 'summer-set': 699 }
+    assert.equal(garment.basePrice, announced[garment.id] || 0, `${garment.id} basePrice`)
   })
 })
 
@@ -473,7 +475,7 @@ test('Every design and ready-made piece has a unique permanent code', () => {
   assert.equal(getDesignByCode('IS-D051').name, 'Panther Claw')
   assert.equal(getDesignByCode('d51').name, 'Panther Claw')
   const liveCodes = getPurchasableGarments().map((garment) => garment.code)
-  assert.deepEqual(liveCodes, ['IS-P01', 'IS-P02', 'IS-P03', 'IS-P04', 'IS-P05', 'IS-P06', 'IS-P07', 'IS-P08', 'IS-P09'])
+  assert.deepEqual(liveCodes, ['IS-P01', 'IS-P02', 'IS-P03', 'IS-P04', 'IS-P05', 'IS-P06', 'IS-P07', 'IS-P08', 'IS-P09', 'IS-P10'])
   assert.equal(getGarmentByCode('P03').name, 'Panther Vest')
   assert.equal(filterDesigns(getDesigns(), { query: 'D059' })[0].name, 'Braai Master Cub')
 })
@@ -515,7 +517,7 @@ test('Festive Summer: filters, drop tabs and Notify me message', () => {
   assert.equal(getDesignByCode('D066').note, 'Black lettering: best on light tees.')
   assert.equal(SEASON_DROP.tabs.find((tab) => tab.id === 'festive').available.length, 6)
   assert.ok(getDesignCollections()[0] === SEASON_COLLECTION)
-  assert.deepEqual(filterGarments(getPurchasableGarments(), { category: SEASON_COLLECTION }).map((g) => g.id), ['classic-tee'])
+  assert.deepEqual(filterGarments(getPurchasableGarments(), { category: SEASON_COLLECTION }).map((g) => g.id), ['classic-tee', 'kids-classic-tee'])
   assert.deepEqual(SEASON_DROP.tabs.map((tab) => tab.label), ['Summer', 'Festive'])
   for (const tab of SEASON_DROP.tabs) for (const entry of tab.available) assert.ok(getDesigns().some((design) => design.id === entry.designId))
   assert.equal(getPlannedGarments().find((g) => g.id === 'summer-set').season, 'summer')
@@ -524,4 +526,59 @@ test('Festive Summer: filters, drop tabs and Notify me message', () => {
   const notify = decodeURIComponent(seasonNotifyUrl('Summer Set: Tee + Shorts', 'Summer'))
   assert.ok(notify.startsWith('https://wa.me/27843252262?text='))
   assert.ok(notify.includes('Please let me know when the Festive Summer drop lands, especially: Summer Set: Tee + Shorts (Summer).'))
+})
+
+const familyLine = (garmentId, size, quantity, designId = 'design-067') => {
+  const garmentName = garmentId === 'kids-classic-tee' ? 'Kids Classic Tee' : 'Classic Tee'
+  const unitPrice = garmentId === 'kids-classic-tee' ? 299 : 399
+  return { garmentId, garmentName, colour: 'White', size, prints: [{ placement: 'front-center', designId, designName: 'x' }], designName: 'x', unitPrice, quantity }
+}
+
+test('Kids Classic Tee: R249 base, R299 with a front print, code IS-P10, all designs', () => {
+  const kids = getGarments().find((garment) => garment.id === 'kids-classic-tee')
+  assert.equal(kids.code, 'IS-P10')
+  assert.deepEqual(kids.sizes, ['2-3', '4-5', '6-7', '8-9', '10-11', '12-13'])
+  assert.equal(kids.colours.length, 8)
+  const customizer = new Customizer()
+  customizer.setGarment('kids-classic-tee')
+  customizer.setZoneDesign('front', 'design-067')
+  assert.equal(customizer.getPrice(), 299)
+  customizer.setZoneDesign('back', 'design-063')
+  assert.equal(customizer.getPrice(), 379)
+})
+
+test('Family Kit discount: 4+ matching tees 10%, 6+ 15%, adult and kids mixed, designs kept apart', () => {
+  const cart = new Cart(createMemoryStorage())
+  cart.addItem(familyLine('classic-tee', 'L', 1))
+  cart.addItem(familyLine('classic-tee', 'M', 1))
+  cart.addItem(familyLine('kids-classic-tee', '4-5', 1))
+  assert.equal(cart.getDiscount(), 0)
+  assert.deepEqual(familyGroups(cart.items)[0].toNext, { more: 1, rate: 0.1 })
+  cart.addItem(familyLine('kids-classic-tee', '8-9', 1))
+  assert.equal(cart.getSubtotal(), 1396)
+  assert.equal(cart.getDiscount(), 140)
+  assert.equal(cart.getTotal(), 1256)
+  cart.addItem(familyLine('kids-classic-tee', '2-3', 2))
+  assert.equal(familyDiscounts(cart.items)[0].rate, 0.15)
+  assert.equal(cart.getDiscount(), Math.round((399 * 2 + 299 * 4) * 0.15))
+  // A different front design, or a non-tee piece, does not count towards the kit.
+  cart.addItem(familyLine('classic-tee', 'S', 3, 'design-063'))
+  cart.addItem({ garmentId: 'panther-vest', garmentName: 'Panther Vest', colour: 'Blue / Black', size: 'M', prints: [], designName: 'None', unitPrice: 399, quantity: 5 })
+  assert.equal(familyDiscounts(cart.items).length, 1)
+  const message = generateWhatsAppMessage(cart)
+  assert.ok(message.includes('Family Kit discount (Festive Squad IS-D067 × 6, 15% off): -R299'))
+  assert.ok(message.includes(`TOTAL: R${cart.getTotal()}`))
+  const payload = buildOrderPayload(cart, { ref: 'IS-261124-FAM1' })
+  assert.deepEqual([payload.subtotal, payload.discount, payload.total], [cart.getSubtotal(), 299, cart.getTotal()])
+})
+
+test('Festive Summer drops 1 December: pre-order before, Family Kit card, summer prices', () => {
+  assert.equal(SEASON_DROP.dropDate, '2026-12-01')
+  assert.equal(dropDateLabel(), 'Drops 1 December')
+  assert.equal(isPreorder(new Date('2026-11-24T10:00:00')), true)
+  assert.equal(isPreorder(new Date('2026-12-01T08:00:00')), false)
+  const festive = SEASON_DROP.tabs.find((tab) => tab.id === 'festive')
+  assert.deepEqual(festive.kit, { designId: 'design-067', colour: 'White' })
+  assert.equal(getPlannedGarments().find((g) => g.id === 'shorts').basePrice, 349)
+  assert.equal(getPlannedGarments().find((g) => g.id === 'summer-set').basePrice, 699)
 })
