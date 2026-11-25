@@ -27,7 +27,7 @@ import { initCustomizerFromUrl } from '../src/services/customizer.js'
 import { getDesignByCode, getGarmentByCode, SEASON_COLLECTION } from '../src/data/catalogue.js'
 import { dropDateLabel, isPreorder, SEASON_DROP } from '../src/data/seasonal.js'
 import { familyDiscounts, familyGroups } from '../src/services/family.js'
-import { lookbook, heroShowcase } from '../src/data/lookbook.js'
+import { lookbook, heroShowcase, lookbookCta, lookbookHref } from '../src/data/lookbook.js'
 import { paymentSplit } from '../src/services/payment.js'
 
 test('Baseline: Store configuration matches expected InterSacks brand settings', () => {
@@ -37,13 +37,13 @@ test('Baseline: Store configuration matches expected InterSacks brand settings',
   assert.equal(STORE_CONFIG.whatsappNumber, '27843252262')
 })
 
-test('Garment catalogue integrity (2 active real products, 19 planned)', () => {
+test('Garment catalogue integrity (4 active real products, 19 planned)', () => {
   const allGarments = getGarments()
   const realGarments = allGarments.filter((garment) => garment.available !== false)
   const plannedGarments = allGarments.filter((garment) => garment.available === false)
 
-  assert.equal(allGarments.length, 21, 'Total active garments should be 21 (2 real + 19 planned)')
-  assert.equal(realGarments.length, 2, 'Real active garments should be 2 (Classic Tee, Kids Classic Tee)')
+  assert.equal(allGarments.length, 23, 'Total active garments should be 23 (4 real + 19 planned)')
+  assert.deepEqual(realGarments.map((garment) => garment.id), ['classic-tee', 'kids-classic-tee', 'street-moves-tee', 'urban-motion-tee'])
   assert.ok(realGarments.every((garment) => !RIGHTS_HOLD[garment.id]))
   assert.equal(plannedGarments.length, 19, 'Planned garments should be 19')
 
@@ -494,6 +494,17 @@ test('Order log: posts without Google cookies so signed-in browsers still reach 
   assert.deepEqual(JSON.parse(calls[0].options.body), { type: 'enquiry', ref: 'IS-270101-AAAA' })
 })
 
+test('Lookbook: sheets sold as shown link to their R399 tee; held art stays out', () => {
+  const byId = Object.fromEntries(lookbook.map((entry) => [entry.id, entry]))
+  assert.deepEqual(Object.keys(byId).sort(), ['street-moves', 'urban-motion'])
+  assert.equal(lookbookHref(byId['street-moves']), 'product.html?garment=street-moves-tee')
+  assert.equal(lookbookHref(byId['urban-motion']), 'product.html?garment=urban-motion-tee')
+  assert.equal(lookbookCta(byId['street-moves']), 'Buy this look · R399 →')
+  assert.equal(getGarmentById('street-moves-tee').basePrice, 399)
+  assert.deepEqual(getGarmentById('urban-motion-tee').colours.map((colour) => colour.name), ['Black', 'White', 'Sand', 'Navy'])
+  assert.equal(lookbookCta({ designId: 'design-005' }), 'Put it on a tee →')
+})
+
 test('Every design and ready-made piece has a unique permanent code', () => {
   const designCodes = allDesigns.map((design) => design.code)
   assert.equal(new Set(designCodes).size, allDesigns.length)
@@ -501,7 +512,7 @@ test('Every design and ready-made piece has a unique permanent code', () => {
   assert.equal(getDesignByCode('IS-D051').name, 'Panther Claw')
   assert.equal(getDesignByCode('d51').name, 'Panther Claw')
   const liveCodes = getPurchasableGarments().map((garment) => garment.code)
-  assert.deepEqual(liveCodes, ['IS-P01', 'IS-P10'])
+  assert.deepEqual(liveCodes, ['IS-P01', 'IS-P10', 'IS-P11', 'IS-P12'])
   // Held pieces keep their codes (never reused) but are not for sale.
   assert.equal(getGarmentByCode('P03').name, 'Panther Vest')
   assert.equal(getGarmentByCode('P03').active, false)

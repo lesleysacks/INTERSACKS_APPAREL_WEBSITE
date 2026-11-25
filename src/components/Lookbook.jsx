@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { Lightbox } from './Lightbox.jsx'
 import { Photo } from './Photo.jsx'
-import { lookbook, lookbookHref } from '../data/lookbook.js'
+import { lookbook, lookbookCta, lookbookHref } from '../data/lookbook.js'
 
 /* Swipeable lookbook row: native scroll with snap points, plus previous/next buttons. */
 export function Lookbook() {
@@ -25,7 +25,7 @@ export function Lookbook() {
           <div className="section-head">
             <p className="kicker">Lookbook</p>
             <h2 id="lookbook-title">Every angle, every piece</h2>
-            <p>Front, back and close-up views. Tap a sheet to see it fullscreen, or put that artwork on your own Classic Tee.</p>
+            <p>Front, back and close-up views. Tap a sheet to see it fullscreen, buy the tee as shown, or put the artwork on your own Classic Tee.</p>
           </div>
           <div className="lookbook-nav">
             <button type="button" className="btn btn-ghost" onClick={() => scrollByCard(-1)} aria-label="Previous looks">←</button>
@@ -43,7 +43,7 @@ export function Lookbook() {
                 <span className="lookbook-meta">
                   <strong>{entry.name}</strong>
                   <span>{entry.tagline}</span>
-                  <span className="lookbook-cta">Put it on a tee →</span>
+                  <span className="lookbook-cta">{lookbookCta(entry)}</span>
                 </span>
               </a>
             </li>
@@ -56,7 +56,7 @@ export function Lookbook() {
         title={openEntry ? `${openEntry.name} · ${openEntry.tagline}` : 'Lookbook'}
         views={openEntry ? [{ label: 'Lookbook sheet', src: openEntry.image, alt: openEntry.alt }] : []}
       >
-        {openEntry ? <a className="btn" href={lookbookHref(openEntry)}>Put it on a tee →</a> : null}
+        {openEntry ? <a className="btn" href={lookbookHref(openEntry)}>{lookbookCta(openEntry)}</a> : null}
       </Lightbox>
     </section>
   )

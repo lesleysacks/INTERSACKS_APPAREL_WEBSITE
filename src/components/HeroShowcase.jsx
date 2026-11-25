@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Photo } from './Photo.jsx'
-import { heroShowcase, lookbookHref } from '../data/lookbook.js'
+import { heroShowcase, lookbookHref, lookbookProduct } from '../data/lookbook.js'
 
 const INTERVAL = 4500
 
@@ -81,7 +81,7 @@ export function HeroShowcase() {
             />
           </div>
         ))}
-        <span className="visually-hidden">Customise {active.name}</span>
+        <span className="visually-hidden">{lookbookProduct(active) ? `Buy ${active.name}` : `Customise ${active.name}`}</span>
       </a>
       <figcaption className="showcase-bar">
         <span className="showcase-caption" aria-live={playing ? 'off' : 'polite'}>

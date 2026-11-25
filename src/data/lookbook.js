@@ -1,11 +1,11 @@
 /* Lookbook sheets made in Canva (front, back and detail views of each tee).
-   Each links to the customiser with the matching archive design.
+   Sheets sold as shown link to their ready-made tee; the rest open the customiser with that design.
    Sheets whose artwork is on RIGHTS_HOLD are deliberately not included. */
-import { getDesignById } from './catalogue.js'
+import { getDesignById, getGarmentById } from './catalogue.js'
 
 const allLooks = [
-  { id: 'street-moves', name: 'Street Moves', tagline: 'Urban. Bold. Unstoppable.', designId: 'design-005', image: 'assets/lookbook/street-moves.jpg', alt: 'Street Moves oversized black tee with a graffiti breakdancer print, front and back views' },
-  { id: 'urban-motion', name: 'Urban Motion', tagline: 'Wear the movement.', designId: 'design-008', image: 'assets/lookbook/urban-motion.jpg', alt: 'Urban Motion all-over print tee with a street dancer, shown in black, white, sand and navy' },
+  { id: 'street-moves', name: 'Street Moves', tagline: 'Urban. Bold. Unstoppable.', designId: 'design-005', productId: 'street-moves-tee', image: 'assets/lookbook/street-moves.jpg', alt: 'Street Moves oversized black tee with a graffiti breakdancer print, front and back views' },
+  { id: 'urban-motion', name: 'Urban Motion', tagline: 'Wear the movement.', designId: 'design-008', productId: 'urban-motion-tee', image: 'assets/lookbook/urban-motion.jpg', alt: 'Urban Motion all-over print tee with a street dancer, shown in black, white, sand and navy' },
   { id: 'no-pain-no-gain', name: 'No Pain No Gain', tagline: 'Front, side and back.', designId: 'design-004', image: 'assets/lookbook/no-pain-no-gain.jpg', alt: 'No Pain No Gain black tee in red and silver type, worn from the front, side and back' },
   { id: 'let-god-handle-it', name: 'Let God Handle It', tagline: 'Faith in full colour.', designId: 'design-016', image: 'assets/lookbook/let-god-handle-it.jpg', alt: 'Let God Handle It black tee with gold lettering and colour streaks, with lifestyle, back and side views' },
   { id: 'urban-mask', name: 'Urban Mask', tagline: 'Mosaic all-over print.', designId: 'design-021', image: 'assets/lookbook/urban-mask.jpg', alt: 'Urban Mask black tee with a colourful mosaic portrait, front, back and worn views' },
@@ -23,6 +23,19 @@ export const heroShowcase = ['street-moves', 'urban-motion', 'no-pain-no-gain', 
   .map((id) => lookbook.find((entry) => entry.id === id))
   .filter(Boolean)
 
+/* A sheet that is sold as shown links to that ready-made tee; the others open the customiser. */
+export function lookbookProduct(entry) {
+  const product = entry.productId ? getGarmentById(entry.productId) : null
+  return product?.active ? product : null
+}
+
 export function lookbookHref(entry) {
+  const product = lookbookProduct(entry)
+  if (product) return `product.html?garment=${encodeURIComponent(product.id)}`
   return `product.html?garment=classic-tee&design=${encodeURIComponent(entry.designId)}`
+}
+
+export function lookbookCta(entry) {
+  const product = lookbookProduct(entry)
+  return product ? `Buy this look · R${product.basePrice} →` : 'Put it on a tee →'
 }

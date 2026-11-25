@@ -19,6 +19,8 @@ export const garments = [
   { id:"pop-art-skirt", name:"Pop Art Skirt", category:"Skirts", description:"Pink maxi skirt with colourful pop-art portrait.", basePrice:499, colours:[{name:"Pink",value:"#ed388c",frontImage:"assets/products/product-6.png",backImage:null}], sizes:["S","M","L","XL"], featured:false, active:true, customizable:false, image:"assets/products/product-6.png" },
   { id:"birthday-queen-tee", name:"Birthday Queen Tee", category:"T-Shirts", description:"Black tee with a bright Birthday Queen graphic.", basePrice:399, colours:[{name:"Black",value:"#111111",frontImage:"assets/products/product-7.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:false, active:true, customizable:false, image:"assets/products/product-7.png" },
   { id:"kids-classic-tee", name:"Kids Classic Tee", category:"T-Shirts", description:"The Classic Tee in kids sizes. Pair it with an adult tee for a matching Family Kit.", basePrice:249, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["2-3","4-5","6-7","8-9","10-11","12-13"], featured:false, active:true, customizable:true, image:"assets/garments/classic-tee/white-front.webp" },
+  { id:"street-moves-tee", showsBothSides:true, name:"Street Moves Oversized Tee", category:"T-Shirts", description:"Black oversized tee from the lookbook: small tag print on the front and the full graffiti breakdancer on the back. Urban. Bold. Unstoppable.", basePrice:399, colours:[{name:"Black",value:"#141414",frontImage:"assets/lookbook/street-moves.jpg",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/lookbook/street-moves.jpg" },
+  { id:"urban-motion-tee", name:"Urban Motion Graphic Tee", category:"T-Shirts", description:"The street dancer tee from the lookbook, printed front and back. Wear the movement.", basePrice:399, colours:["Black","White","Sand","Navy"].map((name) => { const tee = TEE_COLOURS.find((colour) => colour.name === name); return { name, value:tee.value, frontImage:"assets/lookbook/urban-motion.jpg", backImage:null } }), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/lookbook/urban-motion.jpg" },
   { id:"rose-tracksuit", name:"Rose Sleeve Tracksuit", category:"Sets", description:"Black hoodie-and-jogger set with rose sleeve artwork.", basePrice:899, colours:[{name:"Black / Pink",value:"#1a151a",frontImage:"assets/products/product-8.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/product-8.png" }
 ];
 
@@ -52,10 +54,11 @@ const plannedProducts = [
 
 garments.push(...plannedProducts);
 
-/* Permanent product codes. Never reuse a code; new pieces continue from P10. */
+/* Permanent product codes. Never reuse a code; new pieces continue from P13. */
 const PRODUCT_CODES = {
   "classic-tee":"IS-P01","panther-long-sleeve":"IS-P02","panther-vest":"IS-P03","skull-tracksuit":"IS-P04","graphic-long-sleeve":"IS-P05",
-  "rose-shirt":"IS-P06","hip-hop-tee":"IS-P07","pop-art-skirt":"IS-P08","birthday-queen-tee":"IS-P09","kids-classic-tee":"IS-P10"
+  "rose-shirt":"IS-P06","hip-hop-tee":"IS-P07","pop-art-skirt":"IS-P08","birthday-queen-tee":"IS-P09","kids-classic-tee":"IS-P10",
+  "street-moves-tee":"IS-P11","urban-motion-tee":"IS-P12"
 };
 
 /* Festive Summer drop: which pieces and designs belong to it. */
