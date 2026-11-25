@@ -314,7 +314,7 @@ export function ProductPage() {
                             checked={activeDesign?.id === entry.id}
                             onChange={() => { setFocus(null); commitPreview(() => { customizer.setDesign(entry.id); customizer.setActiveZone(customizer.activeZone) }) }}
                           />
-                          <Photo layout="thumb" framed={false} src={entry.image} alt="" />
+                          <Photo layout="artwork" framed={false} src={entry.image} alt="" />
                           <span className="artwork-name">{entry.name}</span>
                           <span className="artwork-code">{entry.code}</span>
                         </label>
@@ -351,7 +351,7 @@ export function ProductPage() {
                   </div>
                 </div>
                 <button className={`btn btn-buy${flash ? ' is-added' : ''}`} type="submit">
-                  {flash ? <><SuccessTick /> Added to bag</> : <>Add to bag · <RollingNumber value={lineTotal} prefix={STORE_CONFIG.currency} /></>}
+                  {flash ? <><SuccessTick /> Added to bag</> : <>Add to bag ·{'\u00a0'}<RollingNumber value={lineTotal} prefix={STORE_CONFIG.currency} /></>}
                 </button>
               </div>
               <p className="buy-breakdown">
