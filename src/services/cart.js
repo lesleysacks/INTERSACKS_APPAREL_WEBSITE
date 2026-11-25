@@ -103,6 +103,15 @@ export class Cart {
     return this.items
   }
 
+  /* Move one line to another place in the bag (drag to reorder). */
+  moveItem(from, to) {
+    if (from === to || from < 0 || to < 0 || from >= this.items.length || to >= this.items.length) return this.items
+    const [item] = this.items.splice(from, 1)
+    this.items.splice(to, 0, item)
+    this.saveToStorage()
+    return this.items
+  }
+
   clear() {
     this.items = []
     this.saveToStorage()

@@ -8,6 +8,15 @@
   --dur-fast: 160ms;
   --dur-med: 280ms;
   --lift-shadow: 0 14px 30px -18px rgb(0 0 0 / 0.55);
+  /* Motion UI timings (section 9). */
+  --press-in: 90ms;
+  --spring-out: 460ms;
+  /* Release spring: overshoots past 100% once, then settles. */
+  --spring-back: linear(0, 0.42 9%, 0.84 18%, 1.06 28%, 1.1 34%, 1.06 43%, 0.99 56%, 0.985 64%, 1.003 80%, 1);
+  --ease-expand: cubic-bezier(0.16, 1, 0.3, 1);
+  --expand-dur: 360ms;
+  --slide-dur: 200ms;
+  --tick-dur: 470ms;
 }
 
 /* ---------- 1. Page-to-page transitions (MPA view transitions) ---------- */
@@ -44,15 +53,17 @@
 
 /* ---------- 2. Hover, press and focus feedback ---------- */
 
-.btn,
-.text-button,
-.chip {
+/* Everything you can press. `html` raises specificity above studio.css, which loads later.
+   Pressing shrinks to 95% quickly; letting go springs back past 100% and settles. */
+html :is(.btn, .text-button, .chip, .pill, .zoom-btn, .drag-handle, .showcase-toggle) {
   transition:
     background-color var(--dur-fast) ease-out,
     color var(--dur-fast) ease-out,
     border-color var(--dur-fast) ease-out,
     box-shadow var(--dur-fast) ease-out,
-    scale var(--dur-fast) ease-out;
+    scale var(--spring-out) cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Browsers that know linear() use the real spring; older ones keep the curve above. */
+  transition-timing-function: ease-out, ease-out, ease-out, ease-out, var(--spring-back);
 }
 
 .btn:hover {
@@ -70,10 +81,10 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .btn:active,
-  .text-button:active,
-  .chip:active {
-    scale: 0.97;
+  html :is(.btn, .text-button, .chip, .pill, .zoom-btn, .drag-handle, .showcase-toggle):active:not(:disabled) {
+    scale: 0.95;
+    transition-duration: var(--dur-fast), var(--dur-fast), var(--dur-fast), var(--dur-fast), var(--press-in);
+    transition-timing-function: ease-out;
   }
 }
 
@@ -542,4 +553,215 @@ html.vt-preview::view-transition-new(root) {
 }
 @keyframes look-shrink {
   to { scale: 0.88; opacity: 0.5; }
+}
+
+
+/* ---------- 9. Motion UI ---------- */
+
+/* Pull to refresh (touch screens, top of the page). The badge follows the finger 1:1;
+   the page content follows at 35% (--content-ratio). Both spring home on release. */
+html {
+  overscroll-behavior-y: none; /* our pull replaces the browser's own, so they don't fight */
+}
+.ptr {
+  position: relative;
+  --pull: 0px;
+  --pull-progress: 0;
+}
+.ptr-content {
+  translate: 0 calc(var(--pull) * var(--content-ratio, 0.35));
+}
+.ptr-badge {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  inline-size: 2.6rem;
+  block-size: 2.6rem;
+  margin-inline-start: -1.3rem;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 6px 18px -8px rgb(0 0 0 / 0.5);
+  translate: 0 calc(var(--pull) - 3.2rem);
+  opacity: min(1, calc(var(--pull-progress) * 2));
+  pointer-events: none;
+}
+.ptr-badge svg {
+  inline-size: 1.3rem;
+  block-size: 1.3rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  rotate: calc(var(--pull-progress) * 270deg);
+}
+.ptr[data-pull="ready"] .ptr-badge,
+.ptr[data-pull="refreshing"] .ptr-badge {
+  background: var(--ink);
+  color: var(--paper);
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* While the finger is down the pull tracks it exactly; afterwards it springs. */
+  .ptr:not([data-pull="pulling"], [data-pull="ready"]) :is(.ptr-content, .ptr-badge) {
+    transition: translate var(--spring-out) var(--spring-back), opacity var(--dur-med) ease-out;
+  }
+  .ptr[data-pull="refreshing"] .ptr-badge svg {
+    animation: ptr-spin 700ms linear infinite;
+  }
+}
+@keyframes ptr-spin {
+  to { rotate: 1turn; }
+}
+
+/* Rolling numbers: each digit is a strip 0 to 9 that slides to its value.
+   Digits start 100ms apart, from the right (--i is the digit's place from the right). */
+.roll {
+  display: inline-flex;
+  vertical-align: top;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.roll-track {
+  display: inline-flex;
+}
+.roll-static,
+.roll-digit {
+  display: inline-block;
+  block-size: 1lh;
+}
+.roll-digit {
+  overflow: clip;
+}
+.roll-strip {
+  display: flex;
+  flex-direction: column;
+  translate: 0 calc(var(--d) * -10%);
+}
+.roll-strip > span {
+  block-size: 1lh;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .roll-strip {
+    transition: translate 520ms var(--ease-expand);
+    transition-delay: calc(var(--i, 0) * 100ms);
+  }
+}
+
+/* Drag to reorder (the bag). The grabbed item lifts to 105% and follows the pointer;
+   the items it passes slide out of its way in 200ms. */
+.drag-handle {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.cart-item:has(> .drag-handle) {
+  padding-inline-end: 3.4rem; /* room for the handle beside long names */
+}
+.cart-item > .drag-handle {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+}
+.drag-handle svg {
+  inline-size: 1.2rem;
+  block-size: 1.2rem;
+  fill: currentColor;
+}
+.drag-handle:is(:hover, :focus-visible) {
+  background: var(--ink);
+  color: var(--paper);
+}
+html.is-reordering,
+html.is-reordering * {
+  cursor: grabbing !important;
+}
+.cart-item {
+  position: relative;
+  background: var(--paper);
+}
+.cart-item:has(.drag-handle:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.cart-item.is-lifted {
+  z-index: 3;
+  box-shadow: 0 22px 40px -22px rgb(0 0 0 / 0.6);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cart-item.is-lifted {
+    scale: 1.05;
+    transition: scale 160ms ease-out, box-shadow 160ms ease-out;
+  }
+  .cart-list.is-dragging > .cart-item:not(.is-lifted) {
+    transition: translate var(--slide-dur) var(--ease-out);
+  }
+}
+
+/* Card expand: the fullscreen viewer grows out of the card you tapped (ease-out, 360ms). */
+.lightbox[open] {
+  opacity: 1;
+  transition: opacity var(--expand-dur) var(--ease-expand);
+  @starting-style {
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    transform-origin: var(--expand-origin, 50% 50%);
+    scale: 1;
+    transition: opacity var(--expand-dur) var(--ease-expand), scale var(--expand-dur) var(--ease-expand);
+    @starting-style {
+      scale: 0.25;
+    }
+  }
+}
+.lightbox[open]::backdrop {
+  transition: background-color var(--expand-dur) var(--ease-expand);
+  @starting-style {
+    background-color: rgb(0 0 0 / 0);
+  }
+}
+
+/* Success: the circle draws, then the tick (470ms in all). */
+.success-tick {
+  inline-size: 1.15em;
+  block-size: 1.15em;
+  vertical-align: -0.2em;
+  margin-inline-end: 0.35em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.success-tick :is(circle, path) {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .success-tick-circle {
+    /* Start drawing from the top. */
+    transform: rotate(-90deg);
+    transform-origin: 12px 12px;
+    animation: tick-draw calc(var(--tick-dur) * 0.55) var(--ease-out) both;
+  }
+  .success-tick-mark {
+    animation: tick-draw calc(var(--tick-dur) * 0.45) var(--ease-out) calc(var(--tick-dur) * 0.55) both;
+  }
+}
+@keyframes tick-draw {
+  from { stroke-dashoffset: 1; }
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useCart } from '../context/CartContext.jsx'
 import { STORE_CONFIG } from '../data/catalogue.js'
 import { Photo } from './Photo.jsx'
+import { PullToRefresh } from './Motion.jsx'
 
 export const WHATSAPP_DESK_URL = `https://wa.me/${STORE_CONFIG.whatsappNumber}`
 
@@ -169,7 +170,7 @@ export function Layout({ current, children }) {
       <a className="skip-link visually-hidden" href="#content">Skip to content</a>
       <p className="announcement">Made to order in South Africa · Order in minutes on WhatsApp</p>
       <SiteHeader current={current} />
-      <main id="content">{children}</main>
+      <main id="content"><PullToRefresh>{children}</PullToRefresh></main>
       <SiteFooter />
     </div>
   )

@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { useCart } from '../context/CartContext.jsx'
 import { formatPrice } from '../data/catalogue.js'
+import { SuccessTick } from './Motion.jsx'
 
 /* Size (and colour, when there is a choice) plus Add to bag, for ready-made pieces.
    The customer stays where they are; the header bag count updates and a View bag link appears. */
@@ -9,6 +10,7 @@ export function QuickAdd({ garment, colourName, onColour, compact = false }) {
   const id = useId()
   const [size, setSize] = useState('')
   const [status, setStatus] = useState(null)
+  const [adds, setAdds] = useState(0)
   const colour = garment.colours.find((entry) => entry.name === colourName) || garment.colours[0]
 
   function add() {
@@ -28,6 +30,7 @@ export function QuickAdd({ garment, colourName, onColour, compact = false }) {
         quantity: 1
       })
       setStatus({ added: `${garment.name}, size ${size}` })
+      setAdds((value) => value + 1)
     } catch (error) {
       setStatus({ error: error.message })
     }
@@ -56,8 +59,8 @@ export function QuickAdd({ garment, colourName, onColour, compact = false }) {
           </label>
         ))}
       </fieldset>
-      <button type="button" className="btn btn-buy quick-add-btn" onClick={add}>
-        {status?.added ? '✓ Added' : <>Add to bag · {formatPrice(garment.basePrice)}</>}
+      <button type="button" className={`btn btn-buy quick-add-btn${status?.added ? ' is-added' : ''}`} onClick={add}>
+        {status?.added ? <><SuccessTick key={adds} /> Added</> : <>Add to bag · {formatPrice(garment.basePrice)}</>}
       </button>
       <p className="quick-add-status" aria-live="polite">
         {status?.added ? <>✓ {status.added} is in your bag. <a href="cart.html">View bag</a></> : null}

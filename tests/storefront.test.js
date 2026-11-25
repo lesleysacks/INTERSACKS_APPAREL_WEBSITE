@@ -513,6 +513,18 @@ test('Shop: the Classic Tee leads the featured order and its card shows every co
   assert.equal(sortGarments(getPurchasableGarments(), 'name')[0].id, 'by-his-wounds-tee')
 })
 
+test('Bag: lines can be moved to a new place (drag to reorder) and the order is saved', () => {
+  const storage = createMemoryStorage()
+  const cart = new Cart(storage)
+  for (const size of ['S', 'M', 'L']) cart.addItem({ garmentId: 'classic-tee', garmentName: 'Classic Tee', colour: 'Black', size, prints: [], designName: 'None', unitPrice: 349, quantity: 1 })
+  cart.moveItem(0, 2)
+  assert.deepEqual(cart.items.map((item) => item.size), ['M', 'L', 'S'])
+  cart.moveItem(2, 0)
+  assert.deepEqual(new Cart(storage).items.map((item) => item.size), ['S', 'M', 'L'])
+  cart.moveItem(0, 9)
+  assert.deepEqual(cart.items.map((item) => item.size), ['S', 'M', 'L'])
+})
+
 test('Every design and ready-made piece has a unique permanent code', () => {
   const designCodes = allDesigns.map((design) => design.code)
   assert.equal(new Set(designCodes).size, allDesigns.length)
