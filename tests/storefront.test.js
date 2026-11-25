@@ -37,13 +37,13 @@ test('Baseline: Store configuration matches expected InterSacks brand settings',
   assert.equal(STORE_CONFIG.whatsappNumber, '27843252262')
 })
 
-test('Garment catalogue integrity (4 active real products, 19 planned)', () => {
+test('Garment catalogue integrity (7 active real products, 19 planned)', () => {
   const allGarments = getGarments()
   const realGarments = allGarments.filter((garment) => garment.available !== false)
   const plannedGarments = allGarments.filter((garment) => garment.available === false)
 
-  assert.equal(allGarments.length, 23, 'Total active garments should be 23 (4 real + 19 planned)')
-  assert.deepEqual(realGarments.map((garment) => garment.id), ['classic-tee', 'kids-classic-tee', 'street-moves-tee', 'urban-motion-tee'])
+  assert.equal(allGarments.length, 26, 'Total active garments should be 26 (7 real + 19 planned)')
+  assert.deepEqual(realGarments.map((garment) => garment.id), ['classic-tee', 'kids-classic-tee', 'street-moves-tee', 'urban-motion-tee', 'by-his-wounds-tee', 'cute-pup-peek-tee', 'pocket-kitten-tee'])
   assert.ok(realGarments.every((garment) => !RIGHTS_HOLD[garment.id]))
   assert.equal(plannedGarments.length, 19, 'Planned garments should be 19')
 
@@ -496,7 +496,8 @@ test('Order log: posts without Google cookies so signed-in browsers still reach 
 
 test('Lookbook: sheets sold as shown link to their R399 tee; held art stays out', () => {
   const byId = Object.fromEntries(lookbook.map((entry) => [entry.id, entry]))
-  assert.deepEqual(Object.keys(byId).sort(), ['street-moves', 'urban-motion'])
+  assert.deepEqual(Object.keys(byId).sort(), ['by-his-wounds', 'cute-pup-peek', 'pocket-kitten', 'street-moves', 'urban-motion'])
+  assert.equal(lookbookHref(byId['pocket-kitten']), 'product.html?garment=pocket-kitten-tee')
   assert.equal(lookbookHref(byId['street-moves']), 'product.html?garment=street-moves-tee')
   assert.equal(lookbookHref(byId['urban-motion']), 'product.html?garment=urban-motion-tee')
   assert.equal(lookbookCta(byId['street-moves']), 'Buy this look · R399 →')
@@ -512,7 +513,7 @@ test('Every design and ready-made piece has a unique permanent code', () => {
   assert.equal(getDesignByCode('IS-D051').name, 'Panther Claw')
   assert.equal(getDesignByCode('d51').name, 'Panther Claw')
   const liveCodes = getPurchasableGarments().map((garment) => garment.code)
-  assert.deepEqual(liveCodes, ['IS-P01', 'IS-P10', 'IS-P11', 'IS-P12'])
+  assert.deepEqual(liveCodes, ['IS-P01', 'IS-P10', 'IS-P11', 'IS-P12', 'IS-P13', 'IS-P14', 'IS-P15'])
   // Held pieces keep their codes (never reused) but are not for sale.
   assert.equal(getGarmentByCode('P03').name, 'Panther Vest')
   assert.equal(getGarmentByCode('P03').active, false)
@@ -647,8 +648,8 @@ test('Downloaded artwork is never for sale: no Pinterest-style files, held piece
     for (const colour of garment.colours) assert.ok(!downloaded.test(colour.frontImage || ''), garment.id)
   }
   for (const id of ['design-001', 'design-034', 'design-046', 'panther-vest', 'birthday-queen-tee']) assert.ok(RIGHTS_HOLD[id], id)
-  assert.ok(lookbook.every((entry) => getDesigns().some((design) => design.id === entry.designId)))
-  assert.deepEqual(lookbook.map((entry) => entry.id), ['street-moves', 'urban-motion'])
+  assert.ok(lookbook.every((entry) => (entry.designId ? getDesigns().some((design) => design.id === entry.designId) : getGarmentById(entry.productId)?.active)))
+  assert.deepEqual(lookbook.map((entry) => entry.id), ['street-moves', 'urban-motion', 'by-his-wounds', 'cute-pup-peek', 'pocket-kitten'])
   assert.ok(heroShowcase.length >= 1 && heroShowcase.every(Boolean))
   const cart = new Cart(createMemoryStorage())
   cart.addItem({ garmentId: 'panther-vest', garmentName: 'Panther Vest', colour: 'Blue / Black', size: 'M', prints: [], designName: 'None', unitPrice: 399, quantity: 1 })

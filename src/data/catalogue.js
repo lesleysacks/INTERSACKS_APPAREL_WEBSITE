@@ -7,6 +7,11 @@ import { TEE_COLOURS } from "./teeColours.js";
    Leave empty to switch order logging off; WhatsApp ordering works either way. */
 export const STORE_CONFIG = { whatsappNumber: "27843252262", brandName: "InterSacks Apparel", tagline: "Built Different.", currency: "R", orderLogUrl: "https://script.google.com/macros/s/AKfycby1R8_A-4c9CaKOttxzzy_CukUymG3QbSPFEClA1XWfEIQ0v3HNCGl8fokDEC9RCKEwZA/exec", siteUrl: "https://lesleysacks.github.io/INTERSACKS_APPAREL_WEBSITE/" };
 
+/* Ready-made lookbook tees: the Classic Tee colours they come in, each shown with the lookbook sheet. */
+function lookbookColours(names, image) {
+  return names.map((name) => ({ name, value: TEE_COLOURS.find((colour) => colour.name === name).value, frontImage: image, backImage: null }))
+}
+
 export const garments = [
   { id:"classic-tee", name:"Classic Tee", category:"T-Shirts", description:"A clean short-sleeve base for custom InterSacks artwork.", basePrice:349, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:true, image:"assets/garments/classic-tee/black-front.webp" },
   { id:"panther-long-sleeve", showsBothSides:true, name:"Panther Long Sleeve", category:"Long Sleeves", description:"Blue and black Panther long-sleeve set shown from the front and back.", basePrice:499, colours:[{name:"Blue / Black",value:"#1256a3",frontImage:"assets/products/pantherPJ_longsleeve(blue&black) (2).png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/pantherPJ_longsleeve(blue&black) (2).png" },
@@ -20,7 +25,10 @@ export const garments = [
   { id:"birthday-queen-tee", name:"Birthday Queen Tee", category:"T-Shirts", description:"Black tee with a bright Birthday Queen graphic.", basePrice:399, colours:[{name:"Black",value:"#111111",frontImage:"assets/products/product-7.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:false, active:true, customizable:false, image:"assets/products/product-7.png" },
   { id:"kids-classic-tee", name:"Kids Classic Tee", category:"T-Shirts", description:"The Classic Tee in kids sizes. Pair it with an adult tee for a matching Family Kit.", basePrice:249, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["2-3","4-5","6-7","8-9","10-11","12-13"], featured:false, active:true, customizable:true, image:"assets/garments/classic-tee/white-front.webp" },
   { id:"street-moves-tee", showsBothSides:true, name:"Street Moves Oversized Tee", category:"T-Shirts", description:"Black oversized tee from the lookbook: small tag print on the front and the full graffiti breakdancer on the back. Urban. Bold. Unstoppable.", basePrice:399, colours:[{name:"Black",value:"#141414",frontImage:"assets/lookbook/street-moves.jpg",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/lookbook/street-moves.jpg" },
-  { id:"urban-motion-tee", name:"Urban Motion Graphic Tee", category:"T-Shirts", description:"The street dancer tee from the lookbook, printed front and back. Wear the movement.", basePrice:399, colours:["Black","White","Sand","Navy"].map((name) => { const tee = TEE_COLOURS.find((colour) => colour.name === name); return { name, value:tee.value, frontImage:"assets/lookbook/urban-motion.jpg", backImage:null } }), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/lookbook/urban-motion.jpg" },
+  { id:"urban-motion-tee", name:"Urban Motion Graphic Tee", category:"T-Shirts", description:"The street dancer tee from the lookbook, printed front and back. Wear the movement.", basePrice:399, colours:lookbookColours(["Black","White","Sand","Navy"], "assets/lookbook/urban-motion.jpg"), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/lookbook/urban-motion.jpg" },
+  { id:"by-his-wounds-tee", name:"By His Wounds Tee", category:"T-Shirts", description:"Black tee with a white drip-style crown of thorns and BY HIS WOUNDS lettering on the front. An original InterSacks design.", basePrice:399, colours:[{name:"Black",value:"#141414",frontImage:"assets/lookbook/by-his-wounds.jpg",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/lookbook/by-his-wounds.jpg" },
+  { id:"cute-pup-peek-tee", name:"Cute Pup Peek Tee", category:"T-Shirts", description:"A French bulldog peeking over a wooden fence, printed on the front. An original InterSacks design.", basePrice:399, colours:lookbookColours(["Black","White","Navy","Charcoal","Sand"], "assets/lookbook/cute-pup-peek-frenchie.jpg"), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/lookbook/cute-pup-peek-frenchie.jpg" },
+  { id:"pocket-kitten-tee", name:"Pocket Kitten Tee", category:"T-Shirts", description:"A ginger kitten peeking out of a printed denim pocket on the front. An original InterSacks design.", basePrice:399, colours:lookbookColours(["Light blue","White","Navy","Black"], "assets/lookbook/pocket-kitten.jpg"), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/lookbook/pocket-kitten.jpg" },
   { id:"rose-tracksuit", name:"Rose Sleeve Tracksuit", category:"Sets", description:"Black hoodie-and-jogger set with rose sleeve artwork.", basePrice:899, colours:[{name:"Black / Pink",value:"#1a151a",frontImage:"assets/products/product-8.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/product-8.png" }
 ];
 
@@ -54,11 +62,12 @@ const plannedProducts = [
 
 garments.push(...plannedProducts);
 
-/* Permanent product codes. Never reuse a code; new pieces continue from P13. */
+/* Permanent product codes. Never reuse a code; new pieces continue from P16. */
 const PRODUCT_CODES = {
   "classic-tee":"IS-P01","panther-long-sleeve":"IS-P02","panther-vest":"IS-P03","skull-tracksuit":"IS-P04","graphic-long-sleeve":"IS-P05",
   "rose-shirt":"IS-P06","hip-hop-tee":"IS-P07","pop-art-skirt":"IS-P08","birthday-queen-tee":"IS-P09","kids-classic-tee":"IS-P10",
-  "street-moves-tee":"IS-P11","urban-motion-tee":"IS-P12"
+  "street-moves-tee":"IS-P11","urban-motion-tee":"IS-P12",
+  "by-his-wounds-tee":"IS-P13","cute-pup-peek-tee":"IS-P14","pocket-kitten-tee":"IS-P15"
 };
 
 /* Festive Summer drop: which pieces and designs belong to it. */

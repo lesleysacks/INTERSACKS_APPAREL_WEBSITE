@@ -16,8 +16,16 @@ const allLooks = [
   { id: 'cute-pup-peek', name: 'Cute Pup Peek', tagline: 'Peekaboo print.', designId: 'design-003', image: 'assets/lookbook/cute-pup-peek.jpg', alt: 'Black tee with a Yorkshire terrier peeking around the edge of the print' }
 ]
 
-/* Only sheets whose artwork is still for sale. */
-export const lookbook = allLooks.filter((entry) => getDesignById(entry.designId)?.active)
+/* New original designs (2026-11), sold only as the ready-made tee shown on the sheet. */
+const originalLooks = [
+  { id: 'by-his-wounds', name: 'By His Wounds', tagline: 'Monochrome faith piece.', productId: 'by-his-wounds-tee', image: 'assets/lookbook/by-his-wounds.jpg', alt: 'Black tee with a white drip-style crown of thorns and BY HIS WOUNDS lettering, shown flat, close up and worn from the front, side and back' },
+  { id: 'cute-pup-peek', name: 'Cute Pup Peek', tagline: 'Peekaboo print.', productId: 'cute-pup-peek-tee', image: 'assets/lookbook/cute-pup-peek-frenchie.jpg', alt: 'Black tee with a French bulldog peeking over a wooden fence, with the back view and a print close-up' },
+  { id: 'pocket-kitten', name: 'Pocket Kitten', tagline: 'A kitten in your pocket.', productId: 'pocket-kitten-tee', image: 'assets/lookbook/pocket-kitten.jpg', alt: 'Light blue tee with a printed denim pocket and a ginger kitten peeking out, with the back view and a fabric close-up' }
+]
+
+/* Only sheets whose artwork is still for sale: an active archive design, or an active ready-made tee. */
+const forSale = (entry) => (entry.designId ? getDesignById(entry.designId)?.active : getGarmentById(entry.productId)?.active)
+export const lookbook = [...allLooks, ...originalLooks].filter(forSale)
 
 export const heroShowcase = ['street-moves', 'urban-motion', 'no-pain-no-gain', 'let-god-handle-it']
   .map((id) => lookbook.find((entry) => entry.id === id))
