@@ -475,6 +475,25 @@ test('Order log: quote requests carry the occasion name, and logging stays off w
   assert.equal(sendOrderLog(payload), false)
 })
 
+test('Order log: posts without Google cookies so signed-in browsers still reach the sheet', () => {
+  const calls = []
+  const saved = { window: globalThis.window, fetch: globalThis.fetch }
+  globalThis.window = {}
+  globalThis.fetch = (url, options) => { calls.push({ url, options }); return Promise.resolve() }
+  try {
+    assert.equal(sendOrderLog({ type: 'enquiry', ref: 'IS-270101-AAAA' }, 'https://script.google.com/macros/s/test/exec'), true)
+  } finally {
+    globalThis.window = saved.window
+    globalThis.fetch = saved.fetch
+  }
+  assert.equal(calls.length, 1)
+  assert.equal(calls[0].options.method, 'POST')
+  assert.equal(calls[0].options.mode, 'no-cors')
+  assert.equal(calls[0].options.credentials, 'omit')
+  assert.equal(calls[0].options.headers['Content-Type'], 'text/plain;charset=utf-8')
+  assert.deepEqual(JSON.parse(calls[0].options.body), { type: 'enquiry', ref: 'IS-270101-AAAA' })
+})
+
 test('Every design and ready-made piece has a unique permanent code', () => {
   const designCodes = allDesigns.map((design) => design.code)
   assert.equal(new Set(designCodes).size, allDesigns.length)

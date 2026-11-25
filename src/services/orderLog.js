@@ -48,18 +48,23 @@ export function buildEnquiryPayload({ occasion = '', garment = '', quantity = ''
   return { type: 'enquiry', ref: reference, name: name.trim(), occasion: label, garment, quantity: String(quantity), date, printText: printText.trim(), notes: notes.trim() }
 }
 
-/* text/plain keeps this a "simple" request: no CORS preflight, which Apps Script cannot answer. */
+/* text/plain keeps this a "simple" request: no CORS preflight, which Apps Script cannot answer.
+   credentials: 'omit' sends no Google cookies. A browser signed in to more than one Google account
+   otherwise gets an account-chooser redirect instead of reaching doPost, and nothing is logged.
+   sendBeacon always sends cookies, so it is only the fallback for browsers without fetch. */
 export function sendOrderLog(payload, url = STORE_CONFIG.orderLogUrl) {
   if (!url || typeof window === 'undefined') return false
   const body = JSON.stringify(payload)
-  try {
-    if (navigator.sendBeacon?.(url, new Blob([body], { type: 'text/plain;charset=utf-8' }))) return true
-  } catch {
-    /* Fall through to fetch. */
+  if (typeof fetch === 'function') {
+    try {
+      fetch(url, { method: 'POST', mode: 'no-cors', credentials: 'omit', keepalive: true, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body }).catch(() => {})
+      return true
+    } catch {
+      /* Fall through to sendBeacon. */
+    }
   }
   try {
-    fetch(url, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body }).catch(() => {})
-    return true
+    return Boolean(navigator.sendBeacon?.(url, new Blob([body], { type: 'text/plain;charset=utf-8' })))
   } catch {
     return false
   }
