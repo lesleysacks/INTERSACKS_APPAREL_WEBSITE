@@ -13,7 +13,7 @@ function lookbookColours(names, image) {
 }
 
 export const garments = [
-  { id:"classic-tee", name:"Classic Tee", category:"T-Shirts", description:"A clean short-sleeve base for custom InterSacks artwork.", basePrice:349, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:true, image:"assets/garments/classic-tee/black-front.webp" },
+  { id:"classic-tee", shopFirst:true, cardImage:"assets/garments/classic-tee/all-colours.webp", name:"Classic Tee", category:"T-Shirts", description:"A clean short-sleeve base for custom InterSacks artwork.", basePrice:349, colours:TEE_COLOURS.map((colour) => ({ ...colour })), sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:true, image:"assets/garments/classic-tee/black-front.webp" },
   { id:"panther-long-sleeve", showsBothSides:true, name:"Panther Long Sleeve", category:"Long Sleeves", description:"Blue and black Panther long-sleeve set shown from the front and back.", basePrice:499, colours:[{name:"Blue / Black",value:"#1256a3",frontImage:"assets/products/pantherPJ_longsleeve(blue&black) (2).png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/pantherPJ_longsleeve(blue&black) (2).png" },
   { id:"panther-vest", showsBothSides:true, name:"Panther Vest", category:"Vests", description:"Blue and black Panther basketball vest shown from the front and back.", basePrice:399, colours:[{name:"Blue / Black",value:"#1256a3",frontImage:"assets/products/pantherPJ_Vest(blue&black) (1).png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/pantherPJ_Vest(blue&black) (1).png" },
   { id:"skull-tracksuit", showsBothSides:true, name:"Skull Tracksuit", category:"Sets", description:"Black hoodie-and-jogger set with purple skull artwork.", basePrice:899, colours:[{name:"Black / Purple",value:"#17131d",frontImage:"assets/products/product-1.png",backImage:null}], sizes:["S","M","L","XL","2XL"], featured:true, active:true, customizable:false, image:"assets/products/product-1.png" },
@@ -424,7 +424,8 @@ export function sortGarments(list, mode = 'featured') {
   if (mode === 'price-asc') sorted.sort((a, b) => a.basePrice - b.basePrice || a.name.localeCompare(b.name))
   else if (mode === 'price-desc') sorted.sort((a, b) => b.basePrice - a.basePrice || a.name.localeCompare(b.name))
   else if (mode === 'name') sorted.sort((a, b) => a.name.localeCompare(b.name))
-  else sorted.sort((a, b) => Number(b.featured) - Number(a.featured) || a.name.localeCompare(b.name))
+  // Featured: the Classic Tee (the plain tee to customise) leads, then featured pieces, then A to Z.
+  else sorted.sort((a, b) => Number(Boolean(b.shopFirst)) - Number(Boolean(a.shopFirst)) || Number(b.featured) - Number(a.featured) || a.name.localeCompare(b.name))
   return sorted
 }
 

@@ -506,6 +506,13 @@ test('Lookbook: sheets sold as shown link to their R399 tee; held art stays out'
   assert.equal(lookbookCta({ designId: 'design-005' }), 'Put it on a tee →')
 })
 
+test('Shop: the Classic Tee leads the featured order and its card shows every colour', () => {
+  const featured = sortGarments(getPurchasableGarments(), 'featured')
+  assert.equal(featured[0].id, 'classic-tee')
+  assert.equal(getGarmentById('classic-tee').cardImage, 'assets/garments/classic-tee/all-colours.webp')
+  assert.equal(sortGarments(getPurchasableGarments(), 'name')[0].id, 'by-his-wounds-tee')
+})
+
 test('Every design and ready-made piece has a unique permanent code', () => {
   const designCodes = allDesigns.map((design) => design.code)
   assert.equal(new Set(designCodes).size, allDesigns.length)

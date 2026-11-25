@@ -15,7 +15,8 @@ export function ProductCard({ garment }) {
   return (
     <article className="product-card">
       <button type="button" className="photo-open" onClick={() => setOpen(true)} aria-label={`View ${garment.name} fullscreen`}>
-        <Photo src={colour?.frontImage || garment.image} alt="" />
+        {/* Pieces made in several colours can show them all together (cardImage). */}
+        <Photo src={garment.cardImage || colour?.frontImage || garment.image} alt="" />
         <span className="photo-open-hint" aria-hidden="true">⤢</span>
       </button>
       <a className="product-link" href={href} data-vt="garment">
