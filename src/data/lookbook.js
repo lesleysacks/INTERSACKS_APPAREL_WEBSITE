@@ -1,11 +1,11 @@
 /* Lookbook sheets made in Canva (front, back and detail views of each tee).
-   Each links to the customiser with the matching archive design.
+   Sheets sold as shown link to their ready-made tee; the rest open the customiser with that design.
    Sheets whose artwork is on RIGHTS_HOLD are deliberately not included. */
-import { getDesignById } from './catalogue.js'
+import { getDesignById, getGarmentById } from './catalogue.js'
 
 const allLooks = [
-  { id: 'street-moves', name: 'Street Moves', tagline: 'Urban. Bold. Unstoppable.', designId: 'design-005', image: 'assets/lookbook/street-moves.jpg', alt: 'Street Moves oversized black tee with a graffiti breakdancer print, front and back views' },
-  { id: 'urban-motion', name: 'Urban Motion', tagline: 'Wear the movement.', designId: 'design-008', image: 'assets/lookbook/urban-motion.jpg', alt: 'Urban Motion all-over print tee with a street dancer, shown in black, white, sand and navy' },
+  { id: 'street-moves', name: 'Street Moves', tagline: 'Urban. Bold. Unstoppable.', designId: 'design-005', productId: 'street-moves-tee', image: 'assets/lookbook/street-moves.jpg', alt: 'Street Moves oversized black tee with a graffiti breakdancer print, front and back views' },
+  { id: 'urban-motion', name: 'Urban Motion', tagline: 'Wear the movement.', designId: 'design-008', productId: 'urban-motion-tee', image: 'assets/lookbook/urban-motion.jpg', alt: 'Urban Motion all-over print tee with a street dancer, shown in black, white, sand and navy' },
   { id: 'no-pain-no-gain', name: 'No Pain No Gain', tagline: 'Front, side and back.', designId: 'design-004', image: 'assets/lookbook/no-pain-no-gain.jpg', alt: 'No Pain No Gain black tee in red and silver type, worn from the front, side and back' },
   { id: 'let-god-handle-it', name: 'Let God Handle It', tagline: 'Faith in full colour.', designId: 'design-016', image: 'assets/lookbook/let-god-handle-it.jpg', alt: 'Let God Handle It black tee with gold lettering and colour streaks, with lifestyle, back and side views' },
   { id: 'urban-mask', name: 'Urban Mask', tagline: 'Mosaic all-over print.', designId: 'design-021', image: 'assets/lookbook/urban-mask.jpg', alt: 'Urban Mask black tee with a colourful mosaic portrait, front, back and worn views' },
@@ -16,13 +16,34 @@ const allLooks = [
   { id: 'cute-pup-peek', name: 'Cute Pup Peek', tagline: 'Peekaboo print.', designId: 'design-003', image: 'assets/lookbook/cute-pup-peek.jpg', alt: 'Black tee with a Yorkshire terrier peeking around the edge of the print' }
 ]
 
-/* Only sheets whose artwork is still for sale. */
-export const lookbook = allLooks.filter((entry) => getDesignById(entry.designId)?.active)
+/* New original designs (2026-11), sold only as the ready-made tee shown on the sheet. */
+const originalLooks = [
+  { id: 'by-his-wounds', name: 'By His Wounds', tagline: 'Monochrome faith piece.', productId: 'by-his-wounds-tee', image: 'assets/lookbook/by-his-wounds.jpg', alt: 'Black tee with a white drip-style crown of thorns and BY HIS WOUNDS lettering, shown flat, close up and worn from the front, side and back' },
+  { id: 'cute-pup-peek', name: 'Cute Pup Peek', tagline: 'Peekaboo print.', productId: 'cute-pup-peek-tee', image: 'assets/lookbook/cute-pup-peek-frenchie.jpg', alt: 'Black tee with a French bulldog peeking over a wooden fence, with the back view and a print close-up' },
+  { id: 'pocket-kitten', name: 'Pocket Kitten', tagline: 'A kitten in your pocket.', productId: 'pocket-kitten-tee', image: 'assets/lookbook/pocket-kitten.jpg', alt: 'Light blue tee with a printed denim pocket and a ginger kitten peeking out, with the back view and a fabric close-up' }
+]
+
+/* Only sheets whose artwork is still for sale: an active archive design, or an active ready-made tee. */
+const forSale = (entry) => (entry.designId ? getDesignById(entry.designId)?.active : getGarmentById(entry.productId)?.active)
+export const lookbook = [...allLooks, ...originalLooks].filter(forSale)
 
 export const heroShowcase = ['street-moves', 'urban-motion', 'no-pain-no-gain', 'let-god-handle-it']
   .map((id) => lookbook.find((entry) => entry.id === id))
   .filter(Boolean)
 
+/* A sheet that is sold as shown links to that ready-made tee; the others open the customiser. */
+export function lookbookProduct(entry) {
+  const product = entry.productId ? getGarmentById(entry.productId) : null
+  return product?.active ? product : null
+}
+
 export function lookbookHref(entry) {
+  const product = lookbookProduct(entry)
+  if (product) return `product.html?garment=${encodeURIComponent(product.id)}`
   return `product.html?garment=classic-tee&design=${encodeURIComponent(entry.designId)}`
+}
+
+export function lookbookCta(entry) {
+  const product = lookbookProduct(entry)
+  return product ? `Buy this look · R${product.basePrice} →` : 'Put it on a tee →'
 }
