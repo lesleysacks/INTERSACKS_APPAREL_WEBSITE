@@ -665,19 +665,22 @@
   }
 }
 
-/* Wide screens: one block that fits the window. Tee on the left, everything else on the right. */
+/* Wide screens: the tee stays put on the left (sticky, fills the window height) while the
+   details column on the right scrolls with the page. No inner scroll box, so the artwork
+   grid gets the full height of the window. Add to bag stays pinned to the bottom. */
 @media (min-width: 52rem) {
   .studio {
-    grid-template-columns: minmax(0, 1.15fr) minmax(22rem, 1fr);
+    grid-template-columns: minmax(0, 1.1fr) minmax(24rem, 1fr);
     gap: 1.5rem;
-    block-size: calc(100dvh - var(--header) - 4.5rem);
-    min-block-size: 34rem;
-    align-items: stretch;
+    align-items: start;
   }
   .studio-stage {
+    position: sticky;
+    inset-block-start: calc(var(--header) + 0.75rem);
+    block-size: calc(100dvh - var(--header) - 1.5rem);
+    min-block-size: 28rem;
     grid-template-rows: auto minmax(0, 1fr) auto auto;
     align-content: start;
-    min-block-size: 0;
   }
   .zoom {
     grid-template-rows: minmax(0, 1fr) auto;
@@ -693,14 +696,26 @@
   .zoom-bar {
     inline-size: min(100%, 40rem);
   }
-  .studio-panel {
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    min-block-size: 0;
-    overflow: clip;
+  .studio-stage .lookbook-strip {
+    max-inline-size: 26rem;
   }
-  .studio-options {
-    overflow-y: auto;
-    overscroll-behavior: contain;
+  .studio-panel {
+    min-block-size: calc(100dvh - var(--header) - 1.5rem);
+  }
+  /* Big artwork tiles: about three across the details column. */
+  .studio-options .artwork-grid {
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+    gap: 0.75rem;
+  }
+  .studio-options .artwork-option {
+    font-size: 0.85rem;
+  }
+}
+
+/* Larger artwork tiles on phones too (three across instead of four). */
+@media (max-width: 51.99rem) {
+  .studio-options .artwork-grid {
+    grid-template-columns: repeat(auto-fill, minmax(6.75rem, 1fr));
   }
 }
 
