@@ -47,6 +47,10 @@ export function CartProvider({ children }) {
       cart.removeItem(index)
       refresh()
     },
+    moveItem(from, to) {
+      cart.moveItem(from, to)
+      refresh()
+    },
     clear() {
       cart.clear()
       refresh()

@@ -15,6 +15,10 @@ export function Lightbox({ open, onClose, title, views, children }) {
     if (!dialog) return undefined
     if (open && !dialog.open) {
       setIndex(0)
+      // Grow out of the card that was tapped: start the expand from the opener's centre.
+      const opener = document.activeElement?.getBoundingClientRect?.()
+      if (opener && opener.width) dialog.style.setProperty('--expand-origin', `${opener.left + opener.width / 2}px ${opener.top + opener.height / 2}px`)
+      else dialog.style.removeProperty('--expand-origin')
       dialog.showModal()
       document.documentElement.classList.add('has-lightbox')
     } else if (!open && dialog.open) {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Layout } from '../components/Chrome.jsx'
 import { Photo } from '../components/Photo.jsx'
 import { useCart } from '../context/CartContext.jsx'
@@ -8,9 +8,24 @@ import { familyGroups, percent } from '../services/family.js'
 import { PAYMENT_OPTIONS, PAYMENT_TERMS, paymentSplit } from '../services/payment.js'
 import { buildPreviewUrl, createOrderReference, whatsAppOrderUrl } from '../services/orders.js'
 import { buildOrderPayload, sendOrderLog } from '../services/orderLog.js'
+import { RollingNumber } from '../components/Motion.jsx'
+import { useDragReorder } from '../lib/useDragReorder.js'
+
+/* A price that rolls to its new value (bag totals change as quantities change). */
+function Price({ amount, minus = false }) {
+  return <RollingNumber value={amount} prefix={`${minus ? '−' : ''}${STORE_CONFIG.currency}`} />
+}
 
 export function CartPage() {
-  const { items, subtotal, discounts, total, empty, updateQuantity, removeItem, clear, cart } = useCart()
+  const { items, subtotal, discounts, total, empty, updateQuantity, removeItem, moveItem, clear, cart } = useCart()
+  const listRef = useRef(null)
+  const [moveNote, setMoveNote] = useState('')
+  const reorder = useDragReorder(listRef, moveItem, {
+    announce: (to, count) => {
+      setMoveNote('')
+      setTimeout(() => setMoveNote(`Moved to position ${to + 1} of ${count}.`), 400)
+    }
+  })
   const nudges = familyGroups(items).filter((group) => group.toNext && group.toNext.more <= 2)
   const [confirmEmpty, setConfirmEmpty] = useState(false)
   const [error, setError] = useState('')
@@ -50,9 +65,12 @@ export function CartPage() {
             </div>
           ) : (
             <div className="cart-layout">
-              <ul className="cart-list">
+              <ul className="cart-list" ref={listRef}>
                 {items.map((item, index) => (
                   <li key={`${item.garmentId}-${item.colour}-${item.size}-${(item.prints || []).map((print) => `${print.placement}:${print.designId}`).join('|')}`} className="cart-item">
+                    <button type="button" className="drag-handle" aria-label={`Reorder ${item.garmentName}. Drag, or use the up and down arrow keys.`} title="Drag to reorder" {...reorder.handleProps(index, items.length)}>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="6" r="1.6" /><circle cx="15" cy="6" r="1.6" /><circle cx="9" cy="12" r="1.6" /><circle cx="15" cy="12" r="1.6" /><circle cx="9" cy="18" r="1.6" /><circle cx="15" cy="18" r="1.6" /></svg>
+                    </button>
                     <CartThumb item={item} />
                     <div>
                       <h2>{item.garmentName}</h2>
@@ -81,7 +99,7 @@ export function CartPage() {
                           onChange={(event) => changeQuantity(index, event.target.value)}
                         />
                       </div>
-                      <p>Line total {formatPrice(item.unitPrice * item.quantity)}</p>
+                      <p>Line total <Price amount={item.unitPrice * item.quantity} /></p>
                       <button type="button" className="text-button" onClick={() => removeItem(index)}>
                         Remove <span className="visually-hidden">{item.garmentName}</span>
                       </button>
@@ -89,18 +107,19 @@ export function CartPage() {
                   </li>
                 ))}
               </ul>
+              <p className="visually-hidden" aria-live="polite">{moveNote}</p>
               <aside className="cart-summary" aria-labelledby="summary-title">
                 <h2 id="summary-title">Order</h2>
                 <dl className="price-list">
-                  <div><dt>Subtotal</dt><dd>{formatPrice(subtotal)}</dd></div>
+                  <div><dt>Subtotal</dt><dd><Price amount={subtotal} /></dd></div>
                   {discounts.map((group) => (
                     <div key={group.designId} className="discount-row">
                       <dt>Family Kit · {group.designName} × {group.tees} ({percent(group.rate)} off)</dt>
-                      <dd>−{formatPrice(group.amount)}</dd>
+                      <dd><Price amount={group.amount} minus /></dd>
                     </div>
                   ))}
                   <div><dt>Delivery</dt><dd>Confirmed on WhatsApp</dd></div>
-                  <div><dt>Total</dt><dd>{formatPrice(total)}</dd></div>
+                  <div><dt>Total</dt><dd><Price amount={total} /></dd></div>
                 </dl>
                 {nudges.map((group) => (
                   <p key={group.designId} className="family-nudge">
@@ -126,7 +145,7 @@ export function CartPage() {
                           <input type="radio" name="payment" value={option.id} required checked={payment === option.id} onChange={() => setPayment(option.id)} />
                           <span>
                             <strong>{option.label}</strong>
-                            <span>{option.id === 'deposit' ? `${formatPrice(split.dueNow)} now, ${formatPrice(split.balance)} before dispatch` : `${formatPrice(split.dueNow)} now`}</span>
+                            <span>{option.id === 'deposit' ? <><Price amount={split.dueNow} /> now, <Price amount={split.balance} /> before dispatch</> : <><Price amount={split.dueNow} /> now</>}</span>
                           </span>
                         </label>
                       )

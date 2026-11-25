@@ -13,11 +13,13 @@ import {
   getPlacementConfig,
   getPurchasableGarments,
   filterDesigns,
-  PRINT_ZONES
+  PRINT_ZONES,
+  STORE_CONFIG
 } from '../data/catalogue.js'
 import { Customizer, initCustomizerFromUrl } from '../services/customizer.js'
 import { withPreviewTransition } from '../lib/pageTransitions.js'
 import { ZoomStage } from '../components/ZoomStage.jsx'
+import { RollingNumber, SuccessTick } from '../components/Motion.jsx'
 import { Tee3D } from '../components/Tee3D.jsx'
 import { FamilyKit } from '../components/FamilyKit.jsx'
 
@@ -349,7 +351,7 @@ export function ProductPage() {
                   </div>
                 </div>
                 <button className={`btn btn-buy${flash ? ' is-added' : ''}`} type="submit">
-                  {flash ? '✓ Added to bag' : <>Add to bag · {formatPrice(lineTotal)}</>}
+                  {flash ? <><SuccessTick /> Added to bag</> : <>Add to bag · <RollingNumber value={lineTotal} prefix={STORE_CONFIG.currency} /></>}
                 </button>
               </div>
               <p className="buy-breakdown">
