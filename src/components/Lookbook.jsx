@@ -25,7 +25,7 @@ export function Lookbook() {
           <div className="section-head">
             <p className="kicker">Lookbook</p>
             <h2 id="lookbook-title">Every angle, every piece</h2>
-            <p>Front, back and close-up views. Tap a sheet to see it fullscreen, or put that artwork on your own Classic Tee.</p>
+            <p>Front, back and close-up views. Tap a sheet to see it fullscreen. Sheets marked “Past work” are earlier pieces, shown for inspiration only.</p>
           </div>
           <div className="lookbook-nav">
             <button type="button" className="btn btn-ghost" onClick={() => scrollByCard(-1)} aria-label="Previous looks">←</button>
@@ -39,13 +39,21 @@ export function Lookbook() {
                 <Photo layout="lookbook" framed={false} src={entry.image} alt={entry.alt} />
                 <span className="photo-open-hint" aria-hidden="true">⤢</span>
               </button>
-              <a href={lookbookHref(entry)}>
+              {entry.forSale ? (
+                <a href={lookbookHref(entry)}>
+                  <span className="lookbook-meta">
+                    <strong>{entry.name}</strong>
+                    <span>{entry.tagline}</span>
+                    <span className="lookbook-cta">Put it on a tee →</span>
+                  </span>
+                </a>
+              ) : (
                 <span className="lookbook-meta">
                   <strong>{entry.name}</strong>
                   <span>{entry.tagline}</span>
-                  <span className="lookbook-cta">Put it on a tee →</span>
+                  <span className="not-for-sale">Past work · not for sale</span>
                 </span>
-              </a>
+              )}
             </li>
           ))}
         </ul>
@@ -56,7 +64,8 @@ export function Lookbook() {
         title={openEntry ? `${openEntry.name} · ${openEntry.tagline}` : 'Lookbook'}
         views={openEntry ? [{ label: 'Lookbook sheet', src: openEntry.image, alt: openEntry.alt }] : []}
       >
-        {openEntry ? <a className="btn" href={lookbookHref(openEntry)}>Put it on a tee →</a> : null}
+        {openEntry?.forSale ? <a className="btn" href={lookbookHref(openEntry)}>Put it on a tee →</a> : null}
+        {openEntry && !openEntry.forSale ? <p className="not-for-sale">Past work · not for sale. <a href="custom.html">Ask for something original</a></p> : null}
       </Lightbox>
     </section>
   )

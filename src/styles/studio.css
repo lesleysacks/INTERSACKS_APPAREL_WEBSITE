@@ -1414,3 +1414,56 @@ p.code-tag {
 .lookbook-band.is-few .lookbook-nav {
   display: none;
 }
+
+/* ---------- Past work (shown, not for sale) ---------- */
+.not-for-sale {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted, #8a8a8a);
+}
+.lightbox .not-for-sale {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.95rem;
+}
+.past-work-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr));
+  gap: 1rem;
+}
+.past-work-grid li {
+  display: grid;
+  gap: 0.4rem;
+}
+.past-work-open {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+.past-work-open img {
+  filter: saturate(0.85);
+}
+.past-work-meta {
+  display: grid;
+  gap: 0.1rem;
+}
+.past-work-meta strong {
+  font-size: 0.95rem;
+}
+.past-work .more-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-block-start: 1.5rem;
+}

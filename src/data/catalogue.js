@@ -160,33 +160,33 @@ const designManifest = [
    have written permission to sell it. */
 export const RIGHTS_HOLD = {
   /* Downloaded from Pinterest / the internet: hidden until replaced with original art. */
-  "design-001": "Downloaded artwork: not licensed for sale",
-  "design-003": "Downloaded artwork: not licensed for sale",
-  "design-004": "Downloaded artwork: not licensed for sale",
-  "design-007": "Downloaded artwork: not licensed for sale",
-  "design-013": "Downloaded artwork: not licensed for sale",
-  "design-014": "Downloaded artwork: not licensed for sale",
-  "design-015": "Downloaded artwork: not licensed for sale",
-  "design-016": "Downloaded artwork: not licensed for sale",
-  "design-018": "Downloaded artwork: not licensed for sale",
-  "design-019": "Downloaded artwork: not licensed for sale",
-  "design-021": "Downloaded artwork: not licensed for sale",
-  "design-025": "Downloaded artwork: not licensed for sale",
-  "design-030": "Downloaded artwork: not licensed for sale",
-  "design-034": "Downloaded artwork: not licensed for sale",
-  "design-037": "Downloaded artwork: not licensed for sale",
-  "design-038": "Downloaded artwork: not licensed for sale",
-  "design-039": "Downloaded artwork: not licensed for sale",
-  "design-041": "Downloaded artwork: not licensed for sale",
-  "design-046": "Downloaded artwork: not licensed for sale",
-  "panther-long-sleeve": "Downloaded artwork: not licensed for sale",
-  "panther-vest": "Downloaded artwork: not licensed for sale",
-  "skull-tracksuit": "Downloaded artwork: not licensed for sale",
-  "graphic-long-sleeve": "Downloaded artwork: not licensed for sale",
-  "rose-shirt": "Downloaded artwork: not licensed for sale",
-  "hip-hop-tee": "Downloaded artwork: not licensed for sale",
-  "pop-art-skirt": "Downloaded artwork: not licensed for sale",
-  "birthday-queen-tee": "Downloaded artwork: not licensed for sale",
+  "design-001": "Downloaded artwork: shown as past work, not for sale",
+  "design-003": "Downloaded artwork: shown as past work, not for sale",
+  "design-004": "Downloaded artwork: shown as past work, not for sale",
+  "design-007": "Downloaded artwork: shown as past work, not for sale",
+  "design-013": "Downloaded artwork: shown as past work, not for sale",
+  "design-014": "Downloaded artwork: shown as past work, not for sale",
+  "design-015": "Downloaded artwork: shown as past work, not for sale",
+  "design-016": "Downloaded artwork: shown as past work, not for sale",
+  "design-018": "Downloaded artwork: shown as past work, not for sale",
+  "design-019": "Downloaded artwork: shown as past work, not for sale",
+  "design-021": "Downloaded artwork: shown as past work, not for sale",
+  "design-025": "Downloaded artwork: shown as past work, not for sale",
+  "design-030": "Downloaded artwork: shown as past work, not for sale",
+  "design-034": "Downloaded artwork: shown as past work, not for sale",
+  "design-037": "Downloaded artwork: shown as past work, not for sale",
+  "design-038": "Downloaded artwork: shown as past work, not for sale",
+  "design-039": "Downloaded artwork: shown as past work, not for sale",
+  "design-041": "Downloaded artwork: shown as past work, not for sale",
+  "design-046": "Downloaded artwork: shown as past work, not for sale",
+  "panther-long-sleeve": "Downloaded artwork: shown as past work, not for sale",
+  "panther-vest": "Downloaded artwork: shown as past work, not for sale",
+  "skull-tracksuit": "Downloaded artwork: shown as past work, not for sale",
+  "graphic-long-sleeve": "Downloaded artwork: shown as past work, not for sale",
+  "rose-shirt": "Downloaded artwork: shown as past work, not for sale",
+  "hip-hop-tee": "Downloaded artwork: shown as past work, not for sale",
+  "pop-art-skirt": "Downloaded artwork: shown as past work, not for sale",
+  "birthday-queen-tee": "Downloaded artwork: shown as past work, not for sale",
   "design-002": "The Notorious B.I.G. likeness",
   "design-006": "Nike logo",
   "design-009": "Kratos (God of War)",
@@ -232,6 +232,14 @@ export const designs = designManifest.map(([id,name,image,category,featured,tran
 });
 
 for (const garment of garments) if (RIGHTS_HOLD[garment.id]) garment.active = false;
+
+/* The owner's choice: downloaded pieces may be SHOWN as "Past work · not for sale".
+   They stay inactive (never in the shop, customiser, bag or search) and never go in ads or promo videos.
+   Trademark and likeness holds are not in this list and are never shown. */
+export const SHOWCASE_ONLY = new Set(Object.keys(RIGHTS_HOLD).filter((id) => RIGHTS_HOLD[id].startsWith("Downloaded artwork")));
+for (const item of [...designs, ...garments]) item.showcase = !item.active && SHOWCASE_ONLY.has(item.id);
+export function getShowcaseDesigns(){return designs.filter(d=>d.showcase)}
+export function getShowcaseGarments(){return garments.filter(g=>g.showcase)}
 
 export const unclassifiedAssets = [
   "assets/Designs/download (2).png",

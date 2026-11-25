@@ -1,6 +1,6 @@
 /* Lookbook sheets made in Canva (front, back and detail views of each tee).
-   Each links to the customiser with the matching archive design.
-   Sheets whose artwork is on RIGHTS_HOLD are deliberately not included. */
+   Sheets whose artwork is for sale link to the customiser. Sheets of downloaded artwork
+   (SHOWCASE_ONLY) are shown as "Past work · not for sale" with no buy link. */
 import { getDesignById } from './catalogue.js'
 
 const allLooks = [
@@ -16,11 +16,13 @@ const allLooks = [
   { id: 'cute-pup-peek', name: 'Cute Pup Peek', tagline: 'Peekaboo print.', designId: 'design-003', image: 'assets/lookbook/cute-pup-peek.jpg', alt: 'Black tee with a Yorkshire terrier peeking around the edge of the print' }
 ]
 
-/* Only sheets whose artwork is still for sale. */
-export const lookbook = allLooks.filter((entry) => getDesignById(entry.designId)?.active)
+export const lookbook = allLooks
+  .map((entry) => ({ ...entry, forSale: Boolean(getDesignById(entry.designId)?.active) }))
+  .filter((entry) => entry.forSale || getDesignById(entry.designId)?.showcase)
 
+/* The hero is promotion, so it only uses artwork that is for sale. */
 export const heroShowcase = ['street-moves', 'urban-motion', 'no-pain-no-gain', 'let-god-handle-it']
-  .map((id) => lookbook.find((entry) => entry.id === id))
+  .map((id) => lookbook.find((entry) => entry.id === id && entry.forSale))
   .filter(Boolean)
 
 export function lookbookHref(entry) {
